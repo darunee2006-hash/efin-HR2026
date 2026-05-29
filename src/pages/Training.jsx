@@ -1,425 +1,569 @@
-import React, { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
 import { useCompanyFilter } from '../lib/CompanyFilterContext';
-import { PageHeader, KPICard, Section, DetailPanel, ProgressBar, StatusBadge as UIStatusBadge } from '../components/PageUI';
+import { PageHeader, KPICard, Section, DetailPanel, ProgressBar } from '../components/PageUI';
 import { exportToExcel, ImportModal, ImportExportButtons } from '../components/ImportExport';
-import {
-  BookOpen,
-  CheckCircle,
-  Users,
-  Clock,
-  Wallet,
-  BarChart3,
-  TrendingUp,
-} from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+import { BookOpen, CheckCircle, Users, Clock, Wallet, Plus, X, Save, Search } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
-const LABELS = {
-  en: {
-    title: 'Training',
-    schedule: 'Training Schedule for the Year',
-    popular: 'Popular Courses',
-    skillGap: 'CP & Skill Gap Summary',
-    registrationTracking: 'Registration Tracking (Overview)',
-    deepStats: 'Training Deep Statistics',
-    achievement: 'Individual Achievement (IDT)',
-  },
-  th: {
-    title: 'ฝึกอบรม',
-    schedule: 'ปฏิทินการฝึกอบรมประจำปี',
-    popular: 'เนตร์หลักสูตรยอดนิยม',
-    skillGap: 'สรุป CP & Skill Gap',
-    registrationTracking: 'การติดตามการลงทะเบียน (ภาพรวม)',
-    deepStats: 'สถิติการฝึกอบรมเชิงลึก',
-    achievement: 'ผลสัมฤทธิ์รายบุคคล (IDT)',
-  },
+// ─── helpers ────────────────────────────────────────────────
+const T = (lang, th, en) => lang === 'th' ? th : en;
+
+const STATUS_COLOR = {
+  completed:   'bg-green-100 text-green-700',
+  ongoing:     'bg-blue-100 text-blue-700',
+  registering: 'bg-yellow-100 text-yellow-700',
+  cancelled:   'bg-red-100 text-red-700',
 };
-
-const getLabel = (key, lang) => LABELS[lang]?.[key] || LABELS.en[key];
-
-// Mock data: 48 courses across categories
-const mockCourses = [
-  // Technical Skills
-  { id: 1, name: 'Python Programming Fundamentals', nameEn: 'Python Programming Fundamentals', category: 'Technical', dateStart: '2026-01-10', dateEnd: '2026-01-24', status: 'completed', participants: 42, hours: 16, budget: 150000 },
-  { id: 2, name: 'Data Analytics for Business', nameEn: 'Data Analytics for Business', category: 'Technical', dateStart: '2026-02-01', dateEnd: '2026-02-19', status: 'ongoing', participants: 38, hours: 20, budget: 180000 },
-  { id: 3, name: 'Cloud Computing with AWS', nameEn: 'Cloud Computing with AWS', category: 'Technical', dateStart: '2026-03-05', dateEnd: '2026-03-26', status: 'ongoing', participants: 25, hours: 24, budget: 250000 },
-  { id: 4, name: 'Power BI Dashboard Development', nameEn: 'Power BI Dashboard Development', category: 'Technical', dateStart: '2026-01-20', dateEnd: '2026-02-03', status: 'completed', participants: 35, hours: 16, budget: 160000 },
-  { id: 5, name: 'Advanced SQL & Database Design', nameEn: 'Advanced SQL & Database Design', category: 'Technical', dateStart: '2026-04-01', dateEnd: '2026-04-22', status: 'registering', participants: 28, hours: 20, budget: 170000 },
-  { id: 6, name: 'Machine Learning Essentials', nameEn: 'Machine Learning Essentials', category: 'Technical', dateStart: '2026-05-10', dateEnd: '2026-06-07', status: 'registering', participants: 18, hours: 28, budget: 220000 },
-
-  // Soft Skills
-  { id: 7, name: 'Effective Communication Skills', nameEn: 'Effective Communication Skills', category: 'Soft Skills', dateStart: '2026-01-12', dateEnd: '2026-01-26', status: 'completed', participants: 89, hours: 8, budget: 120000 },
-  { id: 8, name: 'Emotional Intelligence in Workplace', nameEn: 'Emotional Intelligence in Workplace', category: 'Soft Skills', dateStart: '2026-02-10', dateEnd: '2026-02-24', status: 'completed', participants: 76, hours: 8, budget: 110000 },
-  { id: 9, name: 'Conflict Resolution & Negotiation', nameEn: 'Conflict Resolution & Negotiation', category: 'Soft Skills', dateStart: '2026-03-15', dateEnd: '2026-03-29', status: 'ongoing', participants: 54, hours: 8, budget: 95000 },
-  { id: 10, name: 'Time Management & Productivity', nameEn: 'Time Management & Productivity', category: 'Soft Skills', dateStart: '2026-04-05', dateEnd: '2026-04-12', status: 'registering', participants: 42, hours: 4, budget: 60000 },
-  { id: 11, name: 'Customer Service Excellence', nameEn: 'Customer Service Excellence', category: 'Soft Skills', dateStart: '2026-05-01', dateEnd: '2026-05-15', status: 'registering', participants: 65, hours: 8, budget: 100000 },
-  { id: 12, name: 'Public Speaking & Presentation', nameEn: 'Public Speaking & Presentation', category: 'Soft Skills', dateStart: '2026-06-10', dateEnd: '2026-06-24', status: 'registering', participants: 38, hours: 8, budget: 85000 },
-
-  // Leadership
-  { id: 13, name: 'Leadership Fundamentals', nameEn: 'Leadership Fundamentals', category: 'Leadership', dateStart: '2026-01-15', dateEnd: '2026-02-05', status: 'completed', participants: 45, hours: 16, budget: 200000 },
-  { id: 14, name: 'Strategic Planning & Vision', nameEn: 'Strategic Planning & Vision', category: 'Leadership', dateStart: '2026-02-20', dateEnd: '2026-03-13', status: 'completed', participants: 32, hours: 12, budget: 150000 },
-  { id: 15, name: 'Team Building & Culture', nameEn: 'Team Building & Culture', category: 'Leadership', dateStart: '2026-03-20', dateEnd: '2026-04-10', status: 'ongoing', participants: 28, hours: 12, budget: 140000 },
-  { id: 16, name: 'Change Management Masterclass', nameEn: 'Change Management Masterclass', category: 'Leadership', dateStart: '2026-04-25', dateEnd: '2026-05-16', status: 'registering', participants: 22, hours: 12, budget: 130000 },
-  { id: 17, name: 'Executive Coaching Program', nameEn: 'Executive Coaching Program', category: 'Leadership', dateStart: '2026-05-20', dateEnd: '2026-07-10', status: 'registering', participants: 15, hours: 20, budget: 300000 },
-  { id: 18, name: 'Mentoring & Coaching Skills', nameEn: 'Mentoring & Coaching Skills', category: 'Leadership', dateStart: '2026-06-15', dateEnd: '2026-07-06', status: 'registering', participants: 35, hours: 12, budget: 120000 },
-
-  // Compliance
-  { id: 19, name: 'Occupational Safety & Health (OSH)', nameEn: 'Occupational Safety & Health (OSH)', category: 'Compliance', dateStart: '2026-01-05', dateEnd: '2026-01-09', status: 'completed', participants: 127, hours: 4, budget: 50000 },
-  { id: 20, name: 'Labor Law Compliance Update', nameEn: 'Labor Law Compliance Update', category: 'Compliance', dateStart: '2026-02-02', dateEnd: '2026-02-06', status: 'completed', participants: 98, hours: 4, budget: 45000 },
-  { id: 21, name: 'Data Privacy & GDPR', nameEn: 'Data Privacy & GDPR', category: 'Compliance', dateStart: '2026-03-10', dateEnd: '2026-03-14', status: 'ongoing', participants: 72, hours: 4, budget: 55000 },
-  { id: 22, name: 'Anti-Corruption & Fraud Prevention', nameEn: 'Anti-Corruption & Fraud Prevention', category: 'Compliance', dateStart: '2026-04-08', dateEnd: '2026-04-12', status: 'registering', participants: 85, hours: 4, budget: 60000 },
-  { id: 23, name: 'ISO Standards Awareness', nameEn: 'ISO Standards Awareness', category: 'Compliance', dateStart: '2026-05-05', dateEnd: '2026-05-09', status: 'registering', participants: 64, hours: 4, budget: 50000 },
-  { id: 24, name: 'Environmental Management', nameEn: 'Environmental Management', category: 'Compliance', dateStart: '2026-06-20', dateEnd: '2026-06-24', status: 'registering', participants: 43, hours: 4, budget: 48000 },
-
-  // Digital Transformation
-  { id: 25, name: 'Digital Transformation Strategy', nameEn: 'Digital Transformation Strategy', category: 'Digital', dateStart: '2026-01-18', dateEnd: '2026-02-08', status: 'completed', participants: 62, hours: 12, budget: 140000 },
-  { id: 26, name: 'RPA & Process Automation', nameEn: 'RPA & Process Automation', category: 'Digital', dateStart: '2026-02-15', dateEnd: '2026-03-08', status: 'completed', participants: 29, hours: 16, budget: 180000 },
-  { id: 27, name: 'Business Process Improvement', nameEn: 'Business Process Improvement', category: 'Digital', dateStart: '2026-03-22', dateEnd: '2026-04-12', status: 'ongoing', participants: 44, hours: 12, budget: 130000 },
-  { id: 28, name: 'Artificial Intelligence Basics', nameEn: 'Artificial Intelligence Basics', category: 'Digital', dateStart: '2026-04-20', dateEnd: '2026-05-11', status: 'registering', participants: 31, hours: 12, budget: 150000 },
-  { id: 29, name: 'Cybersecurity Awareness', nameEn: 'Cybersecurity Awareness', category: 'Digital', dateStart: '2026-05-25', dateEnd: '2026-06-08', status: 'registering', participants: 103, hours: 6, budget: 70000 },
-  { id: 30, name: 'Digital Marketing Strategy', nameEn: 'Digital Marketing Strategy', category: 'Digital', dateStart: '2026-06-25', dateEnd: '2026-07-16', status: 'registering', participants: 37, hours: 12, budget: 120000 },
-
-  // Additional courses to reach 48
-  { id: 31, name: 'Project Management Professional', nameEn: 'Project Management Professional', category: 'Technical', dateStart: '2026-02-20', dateEnd: '2026-03-13', status: 'completed', participants: 33, hours: 20, budget: 200000 },
-  { id: 32, name: 'Agile Development Methodology', nameEn: 'Agile Development Methodology', category: 'Technical', dateStart: '2026-03-25', dateEnd: '2026-04-15', status: 'ongoing', participants: 26, hours: 16, budget: 170000 },
-  { id: 33, name: 'JavaScript & Web Development', nameEn: 'JavaScript & Web Development', category: 'Technical', dateStart: '2026-05-15', dateEnd: '2026-06-12', status: 'registering', participants: 22, hours: 24, budget: 210000 },
-  { id: 34, name: 'API Development & Integration', nameEn: 'API Development & Integration', category: 'Technical', dateStart: '2026-06-10', dateEnd: '2026-07-01', status: 'registering', participants: 17, hours: 16, budget: 160000 },
-  { id: 35, name: 'Assertiveness Training', nameEn: 'Assertiveness Training', category: 'Soft Skills', dateStart: '2026-01-25', dateEnd: '2026-02-08', status: 'completed', participants: 51, hours: 6, budget: 80000 },
-  { id: 36, name: 'Critical Thinking Workshop', nameEn: 'Critical Thinking Workshop', category: 'Soft Skills', dateStart: '2026-04-15', dateEnd: '2026-04-22', status: 'registering', participants: 39, hours: 6, budget: 75000 },
-  { id: 37, name: 'Innovation & Creativity', nameEn: 'Innovation & Creativity', category: 'Soft Skills', dateStart: '2026-05-20', dateEnd: '2026-06-03', status: 'registering', participants: 47, hours: 8, budget: 105000 },
-  { id: 38, name: 'Decision Making Skills', nameEn: 'Decision Making Skills', category: 'Soft Skills', dateStart: '2026-07-01', dateEnd: '2026-07-08', status: 'registering', participants: 34, hours: 6, budget: 70000 },
-  { id: 39, name: 'Senior Leadership Program', nameEn: 'Senior Leadership Program', category: 'Leadership', dateStart: '2026-03-02', dateEnd: '2026-04-20', status: 'ongoing', participants: 12, hours: 24, budget: 350000 },
-  { id: 40, name: 'Performance Management', nameEn: 'Performance Management', category: 'Leadership', dateStart: '2026-06-01', dateEnd: '2026-06-22', status: 'registering', participants: 18, hours: 10, budget: 125000 },
-  { id: 41, name: 'Quality Management System', nameEn: 'Quality Management System', category: 'Compliance', dateStart: '2026-01-20', dateEnd: '2026-01-24', status: 'completed', participants: 55, hours: 4, budget: 52000 },
-  { id: 42, name: 'Regulatory Compliance Workshop', nameEn: 'Regulatory Compliance Workshop', category: 'Compliance', dateStart: '2026-02-23', dateEnd: '2026-02-27', status: 'completed', participants: 67, hours: 4, budget: 58000 },
-  { id: 43, name: 'Internal Audit Training', nameEn: 'Internal Audit Training', category: 'Compliance', dateStart: '2026-05-18', dateEnd: '2026-05-22', status: 'registering', participants: 21, hours: 4, budget: 60000 },
-  { id: 44, name: 'Risk Management Framework', nameEn: 'Risk Management Framework', category: 'Compliance', dateStart: '2026-07-08', dateEnd: '2026-07-12', status: 'registering', participants: 16, hours: 4, budget: 65000 },
-  { id: 45, name: 'Cloud Security Best Practices', nameEn: 'Cloud Security Best Practices', category: 'Digital', dateStart: '2026-01-28', dateEnd: '2026-02-11', status: 'completed', participants: 24, hours: 12, budget: 160000 },
-  { id: 46, name: 'IoT & Smart Technology', nameEn: 'IoT & Smart Technology', category: 'Digital', dateStart: '2026-07-15', dateEnd: '2026-08-05', status: 'registering', participants: 19, hours: 16, budget: 180000 },
-  { id: 47, name: 'Blockchain Fundamentals', nameEn: 'Blockchain Fundamentals', category: 'Digital', dateStart: '2026-07-20', dateEnd: '2026-08-10', status: 'registering', participants: 14, hours: 16, budget: 200000 },
-  { id: 48, name: 'Enterprise Architecture', nameEn: 'Enterprise Architecture', category: 'Digital', dateStart: '2026-08-01', dateEnd: '2026-08-22', status: 'registering', participants: 11, hours: 12, budget: 140000 },
-];
-
-// Popular courses with completion tracking
-const popularCourses = [
-  { name: 'Data Analytics for Business', completed: 78, participants: 38 },
-  { name: 'Effective Communication Skills', completed: 85, participants: 89 },
-  { name: 'Project Management Professional', completed: 82, participants: 33 },
-  { name: 'Leadership Fundamentals', completed: 88, participants: 45 },
-  { name: 'Power BI Dashboard Development', completed: 91, participants: 35 },
-];
-
-// Skill gap data
-const skillGaps = [
-  { skill: 'Technical Skills', gap: 75 },
-  { skill: 'Communication', gap: 82 },
-  { skill: 'Leadership', gap: 68 },
-  { skill: 'Digital', gap: 71 },
-];
-
-// Monthly training hours
-const monthlyData = [
-  { month: 'Jan', hours: 245 },
-  { month: 'Feb', hours: 398 },
-  { month: 'Mar', hours: 521 },
-  { month: 'Apr', hours: 487 },
-  { month: 'May', hours: 629 },
-  { month: 'Jun', hours: 445 },
-];
-
-const courseStatusColor = (status) => {
-  if (status === 'completed') return 'bg-green-100 text-green-700';
-  if (status === 'ongoing') return 'bg-blue-100 text-blue-700';
-  return 'bg-yellow-100 text-yellow-700'; // registering
+const STATUS_LABEL = {
+  completed:   { th: 'เสร็จสิ้น',        en: 'Completed' },
+  ongoing:     { th: 'กำลังดำเนินการ',   en: 'Ongoing' },
+  registering: { th: 'เปิดรับสมัคร',     en: 'Registering' },
+  cancelled:   { th: 'ยกเลิก',           en: 'Cancelled' },
 };
-
-const courseStatusLabel = (status, lang) => {
-  if (status === 'completed') return lang === 'th' ? 'เสร็จสิ้น' : 'Completed';
-  if (status === 'ongoing') return lang === 'th' ? 'กำลังดำเนินการ' : 'Ongoing';
-  return lang === 'th' ? 'เปิดรับสมัคร' : 'Registering';
+const CATEGORIES = ['Technical', 'Soft Skills', 'Leadership', 'Compliance', 'Digital'];
+const CAT_LABEL = {
+  Technical:    { th: 'เทคนิค',       en: 'Technical' },
+  'Soft Skills':{ th: 'ทักษะปรับตัว', en: 'Soft Skills' },
+  Leadership:   { th: 'ภาวะผู้นำ',    en: 'Leadership' },
+  Compliance:   { th: 'กฎระเบียบ',   en: 'Compliance' },
+  Digital:      { th: 'ดิจิทัล',      en: 'Digital' },
 };
+const CAT_COLOR = {
+  Technical:    'bg-blue-100 text-blue-700',
+  'Soft Skills':'bg-pink-100 text-pink-700',
+  Leadership:   'bg-purple-100 text-purple-700',
+  Compliance:   'bg-orange-100 text-orange-700',
+  Digital:      'bg-teal-100 text-teal-700',
+};
+const fmtBudget = (n) => n >= 1000000
+  ? (n / 1000000).toFixed(2).replace(/\.?0+$/, '') + 'M'
+  : n.toLocaleString('th-TH');
 
-export default function Training({ lang = 'en' }) {
-  const { filterByCompany, filterByEmployeeCompany } = useCompanyFilter();
-  const [showImport, setShowImport] = useState(false);
+const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
-  // Calculate stats
-  const stats = {
-    totalCourses: 48,
-    completed: mockCourses.filter(c => c.status === 'completed').length,
-    participants: mockCourses.reduce((sum, c) => sum + c.participants, 0),
-    totalHours: mockCourses.reduce((sum, c) => sum + c.hours, 0),
-    totalBudget: mockCourses.reduce((sum, c) => sum + c.budget, 0),
+// ─── Add / Edit Modal ────────────────────────────────────────
+function TrainingModal({ open, onClose, onSaved, lang }) {
+  const blank = {
+    course_name: '', category: 'Technical', start_date: '', end_date: '',
+    hours: '', participants_count: '', budget: '', status: 'registering', notes: '',
   };
+  const [form, setForm] = useState(blank);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
-  // Column definitions for export with Thai headers
-  const exportColumns = [
-    { header: lang === 'th' ? 'ชื่อหลักสูตร' : 'Course Name', accessor: (r) => lang === 'th' ? r.name : r.nameEn, width: 20 },
-    { header: lang === 'th' ? 'ประเภท' : 'Category', accessor: 'category', width: 15 },
-    { header: lang === 'th' ? 'วันเริ่มต้น' : 'Start Date', accessor: 'dateStart', width: 12 },
-    { header: lang === 'th' ? 'วันสิ้นสุด' : 'End Date', accessor: 'dateEnd', width: 12 },
-    { header: lang === 'th' ? 'สถานะ' : 'Status', accessor: (r) => courseStatusLabel(r.status, lang), width: 12 },
-    { header: lang === 'th' ? 'ผู้เข้าร่วม' : 'Participants', accessor: 'participants', width: 10 },
-    { header: lang === 'th' ? 'ชั่วโมง' : 'Hours', accessor: 'hours', width: 8 },
-    { header: lang === 'th' ? 'งบประมาณ' : 'Budget', accessor: 'budget', width: 12 },
-  ];
+  useEffect(() => { if (open) { setForm(blank); setError(''); } }, [open]);
 
-  // Column definitions for import with Thai headers
-  const importColumns = [
-    {
-      header: lang === 'th' ? 'ชื่อหลักสูตร' : 'Course Name',
-      headerEn: 'Course Name',
-      accessor: 'name',
-      dbField: 'name',
-      example: 'Python Programming Fundamentals',
-      width: 20,
-    },
-    {
-      header: lang === 'th' ? 'ประเภท' : 'Category',
-      headerEn: 'Category',
-      accessor: 'category',
-      dbField: 'category',
-      example: 'Technical',
-      width: 15,
-    },
-    {
-      header: lang === 'th' ? 'วันเริ่มต้น' : 'Start Date',
-      headerEn: 'Start Date',
-      accessor: 'dateStart',
-      dbField: 'dateStart',
-      example: '2026-01-10',
-      width: 12,
-    },
-    {
-      header: lang === 'th' ? 'วันสิ้นสุด' : 'End Date',
-      headerEn: 'End Date',
-      accessor: 'dateEnd',
-      dbField: 'dateEnd',
-      example: '2026-01-24',
-      width: 12,
-    },
-    {
-      header: lang === 'th' ? 'สถานะ' : 'Status',
-      headerEn: 'Status',
-      accessor: 'status',
-      dbField: 'status',
-      example: 'completed',
-      width: 12,
-    },
-    {
-      header: lang === 'th' ? 'ผู้เข้าร่วม' : 'Participants',
-      headerEn: 'Participants',
-      accessor: 'participants',
-      dbField: 'participants',
-      example: '42',
-      width: 10,
-      transform: (v) => parseInt(v) || 0,
-    },
-    {
-      header: lang === 'th' ? 'ชั่วโมง' : 'Hours',
-      headerEn: 'Hours',
-      accessor: 'hours',
-      dbField: 'hours',
-      example: '16',
-      width: 8,
-      transform: (v) => parseInt(v) || 0,
-    },
-    {
-      header: lang === 'th' ? 'งบประมาณ' : 'Budget',
-      headerEn: 'Budget',
-      accessor: 'budget',
-      dbField: 'budget',
-      example: '150000',
-      width: 12,
-      transform: (v) => parseInt(v) || 0,
-    },
-  ];
+  const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
 
-  // Export handler
-  const handleExport = () => {
-    exportToExcel({
-      data: mockCourses,
-      columns: exportColumns,
-      filename: 'Training-Courses',
-      sheetName: lang === 'th' ? 'หลักสูตรฝึกอบรม' : 'Training Courses',
-    });
-  };
-
-  // Import handler
-  const handleImport = async (mappedData) => {
+  const handleSave = async () => {
+    if (!form.course_name || !form.start_date || !form.end_date) {
+      setError(T(lang, 'กรุณากรอก ชื่อหลักสูตร วันเริ่ม และวันสิ้นสุด', 'Please fill Course Name, Start Date, and End Date'));
+      return;
+    }
+    setSaving(true); setError('');
     try {
-      // Insert into supabase hr_training_courses table
-      const { data, error } = await supabase
+      // upsert course into hr_training_courses
+      let courseId = null;
+      const { data: existing } = await supabase
         .from('hr_training_courses')
-        .insert(mappedData)
-        .select();
+        .select('id')
+        .eq('name_en', form.course_name)
+        .maybeSingle();
 
-      if (error) {
-        throw new Error(error.message);
+      if (existing) {
+        courseId = existing.id;
+      } else {
+        const { data: inserted, error: cErr } = await supabase
+          .from('hr_training_courses')
+          .insert({ name_th: form.course_name, name_en: form.course_name, category: form.category, duration_hours: Number(form.hours) || 0, is_active: true })
+          .select('id')
+          .single();
+        if (cErr) throw cErr;
+        courseId = inserted.id;
       }
 
-      return data?.length || mappedData.length;
-    } catch (err) {
-      console.error('Import error:', err);
-      throw err;
+      const { error: sErr } = await supabase.from('hr_training').insert({
+        course_id:         courseId,
+        course_name:       form.course_name,
+        start_date:        form.start_date,
+        end_date:          form.end_date,
+        hours:             Number(form.hours) || 0,
+        participants_count:Number(form.participants_count) || 0,
+        budget:            Number(form.budget) || 0,
+        status:            form.status,
+        notes:             form.notes || null,
+      });
+      if (sErr) throw sErr;
+      onSaved();
+      onClose();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setSaving(false);
     }
   };
 
+  if (!open) return null;
   return (
-    <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <PageHeader title={getLabel('title', lang)} lang={lang} />
-        <ImportExportButtons
-          onExport={handleExport}
-          onImportClick={() => setShowImport(true)}
-          lang={lang}
-        />
-      </div>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
+            <BookOpen className="w-5 h-5 text-blue-600" />
+            {T(lang, 'เพิ่มหลักสูตรฝึกอบรม', 'Add Training Course')}
+          </h3>
+          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
+        </div>
+        <div className="px-5 py-4 space-y-3">
+          {error && <div className="bg-red-50 text-red-700 text-xs px-3 py-2 rounded-lg">{error}</div>}
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <KPICard icon={BookOpen} iconBg="bg-blue-100" iconColor="text-blue-600" label={lang === 'th' ? 'หลักสูตรทั้งหมด' : 'Total Courses'} value={stats.totalCourses} />
-        <KPICard icon={CheckCircle} iconBg="bg-green-100" iconColor="text-green-600" label={lang === 'th' ? 'เสร็จสิ้น' : 'Completed'} value={`${stats.completed}`} sub={lang === 'th' ? 'หลักสูตร' : 'courses'} />
-        <KPICard icon={Users} iconBg="bg-purple-100" iconColor="text-purple-600" label={lang === 'th' ? 'ผู้เข้าร่วม' : 'Participants'} value={stats.participants} sub={lang === 'th' ? 'คน' : 'people'} />
-        <KPICard icon={Clock} iconBg="bg-orange-100" iconColor="text-orange-600" label={lang === 'th' ? 'ชั่วโมงฝึกอบรม' : 'Training Hours'} value={stats.totalHours} sub={lang === 'th' ? 'ชม.' : 'hrs'} />
-        <KPICard icon={Wallet} iconBg="bg-green-100" iconColor="text-green-600" label={lang === 'th' ? 'งบประมาณ' : 'Budget'} value={`${(stats.totalBudget / 1000000).toFixed(2)}M`} sub={lang === 'th' ? 'บาท' : 'THB'} />
-      </div>
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'ชื่อหลักสูตร','Course Name')} <span className="text-red-500">*</span></label>
+            <input type="text" value={form.course_name} onChange={e => set('course_name', e.target.value)}
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-200 focus:outline-none" />
+          </div>
 
-      {/* Filters */}
-      <Section className="border-none shadow-none bg-transparent">
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label className="block text-xs text-gray-600 mb-1">{lang === 'th' ? 'ประเภท' : 'Type'}</label>
-            <select className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
-              <option>{lang === 'th' ? 'ทั้งหมด' : 'All'}</option>
-              <option>Technical</option>
-              <option>Soft Skills</option>
-              <option>Leadership</option>
-              <option>Compliance</option>
-              <option>Digital</option>
-            </select>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'ประเภท','Category')}</label>
+              <select value={form.category} onChange={e => set('category', e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2">
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'สถานะ','Status')}</label>
+              <select value={form.status} onChange={e => set('status', e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2">
+                {Object.entries(STATUS_LABEL).map(([k, v]) => <option key={k} value={k}>{v[lang] || v.en}</option>)}
+              </select>
+            </div>
           </div>
-          <div className="flex-1">
-            <label className="block text-xs text-gray-600 mb-1">{lang === 'th' ? 'สถานะ' : 'Status'}</label>
-            <select className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
-              <option>{lang === 'th' ? 'ทั้งหมด' : 'All'}</option>
-              <option>completed</option>
-              <option>ongoing</option>
-              <option>registering</option>
-            </select>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'วันเริ่มต้น','Start Date')} <span className="text-red-500">*</span></label>
+              <input type="date" value={form.start_date} onChange={e => set('start_date', e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'วันสิ้นสุด','End Date')} <span className="text-red-500">*</span></label>
+              <input type="date" value={form.end_date} onChange={e => set('end_date', e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2" />
+            </div>
           </div>
-          <div className="flex-1">
-            <label className="block text-xs text-gray-600 mb-1">{lang === 'th' ? 'ปี' : 'Year'}</label>
-            <select className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
-              <option>2026</option>
-              <option>2025</option>
-            </select>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'ชั่วโมง','Hours')}</label>
+              <input type="number" min="0" value={form.hours} onChange={e => set('hours', e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'ผู้เข้าร่วม','Participants')}</label>
+              <input type="number" min="0" value={form.participants_count} onChange={e => set('participants_count', e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'งบประมาณ','Budget')}</label>
+              <input type="number" min="0" value={form.budget} onChange={e => set('budget', e.target.value)}
+                className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2" />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-700 mb-1">{T(lang,'หมายเหตุ','Notes')}</label>
+            <textarea rows={2} value={form.notes} onChange={e => set('notes', e.target.value)}
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 resize-none" />
           </div>
         </div>
-      </Section>
+        <div className="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{T(lang,'ยกเลิก','Cancel')}</button>
+          <button onClick={handleSave} disabled={saving}
+            className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50">
+            <Save className="w-4 h-4" />{saving ? T(lang,'กำลังบันทึก...','Saving...') : T(lang,'บันทึก','Save')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* Left: Course Schedule ~35% */}
-        <div className="col-span-12 lg:col-span-4">
-          <Section title={getLabel('schedule', lang)} className="h-full">
-            <div className="space-y-3 max-h-96 overflow-y-auto">
-              {[...mockCourses].sort((a, b) => new Date(b.dateStart) - new Date(a.dateStart)).slice(0, 10).map((course) => (
-                <div key={course.id} className="pb-3 border-b border-gray-50 last:border-0">
-                  <div className="flex items-start justify-between mb-1">
-                    <p className="text-sm font-medium text-gray-900">{lang === 'th' ? course.name : course.nameEn}</p>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${courseStatusColor(course.status)}`}>
-                      {courseStatusLabel(course.status, lang)}
-                    </span>
+// ─── Main Component ──────────────────────────────────────────
+export default function Training({ lang = 'th' }) {
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterStatus, setFilterStatus]     = useState('all');
+  const [filterYear, setFilterYear]         = useState('2026');
+  const [search, setSearch]                 = useState('');
+  const [selectedId, setSelectedId]         = useState(null);
+  const [showAdd, setShowAdd]               = useState(false);
+  const [showImport, setShowImport]         = useState(false);
+
+  // ── Fetch ──────────────────────────────────────────────────
+  const fetchData = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('hr_training')
+      .select('*, hr_training_courses(name_th, name_en, category)')
+      .order('start_date', { ascending: true });
+
+    if (!error && data) {
+      const normalized = data.map(s => ({
+        ...s,
+        category:  s.hr_training_courses?.category  || 'Other',
+        name_th:   s.hr_training_courses?.name_th   || s.course_name || '',
+        name_en:   s.hr_training_courses?.name_en   || s.course_name || '',
+      }));
+      setSessions(normalized);
+      if (normalized.length > 0 && !selectedId) setSelectedId(normalized[0].id);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  // ── Filter ─────────────────────────────────────────────────
+  const filtered = useMemo(() => {
+    return sessions.filter(s => {
+      const name = lang === 'th' ? s.name_th : s.name_en;
+      if (search && !name.toLowerCase().includes(search.toLowerCase())) return false;
+      if (filterCategory !== 'all' && s.category !== filterCategory) return false;
+      if (filterStatus !== 'all' && s.status !== filterStatus) return false;
+      if (filterYear !== 'all' && !(s.start_date || '').startsWith(filterYear)) return false;
+      return true;
+    });
+  }, [sessions, search, filterCategory, filterStatus, filterYear, lang]);
+
+  const selected = useMemo(() => sessions.find(s => s.id === selectedId) || null, [sessions, selectedId]);
+
+  // ── KPI stats ──────────────────────────────────────────────
+  const stats = useMemo(() => ({
+    total:        filtered.length,
+    completed:    filtered.filter(s => s.status === 'completed').length,
+    participants: filtered.reduce((sum, s) => sum + (s.participants_count || 0), 0),
+    totalHours:   filtered.reduce((sum, s) => sum + Number(s.hours || 0), 0),
+    totalBudget:  filtered.reduce((sum, s) => sum + Number(s.budget || 0), 0),
+  }), [filtered]);
+
+  // ── Monthly training hours (Jan–Dec) ───────────────────────
+  const monthlyData = useMemo(() => {
+    const buckets = {};
+    MONTHS_EN.forEach(m => { buckets[m] = 0; });
+    filtered.forEach(s => {
+      if (!s.start_date) return;
+      const m = MONTHS_EN[new Date(s.start_date).getMonth()];
+      buckets[m] += Number(s.hours || 0);
+    });
+    return MONTHS_EN.slice(0, 8).map(m => ({ month: m, hours: buckets[m] }));
+  }, [filtered]);
+
+  // ── Popular courses (top 5 by participants) ────────────────
+  const popularCourses = useMemo(() =>
+    [...filtered]
+      .sort((a, b) => (b.participants_count || 0) - (a.participants_count || 0))
+      .slice(0, 5)
+      .map(s => ({
+        name:         lang === 'th' ? s.name_th : s.name_en,
+        participants: s.participants_count || 0,
+        pct:          s.status === 'completed' ? 100 : s.status === 'ongoing' ? 65 : 30,
+      })),
+  [filtered, lang]);
+
+  // ── Category registration stats ────────────────────────────
+  const catStats = useMemo(() => {
+    return CATEGORIES.map(cat => ({
+      cat,
+      count: filtered.filter(s => s.category === cat).reduce((sum, s) => sum + (s.participants_count || 0), 0),
+    }));
+  }, [filtered]);
+  const maxCatCount = Math.max(...catStats.map(c => c.count), 1);
+
+  // ── Skill gap — computed from category completion rate ─────
+  const skillGaps = useMemo(() =>
+    CATEGORIES.map(cat => {
+      const rows = filtered.filter(s => s.category === cat);
+      const done = rows.filter(s => s.status === 'completed').length;
+      const pct  = rows.length ? Math.round((done / rows.length) * 100) : 0;
+      return { skill: CAT_LABEL[cat]?.[lang] || cat, gap: pct };
+    }),
+  [filtered, lang]);
+
+  // ── Export ─────────────────────────────────────────────────
+  const exportColumns = [
+    { header: T(lang,'ชื่อหลักสูตร','Course Name'),  accessor: r => lang === 'th' ? r.name_th : r.name_en, width: 30 },
+    { header: T(lang,'ประเภท','Category'),            accessor: 'category',          width: 14 },
+    { header: T(lang,'วันเริ่มต้น','Start Date'),    accessor: 'start_date',        width: 12 },
+    { header: T(lang,'วันสิ้นสุด','End Date'),        accessor: 'end_date',          width: 12 },
+    { header: T(lang,'สถานะ','Status'),               accessor: r => STATUS_LABEL[r.status]?.[lang] || r.status, width: 14 },
+    { header: T(lang,'ผู้เข้าร่วม','Participants'),   accessor: 'participants_count', width: 12 },
+    { header: T(lang,'ชั่วโมง','Hours'),              accessor: 'hours',             width: 8  },
+    { header: T(lang,'งบประมาณ','Budget'),            accessor: 'budget',            width: 12 },
+  ];
+
+  const handleExport = () => exportToExcel({
+    data: filtered,
+    columns: exportColumns,
+    filename: 'Training-Courses',
+    sheetName: T(lang, 'หลักสูตรฝึกอบรม', 'Training Courses'),
+  });
+
+  // ── Import ─────────────────────────────────────────────────
+  const importColumns = [
+    { header: T(lang,'ชื่อหลักสูตร','Course Name'), headerEn:'Course Name', accessor:'course_name', dbField:'course_name', example:'Python Fundamentals', width:28 },
+    { header: T(lang,'ประเภท','Category'),           headerEn:'Category',    accessor:'category',    dbField:'category',    example:'Technical',           width:14 },
+    { header: T(lang,'วันเริ่มต้น','Start Date'),   headerEn:'Start Date',  accessor:'start_date',  dbField:'start_date',  example:'2026-01-10',           width:12 },
+    { header: T(lang,'วันสิ้นสุด','End Date'),       headerEn:'End Date',    accessor:'end_date',    dbField:'end_date',    example:'2026-01-24',           width:12 },
+    { header: T(lang,'สถานะ','Status'),              headerEn:'Status',      accessor:'status',      dbField:'status',      example:'registering',          width:12 },
+    { header: T(lang,'ผู้เข้าร่วม','Participants'),  headerEn:'Participants', accessor:'participants_count', dbField:'participants_count', example:'30', width:12, transform: v => parseInt(v)||0 },
+    { header: T(lang,'ชั่วโมง','Hours'),             headerEn:'Hours',       accessor:'hours',       dbField:'hours',       example:'16', width:8,  transform: v => parseInt(v)||0 },
+    { header: T(lang,'งบประมาณ','Budget'),           headerEn:'Budget',      accessor:'budget',      dbField:'budget',      example:'150000', width:12, transform: v => parseInt(v)||0 },
+  ];
+
+  const handleImport = async (rows) => {
+    const records = rows.map(r => ({
+      course_name:       r.course_name || '',
+      start_date:        r.start_date  || null,
+      end_date:          r.end_date    || null,
+      hours:             r.hours       || 0,
+      participants_count:r.participants_count || 0,
+      budget:            r.budget      || 0,
+      status:            r.status      || 'registering',
+    })).filter(r => r.course_name);
+
+    const { error } = await supabase.from('hr_training').insert(records);
+    if (error) throw new Error(error.message);
+    await fetchData();
+    return records.length;
+  };
+
+  // ── Delete ─────────────────────────────────────────────────
+  const handleDelete = async (id) => {
+    if (!window.confirm(T(lang, 'ยืนยันลบหลักสูตรนี้?', 'Confirm delete this course?'))) return;
+    await supabase.from('hr_training').delete().eq('id', id);
+    setSessions(prev => prev.filter(s => s.id !== id));
+    if (selectedId === id) setSelectedId(sessions[0]?.id || null);
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+    </div>
+  );
+
+  return (
+    <div className="space-y-5">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <PageHeader title={T(lang, 'ฝึกอบรม', 'Training')} lang={lang} />
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowAdd(true)}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+            <Plus className="w-4 h-4" />{T(lang, 'เพิ่มหลักสูตร', 'Add Course')}
+          </button>
+          <ImportExportButtons onExport={handleExport} onImportClick={() => setShowImport(true)} lang={lang} />
+        </div>
+      </div>
+
+      {/* ── KPI Cards ── */}
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+        <KPICard icon={BookOpen}     iconBg="bg-blue-100"   iconColor="text-blue-600"   label={T(lang,'หลักสูตรทั้งหมด','Total Courses')}    value={stats.total} />
+        <KPICard icon={CheckCircle}  iconBg="bg-green-100"  iconColor="text-green-600"  label={T(lang,'เสร็จสิ้น','Completed')}             value={stats.completed} sub={T(lang,'หลักสูตร','courses')} />
+        <KPICard icon={Users}        iconBg="bg-purple-100" iconColor="text-purple-600" label={T(lang,'ผู้เข้าร่วมรวม','Total Participants')} value={stats.participants.toLocaleString('th-TH')} sub={T(lang,'คน','ppl')} />
+        <KPICard icon={Clock}        iconBg="bg-orange-100" iconColor="text-orange-600" label={T(lang,'ชั่วโมงอบรมรวม','Total Hours')}       value={stats.totalHours.toLocaleString('th-TH')} sub={T(lang,'ชม.','hrs')} />
+        <KPICard icon={Wallet}       iconBg="bg-green-100"  iconColor="text-green-600"  label={T(lang,'งบประมาณรวม','Total Budget')}          value={fmtBudget(stats.totalBudget)} sub={T(lang,'บาท','THB')} />
+      </div>
+
+      {/* ── Filters ── */}
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex gap-3 flex-wrap items-end">
+        <div className="flex-1 min-w-36">
+          <label className="block text-xs text-gray-600 mb-1 font-medium">{T(lang,'ค้นหา','Search')}</label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+              placeholder={T(lang,'ชื่อหลักสูตร...','Course name...')}
+              className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm" />
+          </div>
+        </div>
+        <div className="min-w-32">
+          <label className="block text-xs text-gray-600 mb-1 font-medium">{T(lang,'ประเภท','Category')}</label>
+          <select value={filterCategory} onChange={e => setFilterCategory(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+            <option value="all">{T(lang,'ทั้งหมด','All')}</option>
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+        <div className="min-w-32">
+          <label className="block text-xs text-gray-600 mb-1 font-medium">{T(lang,'สถานะ','Status')}</label>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+            <option value="all">{T(lang,'ทั้งหมด','All')}</option>
+            {Object.entries(STATUS_LABEL).map(([k, v]) => <option key={k} value={k}>{v[lang]||v.en}</option>)}
+          </select>
+        </div>
+        <div className="min-w-24">
+          <label className="block text-xs text-gray-600 mb-1 font-medium">{T(lang,'ปี','Year')}</label>
+          <select value={filterYear} onChange={e => setFilterYear(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
+            <option value="all">{T(lang,'ทั้งหมด','All')}</option>
+            <option value="2026">2026</option>
+            <option value="2025">2025</option>
+          </select>
+        </div>
+      </div>
+
+      {/* ── Main 3-column Grid ── */}
+      <div className="grid grid-cols-12 gap-5">
+
+        {/* LEFT: Course list ~5/12 */}
+        <div className="col-span-12 lg:col-span-5">
+          <Section title={T(lang,'รายการหลักสูตรฝึกอบรม','Training Course List')}>
+            <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+              {filtered.length === 0 && (
+                <p className="text-center text-gray-400 text-sm py-8">{T(lang,'ไม่พบข้อมูล','No data found')}</p>
+              )}
+              {filtered.map(s => {
+                const name = lang === 'th' ? s.name_th : s.name_en;
+                const isSelected = s.id === selectedId;
+                return (
+                  <div key={s.id}
+                    onClick={() => setSelectedId(s.id)}
+                    className={`p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-blue-300 bg-blue-50' : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'}`}>
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <p className="text-sm font-semibold text-gray-900 leading-snug">{name}</p>
+                      <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLOR[s.status] || 'bg-gray-100 text-gray-500'}`}>
+                        {STATUS_LABEL[s.status]?.[lang] || s.status}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${CAT_COLOR[s.category] || 'bg-gray-100 text-gray-600'}`}>
+                        {CAT_LABEL[s.category]?.[lang] || s.category}
+                      </span>
+                      <span className="text-xs text-gray-500">{s.start_date} – {s.end_date}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-1.5 text-xs text-gray-500">
+                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{(s.participants_count||0).toLocaleString()}</span>
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{s.hours} {T(lang,'ชม.','hrs')}</span>
+                      <span className="flex items-center gap-1"><Wallet className="w-3 h-3" />{(s.budget||0).toLocaleString('th-TH')}</span>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-500 mb-2">{course.dateStart} - {course.dateEnd}</p>
-                  <div className="flex items-center gap-2 text-xs text-gray-600">
-                    <Users className="w-3 h-3" />
-                    <span>{course.participants} {lang === 'th' ? 'คน' : 'people'}</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </Section>
         </div>
 
-        {/* Center: Popular Courses ~35% */}
-        <div className="col-span-12 lg:col-span-4">
-          <Section title={getLabel('popular', lang)} className="h-full">
-            <div className="space-y-4">
-              {popularCourses.map((course, idx) => (
-                <div key={idx}>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-medium text-gray-900">{course.name}</p>
-                    <span className="text-xs text-gray-500">{course.completed}%</span>
+        {/* CENTER: Charts ~4/12 */}
+        <div className="col-span-12 lg:col-span-4 space-y-5">
+          {/* Popular courses */}
+          <Section title={T(lang,'หลักสูตรยอดนิยม (ผู้เข้าร่วมสูงสุด)','Most Popular Courses')}>
+            <div className="space-y-3">
+              {popularCourses.map((c, i) => (
+                <div key={i}>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-xs font-medium text-gray-800 truncate max-w-[200px]">{c.name}</p>
+                    <span className="text-xs text-gray-500 shrink-0 ml-2">{c.participants} {T(lang,'คน','ppl')}</span>
                   </div>
-                  <ProgressBar value={course.completed} color="bg-blue-500" />
-                  <p className="text-xs text-gray-500 mt-1">{course.participants} {lang === 'th' ? 'คน' : 'participants'}</p>
+                  <ProgressBar value={c.pct} color="bg-blue-500" />
                 </div>
               ))}
+              {popularCourses.length === 0 && <p className="text-xs text-gray-400 text-center py-4">{T(lang,'ไม่มีข้อมูล','No data')}</p>}
             </div>
+          </Section>
+
+          {/* Monthly hours bar chart */}
+          <Section title={T(lang,'ชั่วโมงอบรมรายเดือน','Monthly Training Hours')}>
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={monthlyData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+                <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                <YAxis tick={{ fontSize: 11 }} />
+                <Tooltip formatter={v => [`${v} hrs`]} />
+                <Bar dataKey="hours" fill="#3b82f6" radius={[5, 5, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </Section>
         </div>
 
-        {/* Right: Skill Gap & Images ~30% */}
-        <div className="col-span-12 lg:col-span-4">
+        {/* RIGHT: Detail panel ~3/12 */}
+        <div className="col-span-12 lg:col-span-3">
           <DetailPanel>
-            <Section title={getLabel('skillGap', lang)}>
-              <div className="space-y-3">
-                {skillGaps.map((item, idx) => (
-                  <div key={idx}>
+            {/* Selected course detail */}
+            {selected ? (
+              <Section title={T(lang,'รายละเอียด','Detail')}>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="font-bold text-gray-900 text-base leading-snug">
+                      {lang === 'th' ? selected.name_th : selected.name_en}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5 mt-2">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLOR[selected.status] || ''}`}>
+                        {STATUS_LABEL[selected.status]?.[lang] || selected.status}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${CAT_COLOR[selected.category] || ''}`}>
+                        {CAT_LABEL[selected.category]?.[lang] || selected.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 text-xs">
+                    <div><p className="text-gray-500">{T(lang,'วันเริ่มต้น','Start')}</p><p className="font-medium">{selected.start_date || '-'}</p></div>
+                    <div><p className="text-gray-500">{T(lang,'วันสิ้นสุด','End')}</p><p className="font-medium">{selected.end_date || '-'}</p></div>
+                    <div><p className="text-gray-500">{T(lang,'ผู้เข้าร่วม','Participants')}</p><p className="font-bold text-blue-700">{(selected.participants_count||0).toLocaleString()}</p></div>
+                    <div><p className="text-gray-500">{T(lang,'ชั่วโมง','Hours')}</p><p className="font-bold text-orange-600">{selected.hours}</p></div>
+                    <div className="col-span-2"><p className="text-gray-500">{T(lang,'งบประมาณ','Budget')}</p><p className="font-bold text-green-700">{(selected.budget||0).toLocaleString('th-TH')} {T(lang,'บาท','THB')}</p></div>
+                  </div>
+                  {selected.notes && (
+                    <div className="text-xs border-t border-gray-100 pt-2">
+                      <p className="text-gray-500 mb-0.5">{T(lang,'หมายเหตุ','Notes')}</p>
+                      <p className="text-gray-700">{selected.notes}</p>
+                    </div>
+                  )}
+                  <button onClick={() => handleDelete(selected.id)}
+                    className="w-full mt-2 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition">
+                    {T(lang,'ลบหลักสูตรนี้','Delete this course')}
+                  </button>
+                </div>
+              </Section>
+            ) : (
+              <Section title={T(lang,'รายละเอียด','Detail')}>
+                <p className="text-xs text-gray-400 text-center py-8">{T(lang,'เลือกหลักสูตรเพื่อดูรายละเอียด','Select a course to view details')}</p>
+              </Section>
+            )}
+
+            {/* Skill gap / completion by category */}
+            <Section title={T(lang,'อัตราสำเร็จตามประเภท','Completion by Category')}>
+              <div className="space-y-2.5">
+                {skillGaps.map((item, i) => (
+                  <div key={i}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs font-medium text-gray-700">{item.skill}</span>
                       <span className="text-xs text-gray-500">{item.gap}%</span>
                     </div>
-                    <ProgressBar value={item.gap} color="bg-orange-500" />
+                    <ProgressBar value={item.gap} color="bg-green-500" />
                   </div>
                 ))}
               </div>
             </Section>
-
-            {/* Course Images */}
-            <div className="grid grid-cols-2 gap-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="bg-gradient-to-br from-blue-100 to-blue-50 rounded-lg h-24 flex items-center justify-center border border-blue-200">
-                  <BookOpen className="w-8 h-8 text-blue-400" />
-                </div>
-              ))}
-            </div>
           </DetailPanel>
         </div>
       </div>
 
-      {/* Bottom Grid */}
-      <div className="grid grid-cols-12 gap-6">
-        {/* Registration Tracking */}
+      {/* ── Bottom: Category registration bar ── */}
+      <div className="grid grid-cols-12 gap-5">
         <div className="col-span-12 lg:col-span-6">
-          <Section title={getLabel('registrationTracking', lang)}>
+          <Section title={T(lang,'ผู้เข้าร่วมตามประเภทหลักสูตร','Participants by Category')}>
             <div className="space-y-3">
-              {[
-                { name: lang === 'th' ? 'เทคนิค' : 'Technical', count: 48 },
-                { name: lang === 'th' ? 'ทักษะปรับตัว' : 'Soft Skills', count: 98 },
-                { name: lang === 'th' ? 'ภาวะผู้นำ' : 'Leadership', count: 64 },
-                { name: lang === 'th' ? 'สอบถาม' : 'Compliance', count: 112 },
-                { name: lang === 'th' ? 'ดิจิทัล' : 'Digital', count: 190 },
-              ].map((cat, idx) => (
-                <div key={idx}>
+              {catStats.map(({ cat, count }) => (
+                <div key={cat}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-700">{cat.name}</span>
-                    <span className="text-xs text-gray-500">{cat.count}</span>
+                    <span className="text-sm font-medium text-gray-700">{CAT_LABEL[cat]?.[lang] || cat}</span>
+                    <span className="text-xs text-gray-500">{count.toLocaleString()} {T(lang,'คน','ppl')}</span>
                   </div>
-                  <div className="flex-1 bg-gray-100 rounded-full h-6 relative overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full flex items-center justify-end pr-2"
-                      style={{ width: `${Math.min((cat.count / 200) * 100, 100)}%` }}>
-                      <span className="text-xs text-white font-medium">{Math.round((cat.count / 512) * 100)}%</span>
+                  <div className="w-full bg-gray-100 rounded-full h-6 relative overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full flex items-center justify-end pr-2 transition-all duration-500"
+                      style={{ width: `${Math.max((count / maxCatCount) * 100, count > 0 ? 5 : 0)}%` }}>
+                      {count > 0 && <span className="text-xs text-white font-medium">{Math.round((count / stats.participants) * 100) || 0}%</span>}
                     </div>
                   </div>
                 </div>
@@ -428,30 +572,31 @@ export default function Training({ lang = 'en' }) {
           </Section>
         </div>
 
-        {/* Deep Stats & Achievement */}
         <div className="col-span-12 lg:col-span-6">
-          <Section title={getLabel('deepStats', lang)}>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
-                <Bar dataKey="hours" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-            <p className="text-xs text-gray-500 text-center mt-2">{getLabel('achievement', lang)}</p>
+          <Section title={T(lang,'สัดส่วนสถานะหลักสูตร','Course Status Breakdown')}>
+            <div className="grid grid-cols-2 gap-3">
+              {Object.entries(STATUS_LABEL).map(([key, label]) => {
+                const count = filtered.filter(s => s.status === key).length;
+                const pct = filtered.length ? Math.round((count / filtered.length) * 100) : 0;
+                return (
+                  <div key={key} className={`rounded-xl p-3 ${STATUS_COLOR[key]?.replace('text-','bg-').replace('-700','-50') || 'bg-gray-50'} border border-gray-100`}>
+                    <p className="text-2xl font-bold text-gray-900">{count}</p>
+                    <p className="text-xs text-gray-600 mt-0.5">{label[lang] || label.en}</p>
+                    <p className="text-[11px] text-gray-400 mt-1">{pct}% {T(lang,'ของทั้งหมด','of total')}</p>
+                  </div>
+                );
+              })}
+            </div>
           </Section>
         </div>
       </div>
 
-      {/* Import Modal */}
+      {/* ── Modals ── */}
+      <TrainingModal open={showAdd} onClose={() => setShowAdd(false)} onSaved={fetchData} lang={lang} />
       <ImportModal
-        open={showImport}
-        onClose={() => setShowImport(false)}
-        onImport={handleImport}
-        columns={importColumns}
-        tableName={lang === 'th' ? 'หลักสูตรฝึกอบรม' : 'Training Courses'}
-        lang={lang}
+        open={showImport} onClose={() => setShowImport(false)}
+        onImport={handleImport} columns={importColumns}
+        tableName={T(lang, 'หลักสูตรฝึกอบรม', 'Training Courses')} lang={lang}
       />
     </div>
   );
