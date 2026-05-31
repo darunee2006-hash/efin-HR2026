@@ -84,16 +84,16 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 z-40 flex flex-col bg-white border-r border-gray-200 transition-all duration-300
-        ${sideOpen ? 'w-60' : 'w-16'}
+        fixed lg:static inset-y-0 left-0 z-40 flex flex-col bg-[#007A3D] transition-all duration-300
+        ${sideOpen ? 'w-[182px]' : 'w-16'}
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Logo */}
-        <div className="flex items-center gap-3 px-4 h-16 border-b border-gray-100">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0">
-            <Users className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-2 px-3.5 h-14 border-b border-white/15">
+          <div className="w-7 h-7 rounded-md bg-[#F5A623] flex items-center justify-center flex-shrink-0">
+            <span className="text-white font-bold text-sm">e</span>
           </div>
-          {sideOpen && <span className="font-bold text-indigo-700 text-sm truncate">EFIN HR</span>}
+          {sideOpen && <span className="text-white text-[15px] font-medium">efin <span className="text-[#80DCA8]">HR</span></span>}
         </div>
 
         {/* Nav items */}
@@ -102,10 +102,10 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
             <button
               key={key}
               onClick={() => { setPage(key); setMobileOpen(false) }}
-              className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
+              className={`w-full flex items-center gap-3 px-3 py-2.5 text-[13px] transition-colors rounded-md mx-1.5 w-[calc(100%-12px)]
                 ${page === key
-                  ? 'bg-indigo-50 text-indigo-700 border-r-2 border-indigo-600 font-medium'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                  ? 'bg-[#00A651] text-white font-medium'
+                  : 'text-white/75 hover:bg-white/10 hover:text-white'}`}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
               {sideOpen && <span className="truncate">{label(key, lang)}</span>}
@@ -115,10 +115,10 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
           {/* Admin section — visually separated */}
           {visibleAdminNav.length > 0 && (
             <>
-              <div className="mx-3 my-2 border-t border-gray-200" />
+              <div className="mx-3 my-2 border-t border-white/15" />
               {sideOpen && (
-                <div className="px-4 py-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-500">
+                <div className="px-3 py-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/50">
                     {lang === 'th' ? 'ผู้ดูแลระบบ' : 'Admin'}
                   </span>
                 </div>
@@ -127,10 +127,10 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
                 <button
                   key={key}
                   onClick={() => { setPage(key); setMobileOpen(false) }}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 text-[13px] transition-colors rounded-md mx-1.5 w-[calc(100%-12px)]
                     ${page === key
-                      ? 'bg-purple-50 text-purple-700 border-r-2 border-purple-600 font-medium'
-                      : 'text-purple-600 hover:bg-purple-50 hover:text-purple-800 font-medium'}`}
+                      ? 'bg-[#00A651] text-white font-medium'
+                      : 'text-white/75 hover:bg-white/10 hover:text-white'}`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
                   {sideOpen && <span className="truncate">{label(key, lang)}</span>}
@@ -141,13 +141,13 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
         </nav>
 
         {/* User info + password + logout */}
-        <div className="border-t border-gray-100 p-3 space-y-1.5">
+        <div className="border-t border-white/15 p-3 space-y-1.5">
           {sideOpen ? (
             <>
               <div className="flex items-center gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-gray-800 truncate">{profile?.display_name_en || profile?.display_name || profile?.email}</p>
-                  <p className="text-[10px] text-gray-400 truncate">
+                  <p className="text-xs font-medium text-white truncate">{profile?.display_name_en || profile?.display_name || profile?.email}</p>
+                  <p className="text-[10px] text-white/60 truncate">
                     {role === 'superuser'
                       ? (lang === 'th' ? 'Super User' : 'Super User')
                       : role === 'admin'
@@ -160,12 +160,12 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
               </div>
               <div className="flex gap-1">
                 <button onClick={() => { setShowPwModal(true); setPwForm({ current: '', newPw: '', confirm: '' }); setPwError(null); setPwSuccess(false); }}
-                  className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-indigo-50 text-gray-400 hover:text-indigo-600 transition-colors text-[10px]"
+                  className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors text-[10px]"
                   title={lang === 'th' ? 'เปลี่ยนรหัสผ่าน' : 'Change Password'}>
                   <Key className="w-3.5 h-3.5" />
                   <span>{lang === 'th' ? 'เปลี่ยนรหัส' : 'Password'}</span>
                 </button>
-                <button onClick={signOut} className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors text-[10px]"
+                <button onClick={signOut} className="flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-colors text-[10px]"
                   title={lang === 'th' ? 'ออกจากระบบ' : 'Sign Out'}>
                   <LogOut className="w-3.5 h-3.5" />
                   <span>{lang === 'th' ? 'ออกจากระบบ' : 'Sign Out'}</span>
@@ -175,11 +175,11 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
           ) : (
             <div className="space-y-1">
               <button onClick={() => { setShowPwModal(true); setPwForm({ current: '', newPw: '', confirm: '' }); setPwError(null); setPwSuccess(false); }}
-                className="w-full flex items-center justify-center p-1.5 rounded-lg hover:bg-indigo-50 text-gray-400 hover:text-indigo-600"
+                className="w-full flex items-center justify-center p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white"
                 title={lang === 'th' ? 'เปลี่ยนรหัสผ่าน' : 'Change Password'}>
                 <Key className="w-4 h-4" />
               </button>
-              <button onClick={signOut} className="w-full flex items-center justify-center p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500">
+              <button onClick={signOut} className="w-full flex items-center justify-center p-1.5 rounded-lg hover:bg-white/10 text-white/60 hover:text-white">
                 <LogOut className="w-4 h-4" />
               </button>
             </div>
@@ -189,7 +189,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
         {/* Collapse toggle */}
         <button
           onClick={() => setSideOpen(!sideOpen)}
-          className="hidden lg:flex items-center justify-center gap-2 h-10 border-t border-gray-100 text-gray-400 hover:text-gray-600"
+          className="hidden lg:flex items-center justify-center gap-2 h-10 border-t border-white/15 text-white/50 hover:text-white"
         >
           <ChevronLeft className={`w-4 h-4 transition-transform ${sideOpen ? '' : 'rotate-180'}`} />
           {sideOpen && <span className="text-xs">{lang === 'th' ? 'ย่อเมนู' : 'Collapse'}</span>}
