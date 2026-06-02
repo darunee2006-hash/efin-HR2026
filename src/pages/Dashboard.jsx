@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import {
   Users, UserPlus, Briefcase, CalendarX, TrendingUp, TrendingDown,
-  ChevronRight, Megaphone, Gift, ShieldCheck, Speakerphone,
+  ChevronRight, Megaphone, Gift, ShieldCheck,
   BookOpen, Bell, Search, ChevronDown,
 } from 'lucide-react'
 import { supabase } from '../lib/supabase'
@@ -166,7 +166,7 @@ export default function Dashboard({ lang = 'th', setPage }) {
   const todayStr = new Date().toLocaleDateString(lang==='th' ? 'th-TH' : 'en-US', { day:'numeric', month:'long', year:'numeric' })
 
   const annIcons = [
-    { bg:'#E3F2FD', color:'#1565C0', icon: Bell },
+    { bg:'#E3F2FD', color:'#1565C0', icon: Megaphone },
     { bg:'#FCE4EC', color:'#C62828', icon: Gift },
     { bg:G.light,   color:G.primary, icon: ShieldCheck },
   ]
