@@ -31,7 +31,7 @@ const EXPENSE_TYPES = {
   meal: { th: 'อาหารและเครื่องดื่ม', en: 'Meals & Drinks', icon: '🍽️', color: 'bg-orange-100 text-orange-700' },
   transport: { th: 'ค่าเดินทาง', en: 'Transport', icon: '🚗', color: 'bg-green-100 text-green-700' },
   accommodation: { th: 'ที่พัก', en: 'Accommodation', icon: '🏨', color: 'bg-purple-100 text-purple-700' },
-  training: { th: 'ฝึกอบรม', en: 'Training', icon: '📚', color: 'bg-indigo-100 text-indigo-700' },
+  training: { th: 'ฝึกอบรม', en: 'Training', icon: '📚', color: 'bg-[#D0F0C0] text-[#5A9020]' },
   medical: { th: 'การแพทย์', en: 'Medical', icon: '⚕️', color: 'bg-red-100 text-red-700' },
   equipment: { th: 'อุปกรณ์', en: 'Equipment', icon: '🛠️', color: 'bg-yellow-100 text-yellow-700' },
   other: { th: 'อื่นๆ', en: 'Other', icon: '📦', color: 'bg-gray-100 text-gray-700' },

@@ -101,7 +101,7 @@ function AppContent() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-10 h-10 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-3" />
+          <div className="w-10 h-10 border-3 border-[#C5E888] border-t-[#7DC242] rounded-full animate-spin mx-auto mb-3" />
           <p className="text-sm text-gray-500">{lang === 'th' ? 'กำลังโหลด...' : 'Loading...'}</p>
         </div>
       </div>

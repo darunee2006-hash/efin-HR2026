@@ -136,7 +136,7 @@ export default function CompanyManagement({ lang }) {
 
   const SectionHeader = ({ icon: Icon, label }) => (
     <div className="flex items-center gap-2 border-b border-gray-100 pb-1.5 mb-3 mt-4 first:mt-0">
-      <Icon className="w-4 h-4 text-indigo-500" />
+      <Icon className="w-4 h-4 text-[#7DC242]" />
       <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{label}</span>
     </div>
   );
@@ -155,8 +155,8 @@ export default function CompanyManagement({ lang }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
-            <Building2 className="w-5 h-5 text-indigo-600" />
+          <div className="w-10 h-10 rounded-xl bg-[#D0F0C0] flex items-center justify-center">
+            <Building2 className="w-5 h-5 text-[#7DC242]" />
           </div>
           <div>
             <h2 className="text-lg font-bold text-gray-900">{L.title}</h2>
@@ -196,10 +196,10 @@ export default function CompanyManagement({ lang }) {
                 onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-xl bg-[#E6F9F0] flex items-center justify-center flex-shrink-0">
                     {c.logo_url
                       ? <img src={c.logo_url} alt="" className="w-10 h-10 rounded-lg object-contain" />
-                      : <Building2 className="w-6 h-6 text-indigo-500" />}
+                      : <Building2 className="w-6 h-6 text-[#7DC242]" />}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -208,7 +208,7 @@ export default function CompanyManagement({ lang }) {
                     </div>
                     <div className="flex items-center gap-3 mt-0.5">
                       {c.name_en && <span className="text-xs text-gray-500">{c.name_en}</span>}
-                      {c.code && <span className="text-xs font-mono text-indigo-500 bg-indigo-50 px-1.5 py-0.5 rounded">{c.code}</span>}
+                      {c.code && <span className="text-xs font-mono text-[#7DC242] bg-[#E6F9F0] px-1.5 py-0.5 rounded">{c.code}</span>}
                       <span className="text-xs text-gray-400">{c.emp_count} {L.empCount}</span>
                     </div>
                   </div>
@@ -216,7 +216,7 @@ export default function CompanyManagement({ lang }) {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={(e) => { e.stopPropagation(); openEdit(c); }}
-                    className="p-2 rounded-lg hover:bg-indigo-50 text-gray-400 hover:text-indigo-600 transition-colors"
+                    className="p-2 rounded-lg hover:bg-[#E6F9F0] text-gray-400 hover:text-[#7DC242] transition-colors"
                     title={L.editCompany}
                   >
                     <Edit2 className="w-4 h-4" />
@@ -318,12 +318,12 @@ export default function CompanyManagement({ lang }) {
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">{L.addressTh}</label>
               <textarea rows={2} value={form.address_th} onChange={e => setForm({ ...form, address_th: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none" />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">{L.addressEn}</label>
               <textarea rows={2} value={form.address_en} onChange={e => setForm({ ...form, address_en: e.target.value })}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none" />
             </div>
           </div>
 
@@ -349,11 +349,11 @@ export default function CompanyManagement({ lang }) {
           <div>
             <label className="block text-xs font-medium text-gray-600 mb-1">{L.notes}</label>
             <textarea rows={2} value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none" />
           </div>
           <div className="flex items-center gap-2 mt-2">
             <input type="checkbox" checked={form.is_active} onChange={e => setForm({ ...form, is_active: e.target.checked })}
-              className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+              className="rounded border-gray-300 text-[#7DC242] focus:ring-[#7DC242]" />
             <label className="text-sm text-gray-700">{L.active}</label>
           </div>
 

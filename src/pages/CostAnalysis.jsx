@@ -31,7 +31,7 @@ const DEPT_COST_TYPE = {
 }
 const COST_TYPE_LABELS = { service: 'ต้นทุนบริการ', sales: 'ต้นทุนขาย', admin: 'ต้นทุนบริหาร' }
 const COST_TYPE_COLORS = { service: '#6366f1', sales: '#06b6d4', admin: '#f59e0b' }
-const COST_TYPE_BG = { service: 'bg-indigo-100 text-indigo-600', sales: 'bg-cyan-100 text-cyan-600', admin: 'bg-amber-100 text-amber-600' }
+const COST_TYPE_BG = { service: 'bg-[#D0F0C0] text-[#7DC242]', sales: 'bg-cyan-100 text-cyan-600', admin: 'bg-amber-100 text-amber-600' }
 const BU_COLORS = {'BU efin.finance':'#6366f1','BU Content':'#06b6d4','BU IR Plus':'#8b5cf6','BU IT Solution':'#f59e0b','Cost Center':'#64748b','Event&Community':'#ec4899','ATESS':'#10b981'}
 const COLORS_ARR = ['#6366f1','#06b6d4','#8b5cf6','#f59e0b','#ef4444','#10b981','#ec4899','#f97316']
 
@@ -43,15 +43,15 @@ const mi = m => MONTH_ORDER.indexOf(m)
 function Tab({tabs,active,onChange}){
   return <div className="flex gap-1 bg-gray-100 rounded-lg p-1 flex-wrap">
     {tabs.map(t=><button key={t.key} onClick={()=>onChange(t.key)}
-      className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all ${active===t.key?'bg-white shadow-sm text-indigo-700 font-semibold':'text-gray-600 hover:text-gray-800'}`}>
+      className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-md transition-all ${active===t.key?'bg-white shadow-sm text-[#5A9020] font-semibold':'text-gray-600 hover:text-gray-800'}`}>
       {t.icon}{t.label}
     </button>)}
   </div>
 }
 
 function KPI({icon,label,value,sub,color='indigo',onClick}){
-  const c={'indigo':'bg-indigo-100 text-indigo-600','cyan':'bg-cyan-100 text-cyan-600','green':'bg-green-100 text-green-600','red':'bg-red-100 text-red-600','purple':'bg-purple-100 text-purple-600','amber':'bg-amber-100 text-amber-600','slate':'bg-slate-100 text-slate-600','pink':'bg-pink-100 text-pink-600'}
-  return <div className={`bg-white rounded-xl border border-gray-200 p-4 ${onClick?'cursor-pointer hover:shadow-md hover:border-indigo-200 transition-all':''}`} onClick={onClick}>
+  const c={'indigo':'bg-[#D0F0C0] text-[#7DC242]','cyan':'bg-cyan-100 text-cyan-600','green':'bg-green-100 text-green-600','red':'bg-red-100 text-red-600','purple':'bg-purple-100 text-purple-600','amber':'bg-amber-100 text-amber-600','slate':'bg-slate-100 text-slate-600','pink':'bg-pink-100 text-pink-600'}
+  return <div className={`bg-white rounded-xl border border-gray-200 p-4 ${onClick?'cursor-pointer hover:shadow-md hover:border-[#C5E888] transition-all':''}`} onClick={onClick}>
     <div className="flex items-center gap-3">
       <div className={`w-10 h-10 rounded-lg ${c[color]} flex items-center justify-center`}>{icon}</div>
       <div className="min-w-0"><p className="text-xs text-gray-500 truncate">{label}</p>
@@ -101,7 +101,7 @@ function CostDetailPopup({ title, icon: Icon, iconBg, data, columns, onClose, su
             <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
           </div>
         </div>
-        {summary && <div className="px-6 py-3 bg-indigo-50 border-b border-indigo-100 text-sm text-indigo-700">{summary}</div>}
+        {summary && <div className="px-6 py-3 bg-[#E6F9F0] border-b border-[#D0F0C0] text-sm text-[#5A9020]">{summary}</div>}
         <div className="overflow-auto flex-1 px-2">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-gray-50 z-10">
@@ -965,12 +965,12 @@ export default function CostAnalysis(){
     {tab==='overview' && <div className="space-y-6">
       {/* Monthly Bar */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-indigo-500"/>ต้นทุนรายเดือน</h3>
+        <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-[#7DC242]"/>ต้นทุนรายเดือน</h3>
         <div className="flex items-end gap-2 h-52">
           {monthlyData.map((d,i)=><div key={i} className="flex-1 flex flex-col items-center gap-1">
             <span className="text-[10px] text-gray-500 font-medium">{fmtM(d.cost)}</span>
             <div className="w-full relative group">
-              <div className="w-full bg-indigo-500 rounded-t-md hover:bg-indigo-600 min-h-[2px]" style={{height:`${Math.max((d.cost/maxBar)*160,4)}px`}}/>
+              <div className="w-full bg-[#7DC242] rounded-t-md hover:bg-[#7DC242] min-h-[2px]" style={{height:`${Math.max((d.cost/maxBar)*160,4)}px`}}/>
               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap pointer-events-none z-10">
                 ฿{fmt(d.cost)}<br/>{fmt(Math.round(d.hours))} ชม. / {d.count} คน
               </div>
@@ -1049,12 +1049,12 @@ export default function CostAnalysis(){
               <td className={`px-3 py-2 text-right tabular-nums ${mom>0?'text-red-600':mom<0?'text-green-600':'text-gray-400'}`}>{i>0?`${mom>=0?'+':''}${mom.toFixed(1)}%`:'-'}</td>
             </tr>
           })}</tbody>
-          <tfoot><tr className="border-t-2 border-gray-300 bg-indigo-50 font-semibold">
-            <td className="px-3 py-2 text-indigo-800">รวม</td>
-            <td className="px-3 py-2 text-right text-indigo-800 tabular-nums">฿{fmt(Math.round(totalCost))}</td>
-            <td className="px-3 py-2 text-right text-indigo-800 tabular-nums">{fmt(Math.round(totalHours))}</td>
-            <td className="px-3 py-2 text-right text-indigo-800 tabular-nums">{uniqueEmp}</td>
-            <td className="px-3 py-2 text-right text-indigo-800 tabular-nums">฿{fmt(Math.round(avgCostPerHour))}</td>
+          <tfoot><tr className="border-t-2 border-gray-300 bg-[#E6F9F0] font-semibold">
+            <td className="px-3 py-2 text-[#4E7F1A]">รวม</td>
+            <td className="px-3 py-2 text-right text-[#4E7F1A] tabular-nums">฿{fmt(Math.round(totalCost))}</td>
+            <td className="px-3 py-2 text-right text-[#4E7F1A] tabular-nums">{fmt(Math.round(totalHours))}</td>
+            <td className="px-3 py-2 text-right text-[#4E7F1A] tabular-nums">{uniqueEmp}</td>
+            <td className="px-3 py-2 text-right text-[#4E7F1A] tabular-nums">฿{fmt(Math.round(avgCostPerHour))}</td>
             <td className="px-3 py-2"></td>
           </tr></tfoot>
         </table></div>
@@ -1216,7 +1216,7 @@ export default function CostAnalysis(){
             <th className="px-3 py-2 text-left font-medium text-gray-600">ประเภท</th>
             <th className="px-3 py-2 text-left font-medium text-gray-600">สถานะ</th>
             <th className="px-3 py-2 text-left font-medium text-gray-600">วันเริ่มงาน</th>
-            <th className="px-3 py-2 text-right font-medium text-gray-600 bg-indigo-50">รวมต้นทุน</th>
+            <th className="px-3 py-2 text-right font-medium text-gray-600 bg-[#E6F9F0]">รวมต้นทุน</th>
             <th className="px-3 py-2 text-right font-medium text-gray-600">ชม.ทำงาน</th>
             <th className="px-3 py-2 text-right font-medium text-gray-600">ต้นทุน/ชม.</th>
           </tr></thead>
@@ -1224,7 +1224,7 @@ export default function CostAnalysis(){
             const cost=costByUUID[e.id]
             const statusColor=e.status==='active'?'bg-green-100 text-green-700':e.status==='inactive'?'bg-red-100 text-red-700':'bg-gray-100 text-gray-600'
             return <tr key={e.id} className="border-t border-gray-100 hover:bg-gray-50">
-              <td className="px-3 py-1.5 text-xs font-mono text-indigo-600">{e.employee_code}</td>
+              <td className="px-3 py-1.5 text-xs font-mono text-[#7DC242]">{e.employee_code}</td>
               <td className="px-3 py-1.5 text-gray-700 font-medium whitespace-nowrap">{`${e.prefix_th||''}${e.first_name_th||''} ${e.last_name_th||''}`.trim()}</td>
               <td className="px-3 py-1.5 text-gray-500 text-xs truncate max-w-[150px]">{e.position_th||'-'}</td>
               <td className="px-3 py-1.5 text-gray-500 text-xs truncate max-w-[150px]">{deptLookup[e.department_id]||'-'}</td>
@@ -1233,7 +1233,7 @@ export default function CostAnalysis(){
               <td className="px-3 py-1.5 text-xs text-gray-500">{e.employment_type||'-'}</td>
               <td className="px-3 py-1.5 text-xs"><span className={`px-1.5 py-0.5 rounded ${statusColor}`}>{e.status||'-'}</span></td>
               <td className="px-3 py-1.5 text-xs text-gray-500">{e.hire_date?new Date(e.hire_date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}):'-'}</td>
-              <td className="px-3 py-1.5 text-right tabular-nums font-semibold text-indigo-700 bg-indigo-50">{cost?`฿${fmt(Math.round(cost.totalCost))}`:'-'}</td>
+              <td className="px-3 py-1.5 text-right tabular-nums font-semibold text-[#5A9020] bg-[#E6F9F0]">{cost?`฿${fmt(Math.round(cost.totalCost))}`:'-'}</td>
               <td className="px-3 py-1.5 text-right tabular-nums">{cost&&cost.totalHours>0?fmt(Math.round(cost.totalHours)):'-'}</td>
               <td className="px-3 py-1.5 text-right tabular-nums">{cost&&cost.costPerHour>0?`฿${fmt(Math.round(cost.costPerHour))}`:'-'}</td>
             </tr>
@@ -1269,7 +1269,7 @@ export default function CostAnalysis(){
 
       {/* Proportion Bar */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-indigo-500"/>สัดส่วนต้นทุน</h3>
+        <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-[#7DC242]"/>สัดส่วนต้นทุน</h3>
         <div className="flex rounded-lg overflow-hidden h-10">
           {['service','sales','admin'].map(ct=>{
             const pct=costTypeData[ct].totalCost/grandTotal*100
@@ -1316,7 +1316,7 @@ export default function CostAnalysis(){
                 <th className="px-4 py-2 text-right font-medium text-gray-600">กองทุนสำรอง</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">สวัสดิการ</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">ชม.ทำงาน</th>
-                <th className="px-4 py-2 text-right font-medium text-gray-600 bg-indigo-50">รวมต้นทุน</th>
+                <th className="px-4 py-2 text-right font-medium text-gray-600 bg-[#E6F9F0]">รวมต้นทุน</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">ต้นทุน/ชม.</th>
               </tr></thead>
               <tbody>
@@ -1329,7 +1329,7 @@ export default function CostAnalysis(){
                   <td className="px-4 py-2 text-right tabular-nums">฿{fmt(Math.round(c.providentFund))}</td>
                   <td className="px-4 py-2 text-right tabular-nums">฿{fmt(Math.round(c.welfare))}</td>
                   <td className="px-4 py-2 text-right tabular-nums">{fmt(Math.round(c.totalHours))}</td>
-                  <td className="px-4 py-2 text-right tabular-nums font-semibold text-indigo-700 bg-indigo-50">฿{fmt(Math.round(c.totalCost))}</td>
+                  <td className="px-4 py-2 text-right tabular-nums font-semibold text-[#5A9020] bg-[#E6F9F0]">฿{fmt(Math.round(c.totalCost))}</td>
                   <td className="px-4 py-2 text-right tabular-nums">{c.totalHours>0?`฿${fmt(Math.round(c.totalCost/c.totalHours))}`:'-'}</td>
                 </tr>)}
                 <tr className="border-t-2 border-gray-300 bg-gray-50 font-bold">
@@ -1341,7 +1341,7 @@ export default function CostAnalysis(){
                   <td className="px-4 py-2 text-right">฿{fmt(Math.round(d.providentFund))}</td>
                   <td className="px-4 py-2 text-right">฿{fmt(Math.round(d.welfare))}</td>
                   <td className="px-4 py-2 text-right">{fmt(Math.round(d.totalHours))}</td>
-                  <td className="px-4 py-2 text-right text-indigo-700 bg-indigo-50">฿{fmt(Math.round(d.totalCost))}</td>
+                  <td className="px-4 py-2 text-right text-[#5A9020] bg-[#E6F9F0]">฿{fmt(Math.round(d.totalCost))}</td>
                   <td className="px-4 py-2 text-right">{d.totalHours>0?`฿${fmt(Math.round(d.totalCost/d.totalHours))}`:'-'}</td>
                 </tr>
               </tbody>
@@ -1364,7 +1364,7 @@ export default function CostAnalysis(){
                 <th className="px-4 py-2 text-right font-medium text-gray-600">กองทุนสำรอง</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">สวัสดิการ</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">ชม.ทำงาน</th>
-                <th className="px-4 py-2 text-right font-medium text-gray-600 bg-indigo-50">รวมต้นทุน</th>
+                <th className="px-4 py-2 text-right font-medium text-gray-600 bg-[#E6F9F0]">รวมต้นทุน</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">ต้นทุน/ชม.</th>
               </tr></thead>
               <tbody>
@@ -1378,7 +1378,7 @@ export default function CostAnalysis(){
                   <td className="px-4 py-2 text-right tabular-nums">฿{fmt(Math.round(dd.providentFund))}</td>
                   <td className="px-4 py-2 text-right tabular-nums">฿{fmt(Math.round(dd.welfare))}</td>
                   <td className="px-4 py-2 text-right tabular-nums">{fmt(Math.round(dd.totalHours))}</td>
-                  <td className="px-4 py-2 text-right tabular-nums font-semibold text-indigo-700 bg-indigo-50">฿{fmt(Math.round(dd.totalCost))}</td>
+                  <td className="px-4 py-2 text-right tabular-nums font-semibold text-[#5A9020] bg-[#E6F9F0]">฿{fmt(Math.round(dd.totalCost))}</td>
                   <td className="px-4 py-2 text-right tabular-nums">{dd.totalHours>0?`฿${fmt(Math.round(dd.totalCost/dd.totalHours))}`:'-'}</td>
                 </tr>)}
               </tbody>
@@ -1420,7 +1420,7 @@ export default function CostAnalysis(){
 
       {/* Stacked Bar Chart */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
-        <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-indigo-500"/>สัดส่วนต้นทุนแยก BU</h3>
+        <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-[#7DC242]"/>สัดส่วนต้นทุนแยก BU</h3>
         <div className="flex gap-6 mb-4">
           {[{k:'service',l:'ต้นทุนบริการ',c:'#6366f1'},{k:'sales',l:'ต้นทุนขาย',c:'#06b6d4'},{k:'admin',l:'ต้นทุนบริหาร',c:'#f59e0b'}].map(x=>
             <div key={x.k} className="flex items-center gap-1.5 text-xs text-gray-600"><div className="w-2.5 h-2.5 rounded" style={{backgroundColor:x.c}}/>{x.l}</div>
@@ -1445,7 +1445,7 @@ export default function CostAnalysis(){
 
       {/* Detail per BU */}
       <div className="space-y-3">
-        <h3 className="font-semibold text-gray-800 flex items-center gap-2"><Layers className="w-5 h-5 text-indigo-500"/>รายละเอียดต้นทุนแยก BU → Product</h3>
+        <h3 className="font-semibold text-gray-800 flex items-center gap-2"><Layers className="w-5 h-5 text-[#7DC242]"/>รายละเอียดต้นทุนแยก BU → Product</h3>
         {costBUData.buList.map(([buName,bu])=>{
           const isExpanded=expandedCostBU[buName]!==false // default expanded
           const products=Object.entries(bu.products)
@@ -1464,7 +1464,7 @@ export default function CostAnalysis(){
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex gap-1.5">
-                  {bu.service>0&&<span className="text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700">บริการ ฿{fmtM(bu.service)}</span>}
+                  {bu.service>0&&<span className="text-[10px] px-1.5 py-0.5 rounded bg-[#D0F0C0] text-[#5A9020]">บริการ ฿{fmtM(bu.service)}</span>}
                   {bu.sales>0&&<span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-700">ขาย ฿{fmtM(bu.sales)}</span>}
                   {bu.admin>0&&<span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">บริหาร ฿{fmtM(bu.admin)}</span>}
                 </div>
@@ -1481,7 +1481,7 @@ export default function CostAnalysis(){
                   <th className="px-4 py-2 text-right font-medium text-gray-600">ต้นทุนบริการ</th>
                   <th className="px-4 py-2 text-right font-medium text-gray-600">ต้นทุนขาย</th>
                   <th className="px-4 py-2 text-right font-medium text-gray-600">ต้นทุนบริหาร</th>
-                  <th className="px-4 py-2 text-right font-medium text-gray-600 bg-indigo-50">รวมต้นทุน</th>
+                  <th className="px-4 py-2 text-right font-medium text-gray-600 bg-[#E6F9F0]">รวมต้นทุน</th>
                   <th className="px-4 py-2 text-right font-medium text-gray-600">ต้นทุน/ชม.</th>
                 </tr></thead>
                 <tbody>
@@ -1494,7 +1494,7 @@ export default function CostAnalysis(){
                       <td className="px-4 py-2 text-right tabular-nums">{p.service>0?`฿${fmt(Math.round(p.service))}`:'-'}</td>
                       <td className="px-4 py-2 text-right tabular-nums">{p.sales>0?`฿${fmt(Math.round(p.sales))}`:'-'}</td>
                       <td className="px-4 py-2 text-right tabular-nums">{p.admin>0?`฿${fmt(Math.round(p.admin))}`:'-'}</td>
-                      <td className="px-4 py-2 text-right tabular-nums font-semibold text-indigo-700 bg-indigo-50">฿{fmt(Math.round(p.totalCost))}</td>
+                      <td className="px-4 py-2 text-right tabular-nums font-semibold text-[#5A9020] bg-[#E6F9F0]">฿{fmt(Math.round(p.totalCost))}</td>
                       <td className="px-4 py-2 text-right tabular-nums">{p.hours>0?`฿${fmt(Math.round(p.totalCost/p.hours))}`:'-'}</td>
                     </tr>
                   })}
@@ -1505,7 +1505,7 @@ export default function CostAnalysis(){
                     <td className="px-4 py-2 text-right">฿{fmt(Math.round(bu.service))}</td>
                     <td className="px-4 py-2 text-right">฿{fmt(Math.round(bu.sales))}</td>
                     <td className="px-4 py-2 text-right">฿{fmt(Math.round(bu.admin))}</td>
-                    <td className="px-4 py-2 text-right text-indigo-700 bg-indigo-50">฿{fmt(Math.round(bu.totalCost))}</td>
+                    <td className="px-4 py-2 text-right text-[#5A9020] bg-[#E6F9F0]">฿{fmt(Math.round(bu.totalCost))}</td>
                     <td className="px-4 py-2 text-right">{bu.hours>0?`฿${fmt(Math.round(bu.totalCost/bu.hours))}`:'-'}</td>
                   </tr>
                 </tbody>
@@ -1686,12 +1686,12 @@ export default function CostAnalysis(){
 
     {/* ===== DETAIL POPUP ===== */}
     {costDetailPopup && (() => {
-      let popupTitle='', popupIcon=DollarSign, popupIconBg='bg-indigo-500', popupData=[], popupCols=[], popupSummary=''
+      let popupTitle='', popupIcon=DollarSign, popupIconBg='bg-[#7DC242]', popupData=[], popupCols=[], popupSummary=''
 
       switch(costDetailPopup.type) {
         case 'totalCost': {
           popupTitle = `ต้นทุนรวม ฿${fmt(Math.round(totalCost))} — แยกรายเดือน`
-          popupIcon = DollarSign; popupIconBg = 'bg-indigo-500'
+          popupIcon = DollarSign; popupIconBg = 'bg-[#7DC242]'
           popupSummary = `ที่มา: hr_cost_employee (total_cost) รวม ${fCostEmp.length} records · filter: ${filterMonth==='all'?'ทุกเดือน':filterMonth}${filterBU!=='all'?' · BU: '+filterBU:''}`
           // Aggregate by month
           const byMonth = {}

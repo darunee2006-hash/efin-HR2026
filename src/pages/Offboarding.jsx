@@ -206,7 +206,7 @@ const DetailPanel = ({ offboarding, employee, lang, onClose }) => {
           {/* Financial Summary */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-indigo-600" />
+              <DollarSign className="w-5 h-5 text-[#7DC242]" />
               {t.financialSummary}
             </h3>
             <div className="grid grid-cols-2 gap-4">
@@ -248,7 +248,7 @@ const DetailPanel = ({ offboarding, employee, lang, onClose }) => {
           {/* Exit Interview */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-indigo-600" />
+              <FileText className="w-5 h-5 text-[#7DC242]" />
               {t.exitInterview}
             </h3>
             {exitData ? (
@@ -286,7 +286,7 @@ const DetailPanel = ({ offboarding, employee, lang, onClose }) => {
           {/* Clearance Checklist */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <ClipboardList className="w-5 h-5 text-indigo-600" />
+              <ClipboardList className="w-5 h-5 text-[#7DC242]" />
               {t.clearanceChecklist}
             </h3>
             {clearanceData.length > 0 ? (
@@ -321,7 +321,7 @@ const DetailPanel = ({ offboarding, employee, lang, onClose }) => {
           {/* Asset Return */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Box className="w-5 h-5 text-indigo-600" />
+              <Box className="w-5 h-5 text-[#7DC242]" />
               {t.assetReturn}
             </h3>
             {assetData.length > 0 ? (
@@ -753,7 +753,7 @@ export default function Offboarding({ lang = 'en' }) {
                   placeholder={t.search}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                 />
               </div>
             </div>
@@ -766,7 +766,7 @@ export default function Offboarding({ lang = 'en' }) {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
               >
                 <option value="">{t.allStatus}</option>
                 <option value="pending">{t.pending}</option>
@@ -784,7 +784,7 @@ export default function Offboarding({ lang = 'en' }) {
               <select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
               >
                 <option value="">{t.allTypes}</option>
                 <option value="resign">{t.resign}</option>
@@ -875,7 +875,7 @@ export default function Offboarding({ lang = 'en' }) {
                         <div className="flex items-center gap-2">
                           <div className="w-16 bg-gray-200 rounded-full h-2">
                             <div
-                              className="bg-indigo-600 h-2 rounded-full"
+                              className="bg-[#7DC242] h-2 rounded-full"
                               style={{
                                 width: `${getClearanceProgress(offboarding)}%`,
                               }}
@@ -906,7 +906,7 @@ export default function Offboarding({ lang = 'en' }) {
                             setSelectedOffboarding(offboarding);
                             setSelectedEmployee(offboarding.hr_employees);
                           }}
-                          className="inline-flex items-center gap-2 px-3 py-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors font-medium text-sm"
+                          className="inline-flex items-center gap-2 px-3 py-2 text-[#7DC242] hover:bg-[#E6F9F0] rounded-lg transition-colors font-medium text-sm"
                         >
                           <ExternalLink className="w-4 h-4" />
                           {t.details}

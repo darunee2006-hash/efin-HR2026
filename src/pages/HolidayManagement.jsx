@@ -214,7 +214,7 @@ export default function HolidayManagement({ lang }) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="w-8 h-8 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-2" />
+          <div className="w-8 h-8 border-3 border-[#C5E888] border-t-[#7DC242] rounded-full animate-spin mx-auto mb-2" />
           <p className="text-sm text-gray-500">{lang === 'th' ? 'กำลังโหลด...' : 'Loading...'}</p>
         </div>
       </div>
@@ -240,7 +240,7 @@ export default function HolidayManagement({ lang }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-1">
-            <CalendarDays className="w-4 h-4 text-indigo-600" />
+            <CalendarDays className="w-4 h-4 text-[#7DC242]" />
             <span className="text-xs text-gray-500">{L.total}</span>
           </div>
           <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
@@ -295,7 +295,7 @@ export default function HolidayManagement({ lang }) {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={L.searchPlaceholder}
-              className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#7DC242] outline-none"
             />
           </div>
 
@@ -312,7 +312,7 @@ export default function HolidayManagement({ lang }) {
             {/* Add button */}
             <button
               onClick={openAdd}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg bg-[#7DC242] hover:bg-[#5A9020] text-white transition-colors"
             >
               <Plus className="w-4 h-4" />
               {L.add}
@@ -365,7 +365,7 @@ export default function HolidayManagement({ lang }) {
                         <div className="flex items-center justify-center gap-1">
                           <button
                             onClick={() => openEdit(h)}
-                            className="p-1.5 rounded-lg hover:bg-indigo-50 text-gray-400 hover:text-indigo-600 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-[#E6F9F0] text-gray-400 hover:text-[#7DC242] transition-colors"
                             title={L.edit}
                           >
                             <Edit2 className="w-4 h-4" />
@@ -400,7 +400,7 @@ export default function HolidayManagement({ lang }) {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <h3 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                <CalendarDays className="w-4 h-4 text-indigo-600" />
+                <CalendarDays className="w-4 h-4 text-[#7DC242]" />
                 {editId ? L.edit : L.add}
               </h3>
               <button onClick={() => setShowModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
@@ -417,7 +417,7 @@ export default function HolidayManagement({ lang }) {
                   type="date"
                   value={form.date}
                   onChange={e => setForm({ ...form, date: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none"
                 />
               </div>
               <div>
@@ -426,7 +426,7 @@ export default function HolidayManagement({ lang }) {
                   type="text"
                   value={form.name_th}
                   onChange={e => setForm({ ...form, name_th: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none"
                   placeholder={lang === 'th' ? 'เช่น วันปีใหม่' : 'e.g. New Year Day'}
                 />
               </div>
@@ -436,7 +436,7 @@ export default function HolidayManagement({ lang }) {
                   type="text"
                   value={form.name_en}
                   onChange={e => setForm({ ...form, name_en: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none"
                   placeholder="e.g. New Year Day"
                 />
               </div>
@@ -446,7 +446,7 @@ export default function HolidayManagement({ lang }) {
                   <select
                     value={form.type}
                     onChange={e => setForm({ ...form, type: e.target.value })}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none"
                   >
                     {TYPES.map(tp => (
                       <option key={tp.value} value={tp.value}>{lang === 'th' ? tp.th : tp.en}</option>
@@ -458,7 +458,7 @@ export default function HolidayManagement({ lang }) {
                   <select
                     value={form.is_active ? 'active' : 'inactive'}
                     onChange={e => setForm({ ...form, is_active: e.target.value === 'active' })}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none"
                   >
                     <option value="active">{L.active}</option>
                     <option value="inactive">{L.inactive}</option>
@@ -475,7 +475,7 @@ export default function HolidayManagement({ lang }) {
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#7DC242] hover:bg-[#5A9020] text-white text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                   {L.save}

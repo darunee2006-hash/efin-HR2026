@@ -409,8 +409,8 @@ export default function Onboarding({ lang = 'en' }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
         <KPICard
           icon={Users}
-          iconBg="bg-indigo-100"
-          iconColor="text-indigo-600"
+          iconBg="bg-[#D0F0C0]"
+          iconColor="text-[#7DC242]"
           label={getLabel('totalOnboarding', lang)}
           value={kpis.total}
         />
@@ -445,7 +445,7 @@ export default function Onboarding({ lang = 'en' }) {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
         >
           <option value="all">{getLabel('allStatuses', lang)}</option>
           <option value="pending">{getStatusLabel('pending', lang)}</option>
@@ -515,7 +515,7 @@ export default function Onboarding({ lang = 'en' }) {
                         {getBuddyName(onboarding.buddy_id)}
                       </td>
                       <td className="px-4 py-3 text-gray-700">
-                        <span className="text-indigo-600 font-medium">{progress}</span>
+                        <span className="text-[#7DC242] font-medium">{progress}</span>
                       </td>
                       <td className="px-4 py-3 text-gray-700">
                         {formatDate(onboarding.orientation_date)}
@@ -578,13 +578,13 @@ function DetailPanel({ onboarding, employee, buddy, lang, onClose }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="bg-gradient-to-r from-indigo-600 to-indigo-500 px-6 py-4 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-[#5A9020] to-[#7DC242] px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-white">
             {getLabel('details', lang)}
           </h2>
           <button
             onClick={onClose}
-            className="text-white hover:bg-indigo-700 p-1 rounded-lg transition-colors"
+            className="text-white hover:bg-[#5A9020] p-1 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -748,7 +748,7 @@ function DetailPanel({ onboarding, employee, buddy, lang, onClose }) {
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+            className="px-4 py-2 bg-[#7DC242] text-white rounded-lg font-medium hover:bg-[#5A9020] transition-colors"
           >
             {getLabel('closePanel', lang)}
           </button>
@@ -767,7 +767,7 @@ function ExpandableSection({ title, icon: Icon, isExpanded, onToggle, children }
         className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
       >
         <div className="flex items-center gap-3">
-          {Icon && <Icon className="w-5 h-5 text-indigo-600 flex-shrink-0" />}
+          {Icon && <Icon className="w-5 h-5 text-[#7DC242] flex-shrink-0" />}
           <h3 className="font-semibold text-gray-900">{title}</h3>
         </div>
         <ChevronDown

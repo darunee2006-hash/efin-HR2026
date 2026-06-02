@@ -89,14 +89,14 @@ export default function Login({ lang: initialLang }) {
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-        <div className="w-8 h-8 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#E6F9F0] via-white to-[#f0fce8]">
+        <div className="w-8 h-8 border-3 border-[#C5E888] border-t-[#7DC242] rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#E6F9F0] via-white to-[#f0fce8] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Language toggle */}
         <div className="flex justify-end mb-4">
@@ -111,7 +111,7 @@ export default function Login({ lang: initialLang }) {
 
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200 mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#7DC242] shadow-lg shadow-[#C5E888] mb-4">
             <Users className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">EFIN HR</h1>
@@ -125,7 +125,7 @@ export default function Login({ lang: initialLang }) {
           {mode === 'setup' && (
             <>
               <div className="flex items-center gap-2 mb-2">
-                <Shield className="w-5 h-5 text-indigo-600" />
+                <Shield className="w-5 h-5 text-[#7DC242]" />
                 <h2 className="text-xl font-semibold text-gray-900">{L.setupTitle}</h2>
               </div>
               <p className="text-sm text-gray-500 mb-6">{L.setupDesc}</p>
@@ -146,7 +146,7 @@ export default function Login({ lang: initialLang }) {
                   <label className="block text-xs font-medium text-gray-600 mb-1">{L.displayName}</label>
                   <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)}
                     placeholder={lang === 'th' ? 'เช่น Admin HR' : 'e.g. Admin HR'}
-                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#7DC242] outline-none" />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">{L.email}</label>
@@ -154,7 +154,7 @@ export default function Login({ lang: initialLang }) {
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
                       placeholder="admin@company.com"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#7DC242] outline-none" />
                   </div>
                 </div>
                 <div>
@@ -163,7 +163,7 @@ export default function Login({ lang: initialLang }) {
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required
                       placeholder="••••••••" minLength={6}
-                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#7DC242] outline-none" />
                     <button type="button" onClick={() => setShowPass(!showPass)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -176,17 +176,17 @@ export default function Login({ lang: initialLang }) {
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type="password" value={confirmPass} onChange={e => setConfirmPass(e.target.value)} required
                       placeholder="••••••••" minLength={6}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#7DC242] outline-none" />
                   </div>
                 </div>
                 <button type="submit" disabled={loading}
-                  className="w-full py-2.5 bg-indigo-600 text-white rounded-lg font-medium text-sm hover:bg-indigo-700 transition-colors disabled:opacity-60 shadow-sm shadow-indigo-200">
+                  className="w-full py-2.5 bg-[#7DC242] text-white rounded-lg font-medium text-sm hover:bg-[#5A9020] transition-colors disabled:opacity-60 shadow-sm shadow-[#C5E888]">
                   {loading ? L.creating : L.createAdmin}
                 </button>
               </form>
 
               {hasUsers && (
-                <button onClick={() => setMode('login')} className="w-full mt-4 text-sm text-indigo-600 hover:text-indigo-800">
+                <button onClick={() => setMode('login')} className="w-full mt-4 text-sm text-[#7DC242] hover:text-[#4E7F1A]">
                   {L.backToLogin}
                 </button>
               )}
@@ -211,7 +211,7 @@ export default function Login({ lang: initialLang }) {
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
                       placeholder="name@company.com"
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" />
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#7DC242] focus:border-transparent outline-none" />
                   </div>
                 </div>
                 <div>
@@ -220,7 +220,7 @@ export default function Login({ lang: initialLang }) {
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <input type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required
                       placeholder="••••••••"
-                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none" />
+                      className="w-full pl-10 pr-10 py-2.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#7DC242] focus:border-transparent outline-none" />
                     <button type="button" onClick={() => setShowPass(!showPass)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                       {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -228,7 +228,7 @@ export default function Login({ lang: initialLang }) {
                   </div>
                 </div>
                 <button type="submit" disabled={loading}
-                  className="w-full py-2.5 bg-indigo-600 text-white rounded-lg font-medium text-sm hover:bg-indigo-700 transition-colors disabled:opacity-60 shadow-sm shadow-indigo-200">
+                  className="w-full py-2.5 bg-[#7DC242] text-white rounded-lg font-medium text-sm hover:bg-[#5A9020] transition-colors disabled:opacity-60 shadow-sm shadow-[#C5E888]">
                   {loading ? L.signingIn : L.signin}
                 </button>
               </form>
@@ -236,7 +236,7 @@ export default function Login({ lang: initialLang }) {
               <p className="text-center text-xs text-gray-400 mt-6">{L.contactAdmin}</p>
 
               {!hasUsers && (
-                <button onClick={() => setMode('setup')} className="w-full mt-2 text-sm text-indigo-600 hover:text-indigo-800">
+                <button onClick={() => setMode('setup')} className="w-full mt-2 text-sm text-[#7DC242] hover:text-[#4E7F1A]">
                   {L.firstTimeSetup}
                 </button>
               )}

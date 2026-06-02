@@ -9,7 +9,7 @@ export function Badge({ children, color = 'gray' }) {
     blue: 'bg-blue-100 text-blue-700',
     purple: 'bg-purple-100 text-purple-700',
     gray: 'bg-gray-100 text-gray-600',
-    indigo: 'bg-indigo-100 text-indigo-700',
+    indigo: 'bg-[#D0F0C0] text-[#5A9020]',
     orange: 'bg-orange-100 text-orange-700',
   }
   return <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${colors[color] || colors.gray}`}>{children}</span>
@@ -17,7 +17,7 @@ export function Badge({ children, color = 'gray' }) {
 
 export function StatCard({ icon: Icon, label, value, sub, color = 'indigo' }) {
   const colors = {
-    indigo: 'bg-indigo-50 text-indigo-600',
+    indigo: 'bg-[#E6F9F0] text-[#7DC242]',
     green: 'bg-green-50 text-green-600',
     blue: 'bg-blue-50 text-blue-600',
     purple: 'bg-purple-50 text-purple-600',
@@ -61,7 +61,7 @@ export function SearchInput({ value, onChange, placeholder }) {
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+        className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#7DC242] focus:border-transparent outline-none"
       />
     </div>
   )
@@ -69,7 +69,7 @@ export function SearchInput({ value, onChange, placeholder }) {
 
 export function Button({ children, onClick, variant = 'primary', size = 'md', className = '', disabled = false }) {
   const variants = {
-    primary: 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm',
+    primary: 'bg-[#7DC242] text-white hover:bg-[#5A9020] shadow-sm',
     secondary: 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50',
     danger: 'bg-red-600 text-white hover:bg-red-700',
     ghost: 'text-gray-600 hover:bg-gray-100',
@@ -116,7 +116,7 @@ export function Select({ value, onChange, options, placeholder, className = '', 
         value={value}
         name={name}
         onChange={onChange}
-        className={`border ${error ? 'border-red-300' : 'border-gray-200'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-white w-full ${className}`}
+        className={`border ${error ? 'border-red-300' : 'border-gray-200'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none bg-white w-full ${className}`}
       >
         {placeholder && <option value="">{placeholder}</option>}
         {children ? children : options?.map(o => (
@@ -132,7 +132,7 @@ export function Input({ label, error, required, ...props }) {
   return (
     <div>
       {label && <label className="block text-xs font-medium text-gray-600 mb-1">{label}{required && <span className="text-red-500"> *</span>}</label>}
-      <input {...props} className={`w-full border ${error ? 'border-red-300' : 'border-gray-200'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none ${props.className || ''}`} />
+      <input {...props} className={`w-full border ${error ? 'border-red-300' : 'border-gray-200'} rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none ${props.className || ''}`} />
       {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
     </div>
   )
@@ -192,7 +192,7 @@ export function Tabs({ tabs, active, onChange }) {
                 else onChange?.(tab.key)
               }}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                isActive ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                isActive ? 'bg-white text-[#5A9020] shadow-sm' : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               {tab.label}
@@ -215,7 +215,7 @@ export function LoadingSpinner({ onRetry }) {
 
   return (
     <div className="flex flex-col items-center justify-center py-12 gap-3">
-      <div className="w-8 h-8 border-3 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
+      <div className="w-8 h-8 border-3 border-[#C5E888] border-t-[#7DC242] rounded-full animate-spin" />
       {slow && (
         <div className="text-center mt-2">
           <p className="text-sm text-gray-400 mb-2">โหลดนานกว่าปกติ...</p>
@@ -224,7 +224,7 @@ export function LoadingSpinner({ onRetry }) {
               if (onRetry) onRetry()
               else window.location.reload()
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#E6F9F0] hover:bg-[#D0F0C0] text-[#5A9020] text-sm font-medium transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             รีเฟรช

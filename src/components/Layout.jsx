@@ -84,7 +84,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 z-40 flex flex-col bg-[#007A3D] transition-all duration-300
+        fixed lg:static inset-y-0 left-0 z-40 flex flex-col bg-[#4E7F1A] transition-all duration-300
         ${sideOpen ? 'w-[182px]' : 'w-16'}
         ${mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
@@ -93,7 +93,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
           <div className="w-7 h-7 rounded-md bg-[#F5A623] flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">e</span>
           </div>
-          {sideOpen && <span className="text-white text-[15px] font-medium">efin <span className="text-[#80DCA8]">HR</span></span>}
+          {sideOpen && <span className="text-white text-[15px] font-medium">efin <span className="text-[#C5E888]">HR</span></span>}
         </div>
 
         {/* Nav items */}
@@ -104,7 +104,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
               onClick={() => { setPage(key); setMobileOpen(false) }}
               className={`w-full flex items-center gap-3 px-3 py-2.5 text-[13px] transition-colors rounded-md mx-1.5 w-[calc(100%-12px)]
                 ${page === key
-                  ? 'bg-[#00A651] text-white font-medium'
+                  ? 'bg-[#7DC242] text-white font-medium'
                   : 'text-white/75 hover:bg-white/10 hover:text-white'}`}
             >
               <Icon className="w-5 h-5 flex-shrink-0" />
@@ -129,7 +129,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
                   onClick={() => { setPage(key); setMobileOpen(false) }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 text-[13px] transition-colors rounded-md mx-1.5 w-[calc(100%-12px)]
                     ${page === key
-                      ? 'bg-[#00A651] text-white font-medium'
+                      ? 'bg-[#7DC242] text-white font-medium'
                       : 'text-white/75 hover:bg-white/10 hover:text-white'}`}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
@@ -222,7 +222,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
                 <select
                   value={selectedCompany}
                   onChange={e => setSelectedCompany(e.target.value)}
-                  className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white hover:bg-gray-50 text-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                  className="text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white hover:bg-gray-50 text-gray-700 focus:ring-2 focus:ring-[#7DC242] outline-none cursor-pointer"
                 >
                   <option value="all">{lang === 'th' ? 'ทุกบริษัท' : 'All Companies'}</option>
                   {activeCompanies.map(c => (
@@ -240,7 +240,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
                 else window.location.reload()
                 setTimeout(() => setRefreshing(false), 1000)
               }}
-              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-indigo-600 transition-colors"
+              className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-[#7DC242] transition-colors"
               title={lang === 'th' ? 'รีเฟรชหน้า' : 'Refresh page'}
             >
               <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
@@ -266,7 +266,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
               <h3 className="font-semibold text-gray-800 text-sm flex items-center gap-2">
-                <Key className="w-4 h-4 text-indigo-600" />
+                <Key className="w-4 h-4 text-[#7DC242]" />
                 {lang === 'th' ? 'เปลี่ยนรหัสผ่าน' : 'Change Password'}
               </h3>
               <button onClick={() => setShowPwModal(false)} className="p-1 rounded-lg hover:bg-gray-100">
@@ -314,7 +314,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
                 <label className="block text-xs font-medium text-gray-600 mb-1">{lang === 'th' ? 'รหัสผ่านใหม่' : 'New Password'}</label>
                 <div className="relative">
                   <input type={pwShow.newPw ? 'text' : 'password'} value={pwForm.newPw} onChange={e => setPwForm({ ...pwForm, newPw: e.target.value })} required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none pr-9" placeholder="••••••" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none pr-9" placeholder="••••••" />
                   <button type="button" onClick={() => setPwShow({ ...pwShow, newPw: !pwShow.newPw })} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                     {pwShow.newPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -324,14 +324,14 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
                 <label className="block text-xs font-medium text-gray-600 mb-1">{lang === 'th' ? 'ยืนยันรหัสผ่านใหม่' : 'Confirm New Password'}</label>
                 <div className="relative">
                   <input type={pwShow.confirm ? 'text' : 'password'} value={pwForm.confirm} onChange={e => setPwForm({ ...pwForm, confirm: e.target.value })} required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none pr-9" placeholder="••••••" />
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-[#7DC242] outline-none pr-9" placeholder="••••••" />
                   <button type="button" onClick={() => setPwShow({ ...pwShow, confirm: !pwShow.confirm })} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                     {pwShow.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
               <button type="submit" disabled={pwSaving}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
+                className="w-full bg-[#7DC242] hover:bg-[#5A9020] text-white rounded-lg py-2.5 text-sm font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2">
                 {pwSaving ? (
                   <><RefreshCw className="w-4 h-4 animate-spin" />{lang === 'th' ? 'กำลังบันทึก...' : 'Saving...'}</>
                 ) : (

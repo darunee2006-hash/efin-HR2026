@@ -183,15 +183,15 @@ function AddProbationModal({ open, onClose, onSaved }) {
 
           {/* Preview: 3 rounds */}
           {form.start_date && (
-            <div className="bg-indigo-50 rounded-lg px-3 py-2">
-              <h5 className="text-xs font-bold text-indigo-700 mb-1">ตาราง 3 รอบประเมิน (คำนวณอัตโนมัติ)</h5>
-              <div className="grid grid-cols-3 gap-2 text-[10px] text-indigo-600">
+            <div className="bg-[#E6F9F0] rounded-lg px-3 py-2">
+              <h5 className="text-xs font-bold text-[#5A9020] mb-1">ตาราง 3 รอบประเมิน (คำนวณอัตโนมัติ)</h5>
+              <div className="grid grid-cols-3 gap-2 text-[10px] text-[#7DC242]">
                 {[1, 2, 3].map(r => {
                   const s = new Date(form.start_date); s.setDate(s.getDate() + (r - 1) * 30)
                   const e = new Date(s); e.setDate(e.getDate() + 29)
                   return (
                     <div key={r} className="bg-white rounded px-2 py-1.5">
-                      <div className="font-bold text-indigo-800">รอบ {r}: {ROUND_LABELS[r]}</div>
+                      <div className="font-bold text-[#4E7F1A]">รอบ {r}: {ROUND_LABELS[r]}</div>
                       <div>{fmtDate(s)} – {fmtDate(e)}</div>
                     </div>
                   )
@@ -376,7 +376,7 @@ function ProbationTab({ lang }) {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 text-center cursor-pointer hover:border-gray-300 transition" onClick={() => setFilterStatus('all')}>
-          <div className={`text-2xl font-bold ${filterStatus === 'all' ? 'text-indigo-600' : 'text-gray-900'}`}>{kpis.total}</div>
+          <div className={`text-2xl font-bold ${filterStatus === 'all' ? 'text-[#7DC242]' : 'text-gray-900'}`}>{kpis.total}</div>
           <div className="text-[10px] text-gray-500 mt-0.5">ทั้งหมด</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 px-4 py-3 text-center cursor-pointer hover:border-amber-300 transition" onClick={() => setFilterStatus('pending')}>
@@ -472,17 +472,17 @@ function ProbationTab({ lang }) {
                   {/* Schedule Table */}
                   <div className="px-4 pt-2 pb-2">
                     <h4 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-1.5">
-                      <Calendar className="w-4 h-4 text-indigo-500" />ตารางกำหนดรอบประเมิน
+                      <Calendar className="w-4 h-4 text-[#7DC242]" />ตารางกำหนดรอบประเมิน
                     </h4>
                     <div className="overflow-x-auto">
                       <table className="w-full text-xs">
-                        <thead><tr className="bg-indigo-50">
-                          <th className="px-3 py-2 text-left font-semibold text-indigo-700">ครั้งที่</th>
-                          <th className="px-3 py-2 text-left font-semibold text-indigo-700">รอบประเมิน</th>
-                          <th className="px-3 py-2 text-left font-semibold text-indigo-700">ช่วงเวลา</th>
-                          <th className="px-3 py-2 text-left font-semibold text-indigo-700">ครบกำหนด</th>
-                          <th className="px-3 py-2 text-left font-semibold text-indigo-700">วัตถุประสงค์</th>
-                          <th className="px-3 py-2 text-center font-semibold text-indigo-700">สถานะ</th>
+                        <thead><tr className="bg-[#E6F9F0]">
+                          <th className="px-3 py-2 text-left font-semibold text-[#5A9020]">ครั้งที่</th>
+                          <th className="px-3 py-2 text-left font-semibold text-[#5A9020]">รอบประเมิน</th>
+                          <th className="px-3 py-2 text-left font-semibold text-[#5A9020]">ช่วงเวลา</th>
+                          <th className="px-3 py-2 text-left font-semibold text-[#5A9020]">ครบกำหนด</th>
+                          <th className="px-3 py-2 text-left font-semibold text-[#5A9020]">วัตถุประสงค์</th>
+                          <th className="px-3 py-2 text-center font-semibold text-[#5A9020]">สถานะ</th>
                         </tr></thead>
                         <tbody className="divide-y divide-gray-100">
                           {[1, 2, 3].map(round => {
@@ -594,18 +594,18 @@ function ProbationTab({ lang }) {
                                         </span>
                                       )}
                                     </td>
-                                    <td className="px-3 py-2 text-center font-medium text-indigo-600">{weighted}</td>
+                                    <td className="px-3 py-2 text-center font-medium text-[#7DC242]">{weighted}</td>
                                     <td className="px-3 py-2 text-gray-400 text-[10px]">{c.description}</td>
                                   </tr>
                                 )
                               })}
-                              <tr className="bg-indigo-50 font-bold">
+                              <tr className="bg-[#E6F9F0] font-bold">
                                 <td className="px-3 py-2"></td>
-                                <td className="px-3 py-2 text-indigo-800">รวมคะแนน</td>
-                                <td className="px-3 py-2 text-center text-indigo-700">100%</td>
+                                <td className="px-3 py-2 text-[#4E7F1A]">รวมคะแนน</td>
+                                <td className="px-3 py-2 text-center text-[#5A9020]">100%</td>
                                 <td className="px-3 py-2 text-center"></td>
-                                <td className="px-3 py-2 text-center text-lg text-indigo-700">{total !== null ? total.toFixed(1) : '-'}</td>
-                                <td className="px-3 py-2 text-indigo-600">
+                                <td className="px-3 py-2 text-center text-lg text-[#5A9020]">{total !== null ? total.toFixed(1) : '-'}</td>
+                                <td className="px-3 py-2 text-[#7DC242]">
                                   {total !== null && <span className={`px-2 py-0.5 rounded-full text-xs ${
                                     total >= 90 ? 'bg-green-100 text-green-700' : total >= 75 ? 'bg-blue-100 text-blue-700' :
                                     total >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
@@ -841,7 +841,7 @@ export default function Performance({ lang }) {
       {/* Main Tab Selector */}
       <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
         <button onClick={() => setMainTab('performance')}
-          className={`flex items-center gap-1.5 px-4 py-2 text-sm rounded-md transition-all ${mainTab === 'performance' ? 'bg-white shadow-sm text-indigo-700 font-semibold' : 'text-gray-600 hover:text-gray-800'}`}>
+          className={`flex items-center gap-1.5 px-4 py-2 text-sm rounded-md transition-all ${mainTab === 'performance' ? 'bg-white shadow-sm text-[#5A9020] font-semibold' : 'text-gray-600 hover:text-gray-800'}`}>
           <Award className="w-4 h-4" />ประเมินผลงาน
         </button>
         <button onClick={() => setMainTab('probation')}

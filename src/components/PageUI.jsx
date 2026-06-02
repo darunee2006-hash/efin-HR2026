@@ -67,7 +67,7 @@ export function DetailPanel({ children, className = '' }) {
 // Avatar with initials
 export function Avatar({ name, size = 'md', className = '' }) {
   const sizes = { sm: 'w-7 h-7 text-xs', md: 'w-9 h-9 text-sm', lg: 'w-12 h-12 text-base', xl: 'w-16 h-16 text-xl' }
-  const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500', 'bg-indigo-500', 'bg-red-400']
+  const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500', 'bg-[#7DC242]', 'bg-red-400']
   const idx = (name || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % colors.length
   const initials = (name || '?').charAt(0)
   return (

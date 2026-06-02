@@ -201,7 +201,7 @@ export default function Recruitment({ lang }) {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <KPICard icon={Briefcase} iconBg="bg-blue-100" iconColor="text-blue-600" label="ตำแหน่งทั้งหมด" value={kpis.total} />
           <KPICard icon={Clock} iconBg="bg-green-100" iconColor="text-green-600" label="เปิดรับอยู่" value={`${kpis.open} (${kpis.openHeadcount} อัตรา)`} />
-          <KPICard icon={UserCheck} iconBg="bg-indigo-100" iconColor="text-indigo-600" label="ปิดแล้ว (Filled)" value={kpis.filled} />
+          <KPICard icon={UserCheck} iconBg="bg-[#D0F0C0]" iconColor="text-[#7DC242]" label="ปิดแล้ว (Filled)" value={kpis.filled} />
           <KPICard icon={XCircle} iconBg="bg-red-100" iconColor="text-red-600" label="ยกเลิก" value={kpis.cancelled} />
           <KPICard icon={Users} iconBg="bg-purple-100" iconColor="text-purple-600" label="อัตราเปิดรับรวม" value={recruitments.reduce((s, r) => s + (r.headcount || 0), 0)} />
         </div>

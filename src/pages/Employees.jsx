@@ -772,7 +772,7 @@ export default function Employees({ lang }) {
           <div className="fixed inset-0 bg-black/40 z-50 flex items-start justify-center pt-6 pb-6 px-4 overflow-y-auto" onClick={() => setSelectedEmployee(null)}>
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
               {/* Header */}
-              <div className="flex items-center gap-4 px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-2xl">
+              <div className="flex items-center gap-4 px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-[#f0fce8] to-[#E6F9F0] rounded-t-2xl">
                 <Avatar name={getEmployeeName(emp)} size="xl" />
                 <div className="flex-1 min-w-0">
                   <h2 className="text-lg font-bold text-gray-900">{getEmployeeName(emp)}</h2>
