@@ -16,7 +16,7 @@ import {
 import { ImportModal, ImportExportButtons, exportToExcel } from '../components/ImportExport';
 
 const CATEGORIES = {
-  general: { label_en: 'General', label_th: 'ทั่วไป', color: 'bg-blue-100 text-blue-800' },
+  general: { label_en: 'General', label_th: 'ทั่วไป', color: 'bg-[#E6F9F0] text-[#4E7F1A]' },
   policy: { label_en: 'Policy', label_th: 'นโยบาย', color: 'bg-purple-100 text-purple-800' },
   event: { label_en: 'Event', label_th: 'กิจกรรม', color: 'bg-green-100 text-green-800' },
   urgent: { label_en: 'Urgent', label_th: 'เร่งด่วน', color: 'bg-red-100 text-red-800' },
@@ -319,14 +319,14 @@ export default function Announcements({ lang = 'en' }) {
       announcement.priority === 'urgent'
         ? 'border-l-4 border-red-500'
         : isPinned && announcement.category === 'policy'
-          ? 'border-l-4 border-blue-500'
+          ? 'border-l-4 border-[#7DC242]'
           : 'border-l-4 border-gray-200';
 
     const bgColor =
       announcement.priority === 'urgent'
         ? 'bg-red-50'
         : isPinned && announcement.category === 'policy'
-          ? 'bg-blue-50'
+          ? 'bg-[#f0fce8]'
           : 'bg-white';
 
     return (
@@ -380,7 +380,7 @@ export default function Announcements({ lang = 'en' }) {
 
         {/* Attachment indicator */}
         {announcement.attachment_url && (
-          <div className="flex items-center gap-2 mb-3 text-blue-600 text-xs">
+          <div className="flex items-center gap-2 mb-3 text-[#7DC242] text-xs">
             <Paperclip className="w-4 h-4" />
             <span>{lang === 'th' ? 'มีไฟล์แนบ' : 'Attachment'}</span>
           </div>
@@ -422,7 +422,7 @@ export default function Announcements({ lang = 'en' }) {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Megaphone className="w-8 h-8 text-blue-600" />
+            <Megaphone className="w-8 h-8 text-[#7DC242]" />
             <h1 className="text-3xl font-bold text-gray-900">{t.title}</h1>
           </div>
 
@@ -434,7 +434,7 @@ export default function Announcements({ lang = 'en' }) {
                   onImportClick={() => setShowImport(true)}
                   lang={lang}
                 />
-                <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                <button className="flex items-center gap-2 bg-[#7DC242] hover:bg-[#5A9020] text-white px-4 py-2 rounded-lg font-medium transition-colors">
                   <Plus className="w-5 h-5" />
                   {t.newAnnouncement}
                 </button>
@@ -452,7 +452,7 @@ export default function Announcements({ lang = 'en' }) {
               onClick={() => setSelectedCategory('all')}
               className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === 'all'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#7DC242] text-white'
                   : 'bg-white text-gray-700 border border-gray-300 hover:border-gray-400'
               }`}
             >
@@ -486,7 +486,7 @@ export default function Announcements({ lang = 'en' }) {
         {loading && (
           <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-12 h-12 border-4 border-[#C5E888] border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
               <p className="text-gray-600">{t.loading}</p>
             </div>
           </div>

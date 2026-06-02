@@ -30,7 +30,7 @@ const statusLabels = {
 
 const statusColors = {
   open: 'bg-green-100 text-green-700',
-  filled: 'bg-blue-100 text-blue-700',
+  filled: 'bg-[#E6F9F0] text-[#5A9020]',
   cancelled: 'bg-red-100 text-red-700',
   on_hold: 'bg-yellow-100 text-yellow-700',
   draft: 'bg-gray-100 text-gray-500',
@@ -183,7 +183,7 @@ export default function Recruitment({ lang }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7DC242]"></div>
       </div>
     );
   }
@@ -199,7 +199,7 @@ export default function Recruitment({ lang }) {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <KPICard icon={Briefcase} iconBg="bg-blue-100" iconColor="text-blue-600" label="ตำแหน่งทั้งหมด" value={kpis.total} />
+          <KPICard icon={Briefcase} iconBg="bg-[#E6F9F0]" iconColor="text-[#7DC242]" label="ตำแหน่งทั้งหมด" value={kpis.total} />
           <KPICard icon={Clock} iconBg="bg-green-100" iconColor="text-green-600" label="เปิดรับอยู่" value={`${kpis.open} (${kpis.openHeadcount} อัตรา)`} />
           <KPICard icon={UserCheck} iconBg="bg-[#D0F0C0]" iconColor="text-[#7DC242]" label="ปิดแล้ว (Filled)" value={kpis.filled} />
           <KPICard icon={XCircle} iconBg="bg-red-100" iconColor="text-red-600" label="ยกเลิก" value={kpis.cancelled} />
@@ -262,7 +262,7 @@ export default function Recruitment({ lang }) {
                     onClick={() => setFilterStatus(tab.key)}
                     className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
                       filterStatus === tab.key
-                        ? 'bg-blue-500 text-white'
+                        ? 'bg-[#7DC242] text-white'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
                   >
@@ -292,7 +292,7 @@ export default function Recruitment({ lang }) {
                         <tr
                           key={r.id}
                           onClick={() => setSelectedRow(r)}
-                          className={`cursor-pointer transition-colors ${isSelected ? 'bg-blue-50' : 'hover:bg-gray-50'}`}
+                          className={`cursor-pointer transition-colors ${isSelected ? 'bg-[#f0fce8]' : 'hover:bg-gray-50'}`}
                         >
                           <td className="px-3 py-2.5 text-gray-500">{idx + 1}</td>
                           <td className="px-3 py-2.5 text-gray-600 text-xs font-mono">{parsed['WAMS'] || '-'}</td>
@@ -403,7 +403,7 @@ export default function Recruitment({ lang }) {
                         href={selectedRow.job_description}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800"
+                        className="inline-flex items-center gap-1.5 text-sm text-[#7DC242] hover:text-[#4E7F1A]"
                       >
                         <ExternalLink size={14} />
                         ดู JD

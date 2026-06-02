@@ -196,7 +196,7 @@ const getSeverityColor = (severity) => {
 const getStatusBadgeColor = (status) => {
   switch (status) {
     case 'open':
-      return 'bg-blue-100 text-blue-800';
+      return 'bg-[#E6F9F0] text-[#4E7F1A]';
     case 'investigating':
       return 'bg-purple-100 text-purple-800';
     case 'resolved':
@@ -443,7 +443,7 @@ export default function EmployeeRelations({ lang = 'en' }) {
   };
 
   const KPICard = ({ label, value, icon: Icon }) => (
-    <div className="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+    <div className="bg-white rounded-lg shadow p-6 border-l-4 border-[#7DC242]">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-gray-600 text-sm font-medium">{label}</p>
@@ -515,7 +515,7 @@ export default function EmployeeRelations({ lang = 'en' }) {
                 onChange={(e) =>
                   handleFilterChange('caseType', e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7DC242] focus:border-transparent"
               >
                 <option value="">{t.filters.all}</option>
                 {Object.entries(
@@ -538,7 +538,7 @@ export default function EmployeeRelations({ lang = 'en' }) {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7DC242] focus:border-transparent"
               >
                 <option value="">{t.filters.all}</option>
                 {Object.entries(
@@ -563,7 +563,7 @@ export default function EmployeeRelations({ lang = 'en' }) {
                 onChange={(e) =>
                   handleFilterChange('severity', e.target.value)
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7DC242] focus:border-transparent"
               >
                 <option value="">{t.filters.all}</option>
                 {Object.entries(
@@ -619,7 +619,7 @@ export default function EmployeeRelations({ lang = 'en' }) {
                       onClick={() => setSelectedCase(caseItem)}
                       className="hover:bg-gray-50 cursor-pointer transition-colors"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#7DC242]">
                         {caseItem.case_number}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -869,7 +869,7 @@ export default function EmployeeRelations({ lang = 'en' }) {
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                          className="flex items-center gap-2 text-sm text-[#7DC242] hover:text-[#4E7F1A] hover:underline"
                         >
                           <ExternalLink className="w-4 h-4" />
                           <span className="truncate">{url}</span>

@@ -27,7 +27,7 @@ const formatDate = (dateStr) => {
 
 // Expense type labels and icons
 const EXPENSE_TYPES = {
-  travel: { th: 'การเดินทาง', en: 'Travel', icon: '✈️', color: 'bg-blue-100 text-blue-700' },
+  travel: { th: 'การเดินทาง', en: 'Travel', icon: '✈️', color: 'bg-[#E6F9F0] text-[#5A9020]' },
   meal: { th: 'อาหารและเครื่องดื่ม', en: 'Meals & Drinks', icon: '🍽️', color: 'bg-orange-100 text-orange-700' },
   transport: { th: 'ค่าเดินทาง', en: 'Transport', icon: '🚗', color: 'bg-green-100 text-green-700' },
   accommodation: { th: 'ที่พัก', en: 'Accommodation', icon: '🏨', color: 'bg-purple-100 text-purple-700' },
@@ -42,7 +42,7 @@ const STATUS_LABELS = {
   pending: { th: 'รอจนท.', en: 'Pending', color: 'bg-yellow-100 text-yellow-700' },
   approved: { th: 'อนุมัติ', en: 'Approved', color: 'bg-green-100 text-green-700' },
   rejected: { th: 'ปฏิเสธ', en: 'Rejected', color: 'bg-red-100 text-red-700' },
-  paid: { th: 'จ่ายแล้ว', en: 'Paid', color: 'bg-blue-100 text-blue-700' },
+  paid: { th: 'จ่ายแล้ว', en: 'Paid', color: 'bg-[#E6F9F0] text-[#5A9020]' },
   cancelled: { th: 'ยกเลิก', en: 'Cancelled', color: 'bg-gray-100 text-gray-500' },
 }
 
@@ -496,8 +496,8 @@ export default function Expenses({ lang }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <KPICard
           icon={Wallet}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-600"
+          iconBg="bg-[#E6F9F0]"
+          iconColor="text-[#7DC242]"
           label={T(lang, 'ค่าใช้จ่ายรวม', 'Total Expenses')}
           value={formatBaht(stats.totalAmount)}
         />
@@ -536,13 +536,13 @@ export default function Expenses({ lang }) {
             placeholder={T(lang, 'ค้นหา...', 'Search...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7DC242]"
           />
           
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7DC242]"
           >
             <option value="all">{T(lang, 'สถานะทั้งหมด', 'All Status')}</option>
             {Object.entries(STATUS_LABELS).map(([key, val]) => (
@@ -553,7 +553,7 @@ export default function Expenses({ lang }) {
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7DC242]"
           >
             <option value="all">{T(lang, 'ประเภททั้งหมด', 'All Types')}</option>
             {Object.entries(EXPENSE_TYPES).map(([key, val]) => (
@@ -565,7 +565,7 @@ export default function Expenses({ lang }) {
             type="date"
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7DC242]"
             placeholder={T(lang, 'จากวันที่', 'From Date')}
           />
 
@@ -573,7 +573,7 @@ export default function Expenses({ lang }) {
             type="date"
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7DC242]"
             placeholder={T(lang, 'ถึงวันที่', 'To Date')}
           />
         </div>
@@ -634,7 +634,7 @@ export default function Expenses({ lang }) {
                           <td className="px-4 py-3 text-center">
                             <button
                               onClick={() => setSelectedExpense(exp)}
-                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-blue-600 transition-colors"
+                              className="inline-flex items-center justify-center w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-[#7DC242] transition-colors"
                               title={T(lang, 'ดูรายละเอียด', 'View Details')}
                             >
                               <Eye className="w-4 h-4" />
@@ -814,7 +814,7 @@ export default function Expenses({ lang }) {
                     href={selectedExpense.receipt_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg text-sm hover:bg-blue-100 transition-colors"
+                    className="inline-flex items-center gap-2 px-3 py-2 bg-[#f0fce8] text-[#5A9020] rounded-lg text-sm hover:bg-[#E6F9F0] transition-colors"
                   >
                     <Download className="w-4 h-4" />
                     {T(lang, 'ดูใบเสร็จ', 'View Receipt')}
@@ -824,10 +824,10 @@ export default function Expenses({ lang }) {
 
               {/* Approval Info */}
               {(selectedExpense.status === 'approved' || selectedExpense.status === 'rejected') && (
-                <div className="bg-blue-50 rounded-lg p-4 space-y-2">
+                <div className="bg-[#f0fce8] rounded-lg p-4 space-y-2">
                   {selectedExpense.status === 'approved' && (
                     <>
-                      <p className="text-xs font-semibold text-blue-700 uppercase">{T(lang, 'อนุมัติโดย', 'Approved By')}</p>
+                      <p className="text-xs font-semibold text-[#5A9020] uppercase">{T(lang, 'อนุมัติโดย', 'Approved By')}</p>
                       <p className="text-sm text-gray-700">{selectedExpense.approved_by || '-'}</p>
                       {selectedExpense.approved_at && (
                         <p className="text-xs text-gray-600">
@@ -864,7 +864,7 @@ export default function Expenses({ lang }) {
                       value={approvalNotes}
                       onChange={(e) => setApprovalNotes(e.target.value)}
                       placeholder={T(lang, 'เพิ่มหมายเหตุ...', 'Add notes...')}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500 resize-none h-20"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-[#7DC242] resize-none h-20"
                     />
                   </label>
 

@@ -14,7 +14,7 @@ const G = { primary:'#00A651', dark:'#007A3D', light:'#E6F9F0', light2:'#CCF0DE'
 const ROLES = [
   { key:'superuser', label:'Super Admin', color:'bg-red-100 text-red-700',     icon:'👑', desc:'เข้าถึงทุกอย่าง รวมถึงเงินเดือนและข้อมูลลับ' },
   { key:'admin',     label:'Admin',       color:'bg-purple-100 text-purple-700', icon:'🛡️', desc:'จัดการผู้ใช้และบริษัท' },
-  { key:'manager',   label:'Manager',     color:'bg-blue-100 text-blue-700',    icon:'👔', desc:'ดูข้อมูลทีมและอนุมัติคำขอ' },
+  { key:'manager',   label:'Manager',     color:'bg-[#E6F9F0] text-[#5A9020]',    icon:'👔', desc:'ดูข้อมูลทีมและอนุมัติคำขอ' },
   { key:'employee',  label:'Employee',    color:'bg-gray-100 text-gray-600',    icon:'👤', desc:'เข้าถึงข้อมูลส่วนตัว' },
 ]
 const roleOf = (key) => ROLES.find(r => r.key === key) || ROLES[3]

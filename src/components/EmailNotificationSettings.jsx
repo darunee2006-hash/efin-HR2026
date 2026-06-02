@@ -70,7 +70,7 @@ export default function EmailNotificationSettings() {
         ))}
       </div>
       <div className="flex gap-3 mb-5">
-        <button onClick={handleSave} className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
+        <button onClick={handleSave} className="px-5 py-2 bg-[#7DC242] hover:bg-[#5A9020] text-white rounded-lg text-sm font-medium transition-colors">
           {saved ? '✅ บันทึกแล้ว' : 'บันทึกการตั้งค่า'}
         </button>
       </div>
@@ -89,9 +89,9 @@ export default function EmailNotificationSettings() {
           <p className={`mt-2 text-sm ${testResult.success ? 'text-green-600' : 'text-red-600'}`}>{testResult.msg}</p>
         )}
       </div>
-      <div className="mt-5 p-4 bg-blue-50 rounded-lg">
-        <h4 className="text-xs font-semibold text-blue-800 mb-2">📌 วิธีตั้งค่า EmailJS</h4>
-        <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
+      <div className="mt-5 p-4 bg-[#f0fce8] rounded-lg">
+        <h4 className="text-xs font-semibold text-[#4E7F1A] mb-2">📌 วิธีตั้งค่า EmailJS</h4>
+        <ol className="text-xs text-[#5A9020] space-y-1 list-decimal list-inside">
           <li>สมัครที่ <a href="https://www.emailjs.com" target="_blank" rel="noreferrer" className="underline">emailjs.com</a> (ฟรี)</li>
           <li>สร้าง Email Service → copy Service ID</li>
           <li>สร้าง Template → ใส่ {'{{to_email}}'} {'{{subject}}'} {'{{message}}'} → copy Template ID</li>

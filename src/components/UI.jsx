@@ -6,7 +6,7 @@ export function Badge({ children, color = 'gray' }) {
     green: 'bg-green-100 text-green-700',
     red: 'bg-red-100 text-red-700',
     yellow: 'bg-yellow-100 text-yellow-700',
-    blue: 'bg-blue-100 text-blue-700',
+    blue: 'bg-[#E6F9F0] text-[#5A9020]',
     purple: 'bg-purple-100 text-purple-700',
     gray: 'bg-gray-100 text-gray-600',
     indigo: 'bg-[#D0F0C0] text-[#5A9020]',
@@ -19,7 +19,7 @@ export function StatCard({ icon: Icon, label, value, sub, color = 'indigo' }) {
   const colors = {
     indigo: 'bg-[#E6F9F0] text-[#7DC242]',
     green: 'bg-green-50 text-green-600',
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-[#f0fce8] text-[#7DC242]',
     purple: 'bg-purple-50 text-purple-600',
     orange: 'bg-orange-50 text-orange-600',
     red: 'bg-red-50 text-red-600',

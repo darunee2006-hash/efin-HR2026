@@ -226,7 +226,7 @@ export default function TimeAttendance({ lang }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7DC242]"></div>
       </div>
     )
   }
@@ -271,7 +271,7 @@ export default function TimeAttendance({ lang }) {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-5">
-        <KPICard icon={Users} iconBg="bg-blue-100" iconColor="text-blue-600" label="พนักงาน" value={kpis.uniqueEmps} />
+        <KPICard icon={Users} iconBg="bg-[#E6F9F0]" iconColor="text-[#7DC242]" label="พนักงาน" value={kpis.uniqueEmps} />
         <KPICard icon={XCircle} iconBg="bg-red-100" iconColor="text-red-600" label="วันขาดงาน" value={kpis.totalAbsent} />
         <KPICard icon={Calendar} iconBg="bg-orange-100" iconColor="text-orange-600" label="วันลารวม" value={Math.round(kpis.totalLeave * 10) / 10} />
         <KPICard icon={CheckCircle} iconBg="bg-green-100" iconColor="text-green-600" label="ลาป่วย" value={Math.round(kpis.totalSick * 10) / 10} />
@@ -326,7 +326,7 @@ export default function TimeAttendance({ lang }) {
                       <td className={`py-2 px-2 text-center text-xs ${(a['กิจ'] || 0) > 0 ? 'text-yellow-600' : 'text-gray-400'}`}>
                         {a['กิจ'] || 0}
                       </td>
-                      <td className={`py-2 px-2 text-center text-xs ${(a['พักร้อน'] || 0) > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
+                      <td className={`py-2 px-2 text-center text-xs ${(a['พักร้อน'] || 0) > 0 ? 'text-[#7DC242]' : 'text-gray-400'}`}>
                         {a['พักร้อน'] || 0}
                       </td>
                       <td className={`py-2 px-2 text-center text-xs font-semibold ${(a['รวมลา'] || 0) > 0 ? 'text-gray-900' : 'text-gray-400'}`}>
@@ -416,9 +416,9 @@ export default function TimeAttendance({ lang }) {
                 <p className="text-xs text-gray-500 mb-1">จำนวนครั้งมาสายรวม</p>
                 <p className="text-xl font-bold text-amber-600">{Math.round(kpis.totalLate)}</p>
               </div>
-              <div className="bg-blue-50 rounded-lg p-3">
+              <div className="bg-[#f0fce8] rounded-lg p-3">
                 <p className="text-xs text-gray-500 mb-1">เฉลี่ยลาต่อคน/เดือน</p>
-                <p className="text-xl font-bold text-blue-600">
+                <p className="text-xl font-bold text-[#7DC242]">
                   {kpis.uniqueEmps > 0 ? (kpis.totalLeave / kpis.uniqueEmps).toFixed(1) : 0} วัน
                 </p>
               </div>

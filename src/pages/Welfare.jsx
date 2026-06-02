@@ -30,7 +30,7 @@ import { ImportModal, ImportExportButtons, exportToExcel } from '../components/I
 const WELFARE_CATEGORIES = [
   { id: 'health', name: 'ประกันสุขภาพ', icon: Heart, color: 'bg-red-100', iconColor: 'text-red-600' },
   { id: 'pvd', name: 'กองทุนสำรองเลี้ยงชีพ', icon: PiggyBank, color: 'bg-green-100', iconColor: 'text-green-600' },
-  { id: 'medical', name: 'ค่ารักษาพยาบาล', icon: Stethoscope, color: 'bg-blue-100', iconColor: 'text-blue-600' },
+  { id: 'medical', name: 'ค่ารักษาพยาบาล', icon: Stethoscope, color: 'bg-[#E6F9F0]', iconColor: 'text-[#7DC242]' },
   { id: 'dental', name: 'ค่าทันตกรรม', icon: Pill, color: 'bg-orange-100', iconColor: 'text-orange-600' },
   { id: 'assistance', name: 'เงินช่วยเหลือ', icon: HandHelping, color: 'bg-purple-100', iconColor: 'text-purple-600' },
   { id: 'other', name: 'สวัสดิการอื่นๆ', icon: MoreVertical, color: 'bg-gray-100', iconColor: 'text-gray-600' },
@@ -247,8 +247,8 @@ export default function Welfare({ lang = 'th' }) {
           />
           <KPICard
             icon={Users}
-            iconBg="bg-blue-100"
-            iconColor="text-blue-600"
+            iconBg="bg-[#E6F9F0]"
+            iconColor="text-[#7DC242]"
             label={labels.usageCount}
             value="842 ครั้ง"
           />
@@ -275,14 +275,14 @@ export default function Welfare({ lang = 'th' }) {
               const catInfo = WELFARE_CATEGORIES[idx];
               const Icon = catInfo.icon;
               return (
-                <div key={catInfo.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-blue-200 transition">
+                <div key={catInfo.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100 hover:border-[#C5E888] transition">
                   <div className={`w-10 h-10 ${catInfo.color} rounded-lg flex items-center justify-center mb-3`}>
                     <Icon className={`w-5 h-5 ${catInfo.iconColor}`} />
                   </div>
                   <p className="text-sm font-medium text-gray-700">{cat.name}</p>
                   <p className="text-lg font-bold text-gray-900 mt-1">{cat.uses}</p>
                   <p className="text-xs text-gray-500">{labels.times}</p>
-                  <ProgressBar value={cat.uses} max={850} color="bg-blue-500" className="mt-2" />
+                  <ProgressBar value={cat.uses} max={850} color="bg-[#7DC242]" className="mt-2" />
                 </div>
               );
             })}
@@ -304,13 +304,13 @@ export default function Welfare({ lang = 'th' }) {
                       placeholder={labels.search}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-9 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                     />
                   </div>
                   <select
                     value={filterCategory}
                     onChange={(e) => setFilterCategory(e.target.value)}
-                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   >
                     <option value="">ทั้งหมด</option>
                     {MOCK_CATEGORIES_DATA.map((cat) => (
@@ -339,7 +339,7 @@ export default function Welfare({ lang = 'th' }) {
                       {filteredWelfareData.slice(0, 8).map((record, idx) => (
                         <tr
                           key={record.id}
-                          className="border-b border-gray-100 hover:bg-blue-50 cursor-pointer transition"
+                          className="border-b border-gray-100 hover:bg-[#f0fce8] cursor-pointer transition"
                           onClick={() => setSelectedEmployee(record.employee)}
                         >
                           <td className="px-4 py-3 text-gray-600">{idx + 1}</td>

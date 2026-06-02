@@ -689,7 +689,7 @@ export default function Leave({ lang }) {
             }}
           />
           {formData.start_date && formData.end_date && (
-            <div className="p-3 bg-blue-50 rounded-lg text-sm text-blue-700">
+            <div className="p-3 bg-[#f0fce8] rounded-lg text-sm text-[#5A9020]">
               {lang === 'th' ? 'จำนวนวัน: ' : 'Days: '}{calculateDays(formData.start_date, formData.end_date)}
             </div>
           )}

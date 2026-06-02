@@ -4,18 +4,18 @@ import { TrendingUp, TrendingDown } from 'lucide-react'
 // Blue gradient page header matching the UI mockups
 export function PageHeader({ title, subtitle, lang }) {
   return (
-    <div className="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl px-6 py-4 mb-5 flex items-center justify-between">
+    <div className="bg-gradient-to-r from-[#5A9020] to-[#7DC242] rounded-xl px-6 py-4 mb-5 flex items-center justify-between">
       <div>
         <h1 className="text-xl font-bold text-white">{title}</h1>
-        {subtitle && <p className="text-blue-100 text-xs mt-0.5">{subtitle}</p>}
+        {subtitle && <p className="text-[#E6F9F0] text-xs mt-0.5">{subtitle}</p>}
       </div>
-      <div className="text-blue-100 text-xs">efin HRS</div>
+      <div className="text-[#E6F9F0] text-xs">efin HRS</div>
     </div>
   )
 }
 
 // KPI stat card matching mockup style
-export function KPICard({ icon: Icon, iconBg = 'bg-blue-100', iconColor = 'text-blue-600', label, value, sub, trend, trendUp }) {
+export function KPICard({ icon: Icon, iconBg = 'bg-[#E6F9F0]', iconColor = 'text-[#7DC242]', label, value, sub, trend, trendUp }) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-start gap-3 min-w-0">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBg}`}>
@@ -67,7 +67,7 @@ export function DetailPanel({ children, className = '' }) {
 // Avatar with initials
 export function Avatar({ name, size = 'md', className = '' }) {
   const sizes = { sm: 'w-7 h-7 text-xs', md: 'w-9 h-9 text-sm', lg: 'w-12 h-12 text-base', xl: 'w-16 h-16 text-xl' }
-  const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500', 'bg-[#7DC242]', 'bg-red-400']
+  const colors = ['bg-[#7DC242]', 'bg-green-500', 'bg-purple-500', 'bg-orange-500', 'bg-pink-500', 'bg-teal-500', 'bg-[#7DC242]', 'bg-red-400']
   const idx = (name || '').split('').reduce((a, c) => a + c.charCodeAt(0), 0) % colors.length
   const initials = (name || '?').charAt(0)
   return (
@@ -83,7 +83,7 @@ export function StatusBadge({ status, labels }) {
     active: { bg: 'bg-green-100 text-green-700', label: 'Active' },
     probation: { bg: 'bg-yellow-100 text-yellow-700', label: 'ทดลองงาน' },
     resigned: { bg: 'bg-red-100 text-red-700', label: 'ลาออก' },
-    fulltime: { bg: 'bg-blue-100 text-blue-700', label: 'ประจำ' },
+    fulltime: { bg: 'bg-[#E6F9F0] text-[#5A9020]', label: 'ประจำ' },
     contract: { bg: 'bg-orange-100 text-orange-700', label: 'สัญญาจ้าง' },
     outsource: { bg: 'bg-purple-100 text-purple-700', label: 'Outsource' },
     completed: { bg: 'bg-green-100 text-green-700', label: 'เสร็จสิ้น' },
@@ -93,7 +93,7 @@ export function StatusBadge({ status, labels }) {
     ontime: { bg: 'bg-green-100 text-green-700', label: 'ตรงเวลา' },
     late: { bg: 'bg-orange-100 text-orange-700', label: 'สาย' },
     absent: { bg: 'bg-red-100 text-red-700', label: 'ขาดงาน' },
-    leave: { bg: 'bg-blue-100 text-blue-700', label: 'ลา' },
+    leave: { bg: 'bg-[#E6F9F0] text-[#5A9020]', label: 'ลา' },
   }
   const s = map[status] || { bg: 'bg-gray-100 text-gray-600', label: status }
   return <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${s.bg}`}>{labels?.[status] || s.label}</span>
@@ -101,7 +101,7 @@ export function StatusBadge({ status, labels }) {
 
 // Mini bar for pipeline/funnel
 export function PipelineBar({ stages }) {
-  const colors = ['bg-blue-500', 'bg-cyan-500', 'bg-yellow-500', 'bg-orange-500', 'bg-green-500']
+  const colors = ['bg-[#7DC242]', 'bg-[#5A9020]', 'bg-yellow-500', 'bg-orange-500', 'bg-green-500']
   const max = Math.max(...stages.map(s => s.count), 1)
   return (
     <div className="space-y-2">
@@ -127,7 +127,7 @@ export function TabPills({ tabs, active, onChange }) {
       {tabs.map(t => (
         <button key={t.key} onClick={() => onChange(t.key)}
           className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors whitespace-nowrap ${
-            active === t.key ? 'bg-white text-blue-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+            active === t.key ? 'bg-white text-[#5A9020] shadow-sm' : 'text-gray-500 hover:text-gray-700'
           }`}>
           {t.label} {t.count != null && <span className="ml-1 text-gray-400">({t.count})</span>}
         </button>
@@ -137,7 +137,7 @@ export function TabPills({ tabs, active, onChange }) {
 }
 
 // Progress bar
-export function ProgressBar({ value, max = 100, color = 'bg-blue-500', className = '' }) {
+export function ProgressBar({ value, max = 100, color = 'bg-[#7DC242]', className = '' }) {
   const pct = Math.min((value / max) * 100, 100)
   return (
     <div className={`w-full bg-gray-100 rounded-full h-2 ${className}`}>

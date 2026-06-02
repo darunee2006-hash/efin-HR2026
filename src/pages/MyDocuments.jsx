@@ -7,7 +7,7 @@ import { useCompanyFilter } from '../lib/CompanyFilterContext'
 const T = (lang, th, en) => lang === 'th' ? th : en
 
 const DOC_TYPES = [
-  { key: 'employment_cert', icon: FileCheck, color: 'bg-blue-500', label_th: 'หนังสือรับรองการทำงาน', label_en: 'Employment Certificate', desc_th: 'ยืนยันสถานะการเป็นพนักงานของบริษัท', desc_en: 'Confirm employment status' },
+  { key: 'employment_cert', icon: FileCheck, color: 'bg-[#7DC242]', label_th: 'หนังสือรับรองการทำงาน', label_en: 'Employment Certificate', desc_th: 'ยืนยันสถานะการเป็นพนักงานของบริษัท', desc_en: 'Confirm employment status' },
   { key: 'salary_cert', icon: Building2, color: 'bg-emerald-500', label_th: 'หนังสือรับรองเงินเดือน', label_en: 'Salary Certificate', desc_th: 'ยืนยันอัตราเงินเดือนปัจจุบัน', desc_en: 'Confirm current salary rate' },
   { key: 'payslip', icon: Receipt, color: 'bg-violet-500', label_th: 'สลิปเงินเดือน', label_en: 'Payslip', desc_th: 'รายละเอียดการจ่ายเงินเดือนประจำเดือน', desc_en: 'Monthly payment details' },
   { key: 'withholding_tax', icon: Stamp, color: 'bg-amber-500', label_th: 'หนังสือรับรองภาษี (50 ทวิ)', label_en: 'Withholding Tax Certificate', desc_th: 'หนังสือรับรองการหักภาษี ณ ที่จ่าย', desc_en: 'Tax withholding certificate' },
@@ -266,7 +266,7 @@ function AdminSignaturePanel({ settings, onUpdate, lang }) {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mt-6">
       <div className="flex items-center gap-2 mb-4">
-        <Stamp className="w-5 h-5 text-blue-600" />
+        <Stamp className="w-5 h-5 text-[#7DC242]" />
         <h3 className="text-base font-bold text-gray-900">{T(lang, 'ตั้งค่าลายเซ็น HR', 'HR Signature Settings')}</h3>
         <span className="px-2 py-0.5 text-[10px] font-bold bg-red-100 text-red-600 rounded-full">ADMIN</span>
       </div>
@@ -300,7 +300,7 @@ function AdminSignaturePanel({ settings, onUpdate, lang }) {
               {T(lang, 'ยังไม่มีรูปลายเซ็น', 'No signature uploaded')}
             </div>
           )}
-          <label className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 cursor-pointer transition">
+          <label className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#7DC242] bg-[#f0fce8] rounded-lg hover:bg-[#E6F9F0] cursor-pointer transition">
             <Upload className="w-3.5 h-3.5" />
             {T(lang, 'อัปโหลดรูป', 'Upload')}
             <input ref={fileRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
@@ -311,7 +311,7 @@ function AdminSignaturePanel({ settings, onUpdate, lang }) {
 
       <div className="flex items-center gap-3 mt-5">
         <button onClick={handleSave} disabled={saving}
-          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition">
+          className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[#7DC242] rounded-lg hover:bg-[#5A9020] disabled:opacity-50 transition">
           <Save className="w-4 h-4" />
           {saving ? T(lang, 'กำลังบันทึก...', 'Saving...') : T(lang, 'บันทึก', 'Save')}
         </button>
@@ -447,7 +447,7 @@ export default function MyDocuments({ lang }) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="w-8 h-8 border-3 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-3 border-[#C5E888] border-t-blue-600 rounded-full animate-spin" />
       </div>
     )
   }
@@ -467,8 +467,8 @@ export default function MyDocuments({ lang }) {
 
       {/* Employee info */}
       {employee && (
-        <div className="bg-blue-50 rounded-xl p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm">
+        <div className="bg-[#f0fce8] rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-[#7DC242] text-white flex items-center justify-center font-bold text-sm">
             {(employee.first_name_th || '?')[0]}
           </div>
           <div>
@@ -502,7 +502,7 @@ export default function MyDocuments({ lang }) {
             <button
               onClick={() => handleRequest(doc.key)}
               disabled={generating === doc.key || !employee}
-              className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+              className="mt-4 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-white bg-[#7DC242] rounded-xl hover:bg-[#5A9020] disabled:opacity-50 disabled:cursor-not-allowed transition">
               {generating === doc.key ? (
                 <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> {T(lang, 'กำลังสร้าง...', 'Generating...')}</>
               ) : (

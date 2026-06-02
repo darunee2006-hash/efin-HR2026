@@ -261,7 +261,7 @@ export default function Reports({ lang }) {
           <div className="flex-1">
             <label className="block text-xs font-medium text-gray-600 mb-2">{labels.type}</label>
             <select value={filterType} onChange={(e) => setFilterType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]">
               <option value="all">{lang === 'th' ? 'ทั้งหมด' : 'All Types'}</option>
               <option value="fulltime">{lang === 'th' ? 'พนักงานประจำ' : 'Full Time'}</option>
               <option value="contract">{lang === 'th' ? 'สัญญาจ้าง' : 'Contract'}</option>
@@ -270,7 +270,7 @@ export default function Reports({ lang }) {
           <div className="flex-1">
             <label className="block text-xs font-medium text-gray-600 mb-2">{labels.department}</label>
             <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]">
               <option value="all">{lang === 'th' ? 'ทุกแผนก' : 'All Departments'}</option>
               {departments.map(d => <option key={d.id} value={d.id}>{lang === 'th' ? (d.name_th || d.name_en || d.code) : (d.name_en || d.name_th || d.code)}</option>)}
             </select>
@@ -278,14 +278,14 @@ export default function Reports({ lang }) {
           <div className="flex-1">
             <label className="block text-xs font-medium text-gray-600 mb-2">{labels.period}</label>
             <select value={filterPeriod} onChange={(e) => setFilterPeriod(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]">
               <option value="3m">{lang === 'th' ? '3 เดือนล่าสุด' : 'Last 3 months'}</option>
               <option value="6m">{lang === 'th' ? '6 เดือนล่าสุด' : 'Last 6 months'}</option>
               <option value="12m">{lang === 'th' ? '12 เดือนล่าสุด' : 'Last 12 months'}</option>
             </select>
           </div>
           <button onClick={handleExportExcel}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg font-medium transition-colors">
+            className="flex items-center gap-2 px-4 py-2 bg-[#7DC242] hover:bg-[#5A9020] text-white text-sm rounded-lg font-medium transition-colors">
             <Download size={16} />
             {labels.export}
           </button>
@@ -293,7 +293,7 @@ export default function Reports({ lang }) {
 
         {/* KPI Cards */}
         <div className="grid grid-cols-5 gap-4">
-          <KPICard icon={Users} iconBg="bg-blue-100" iconColor="text-blue-600"
+          <KPICard icon={Users} iconBg="bg-[#E6F9F0]" iconColor="text-[#7DC242]"
             label={labels.employees} value={kpis.active} />
           <KPICard icon={TrendingDown} iconBg="bg-red-100" iconColor="text-red-600"
             label={labels.turnover} value={`${kpis.turnoverRate}%`} />

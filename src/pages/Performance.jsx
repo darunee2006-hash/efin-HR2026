@@ -505,7 +505,7 @@ function ProbationTab({ lang }) {
                                       <CheckCircle className="w-3 h-3" />เสร็จ
                                     </span>
                                   ) : ev.status === 'in_progress' ? (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full text-[10px] font-medium">
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#E6F9F0] text-[#5A9020] rounded-full text-[10px] font-medium">
                                       <Clock className="w-3 h-3" />กำลังประเมิน
                                     </span>
                                   ) : (
@@ -539,7 +539,7 @@ function ProbationTab({ lang }) {
                             {ev.status === 'completed' && <span className="ml-2 text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full">คะแนน: {ev.total_score} ({ev.grade})</span>}
                           </h4>
                           {canEdit && !isEditing && (
-                            <button onClick={() => startEditing(ev)} className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50">
+                            <button onClick={() => startEditing(ev)} className="flex items-center gap-1 text-xs text-[#7DC242] hover:text-[#4E7F1A] px-2 py-1 rounded hover:bg-[#f0fce8]">
                               <Edit3 className="w-3.5 h-3.5" />ประเมิน
                             </button>
                           )}
@@ -607,7 +607,7 @@ function ProbationTab({ lang }) {
                                 <td className="px-3 py-2 text-center text-lg text-[#5A9020]">{total !== null ? total.toFixed(1) : '-'}</td>
                                 <td className="px-3 py-2 text-[#7DC242]">
                                   {total !== null && <span className={`px-2 py-0.5 rounded-full text-xs ${
-                                    total >= 90 ? 'bg-green-100 text-green-700' : total >= 75 ? 'bg-blue-100 text-blue-700' :
+                                    total >= 90 ? 'bg-green-100 text-green-700' : total >= 75 ? 'bg-[#E6F9F0] text-[#5A9020]' :
                                     total >= 60 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
                                   }`}>เกรด: {getGradeFromScore(total)}</span>}
                                 </td>
@@ -679,7 +679,7 @@ function ProbationTab({ lang }) {
                               <tr key={g.grade} className="hover:bg-white">
                                 <td className="px-2 py-1 font-medium">{g.range}</td>
                                 <td className="px-2 py-1 text-center"><span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${
-                                  g.grade === 'A' ? 'bg-green-100 text-green-700' : g.grade === 'B+' ? 'bg-blue-100 text-blue-700' :
+                                  g.grade === 'A' ? 'bg-green-100 text-green-700' : g.grade === 'B+' ? 'bg-[#E6F9F0] text-[#5A9020]' :
                                   g.grade === 'B' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
                                 }`}>{g.grade}</span></td>
                                 <td className="px-2 py-1 text-gray-600">{g.meaning}</td>
@@ -810,7 +810,7 @@ export default function Performance({ lang }) {
     const total = companyFilteredEmployees.length || 1
     return [
       { key: 'completed', label: lang === 'th' ? 'เสร็จสิ้น' : 'Completed', count: Math.ceil(total * 0.45), color: 'bg-green-500' },
-      { key: 'ontrack', label: lang === 'th' ? 'ตามแผน' : 'On Track', count: Math.ceil(total * 0.30), color: 'bg-blue-500' },
+      { key: 'ontrack', label: lang === 'th' ? 'ตามแผน' : 'On Track', count: Math.ceil(total * 0.30), color: 'bg-[#7DC242]' },
       { key: 'behind', label: lang === 'th' ? 'ล่าช้า' : 'Behind', count: Math.ceil(total * 0.15), color: 'bg-yellow-500' },
       { key: 'atrisk', label: lang === 'th' ? 'เสี่ยง' : 'At Risk', count: Math.ceil(total * 0.10), color: 'bg-orange-500' },
     ]
@@ -856,7 +856,7 @@ export default function Performance({ lang }) {
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <KPICard icon={Users} iconBg="bg-blue-100" iconColor="text-blue-600" label={lang === 'th' ? 'จำนวนพนักงาน' : 'Employees'} value={metrics.totalEmployees} />
+            <KPICard icon={Users} iconBg="bg-[#E6F9F0]" iconColor="text-[#7DC242]" label={lang === 'th' ? 'จำนวนพนักงาน' : 'Employees'} value={metrics.totalEmployees} />
             <KPICard icon={CheckCircle} iconBg="bg-green-100" iconColor="text-green-600" label={lang === 'th' ? 'ผ่านประเมิน' : 'Passed'} value="89" />
             <KPICard icon={Star} iconBg="bg-yellow-100" iconColor="text-yellow-600" label={lang === 'th' ? 'คะแนนเฉลี่ย' : 'Avg Score'} value="3.86" />
             <KPICard icon={Trophy} iconBg="bg-orange-100" iconColor="text-orange-600" label={lang === 'th' ? 'คะแนนสูงสุด' : 'Max Score'} value="5.00" />
@@ -914,7 +914,7 @@ export default function Performance({ lang }) {
               )}
               <Section title={lang === 'th' ? 'ระบบ Feedback จากผู้บังคับบัญชา' : 'Manager Feedback'}>
                 <div className="space-y-3 text-sm">
-                  {[{ label: lang === 'th' ? 'เป้าหมายชัดเจน' : 'Clear Goals', pct: '92%', color: 'bg-blue-500' },
+                  {[{ label: lang === 'th' ? 'เป้าหมายชัดเจน' : 'Clear Goals', pct: '92%', color: 'bg-[#7DC242]' },
                     { label: lang === 'th' ? 'การสนับสนุน' : 'Support', pct: '88%', color: 'bg-green-500' },
                     { label: lang === 'th' ? 'การพัฒนา' : 'Development', pct: '85%', color: 'bg-yellow-500' }
                   ].map(f => (<div key={f.label} className="flex items-start gap-2"><div className={`w-2 h-2 rounded-full ${f.color} mt-1.5 flex-shrink-0`} /><div><p className="font-medium text-gray-700">{f.label}</p><p className="text-xs text-gray-500">{f.pct} {lang === 'th' ? 'ความพึงพอใจ' : 'satisfaction'}</p></div></div>))}
@@ -943,13 +943,13 @@ export default function Performance({ lang }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-2">{lang === 'th' ? 'แผนก' : 'Department'}</label>
-                    <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#7DC242]">
                       {departments.map(d => (<option key={d.key} value={d.key}>{d.label}</option>))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-gray-700 mb-2">{lang === 'th' ? 'ช่วงเวลา' : 'Period'}</label>
-                    <select value={filterPeriod} onChange={(e) => setFilterPeriod(e.target.value)} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select value={filterPeriod} onChange={(e) => setFilterPeriod(e.target.value)} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#7DC242]">
                       <option value="2024-Q4">Q4 2024</option><option value="2024-Q3">Q3 2024</option><option value="2024-Q2">Q2 2024</option><option value="2024-Q1">Q1 2024</option>
                     </select>
                   </div>
@@ -981,7 +981,7 @@ export default function Performance({ lang }) {
                         <td className="px-4 py-3 text-center font-medium text-gray-900">{emp.boss_score.toFixed(2)}</td>
                         <td className="px-4 py-3 text-center text-gray-600">{emp.self_score.toFixed(2)}</td>
                         <td className="px-4 py-3 text-center font-bold text-gray-900">{emp.avg_score.toFixed(2)}</td>
-                        <td className="px-4 py-3 text-center"><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${emp.grade === 'A' ? 'bg-green-100 text-green-700' : emp.grade === 'B+' ? 'bg-blue-100 text-blue-700' : emp.grade === 'B' ? 'bg-cyan-100 text-cyan-700' : emp.grade === 'C+' ? 'bg-yellow-100 text-yellow-700' : 'bg-orange-100 text-orange-700'}`}>{emp.grade}</span></td>
+                        <td className="px-4 py-3 text-center"><span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${emp.grade === 'A' ? 'bg-green-100 text-green-700' : emp.grade === 'B+' ? 'bg-[#E6F9F0] text-[#5A9020]' : emp.grade === 'B' ? 'bg-cyan-100 text-cyan-700' : emp.grade === 'C+' ? 'bg-yellow-100 text-yellow-700' : 'bg-orange-100 text-orange-700'}`}>{emp.grade}</span></td>
                         <td className="px-4 py-3 text-center"><StatusBadge status="completed" labels={{ completed: lang === 'th' ? 'เสร็จสิ้น' : 'Completed' }} /></td>
                       </tr>
                     ))}

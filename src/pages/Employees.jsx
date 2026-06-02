@@ -547,7 +547,7 @@ export default function Employees({ lang }) {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-3">
-        <KPICard icon={Users} iconBg="bg-blue-100" iconColor="text-blue-600" label="จำนวนพนักงานทั้งหมด" value={totalEmployees} />
+        <KPICard icon={Users} iconBg="bg-[#E6F9F0]" iconColor="text-[#7DC242]" label="จำนวนพนักงานทั้งหมด" value={totalEmployees} />
         <KPICard icon={UserCheck} iconBg="bg-green-100" iconColor="text-green-600" label="พนักงานประจำ" value={fullTimeCount} />
         <KPICard icon={Building} iconBg="bg-purple-100" iconColor="text-purple-600" label="แผนก/ฝ่าย" value={deptCount} />
         <KPICard icon={UserPlus} iconBg="bg-orange-100" iconColor="text-orange-600" label="พนักงานใหม่เดือนนี้" value={newHireCount} />
@@ -584,12 +584,12 @@ export default function Employees({ lang }) {
                 placeholder="ค้นหารหัส, ชื่อ, อีเมล..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
               />
             </div>
             <button
               onClick={handleOpenAddModal}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-[#7DC242] text-white rounded-lg font-medium text-sm hover:bg-[#5A9020] transition-colors flex items-center gap-2"
             >
               <Plus size={16} /> เพิ่มพนักงาน
             </button>
@@ -626,7 +626,7 @@ export default function Employees({ lang }) {
                 <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 w-64 py-2">
                   <p className="px-4 py-1 text-xs text-gray-500 font-medium">เลือกคอลัมน์ที่จะแสดง</p>
                   <div className="px-4 py-1.5 flex gap-2 border-b border-gray-100 mb-1">
-                    <button onClick={selectAllColumns} className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                    <button onClick={selectAllColumns} className="text-xs text-[#7DC242] hover:text-[#4E7F1A] font-medium flex items-center gap-1">
                       <CheckSquare size={12} /> เลือกทั้งหมด
                     </button>
                     <button onClick={deselectAllColumns} className="text-xs text-gray-500 hover:text-gray-700 font-medium">ล้าง</button>
@@ -638,7 +638,7 @@ export default function Employees({ lang }) {
                           type="checkbox"
                           checked={visibleColumns.includes(col.key)}
                           onChange={() => toggleColumn(col.key)}
-                          className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="w-4 h-4 rounded border-gray-300 text-[#7DC242] focus:ring-[#7DC242]"
                         />
                         <span className="text-sm text-gray-700">{col.label}</span>
                         {col.sensitive && <span className="text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded font-medium">sensitive</span>}
@@ -653,7 +653,7 @@ export default function Employees({ lang }) {
             <select
               value={filterDept}
               onChange={(e) => setFilterDept(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
             >
               <option value="all">แผนก/ฝ่าย ทั้งหมด</option>
               {departments.map((dept) => (
@@ -665,7 +665,7 @@ export default function Employees({ lang }) {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
             >
               <option value="all">สถานะ ทั้งหมด</option>
               <option value="active">ทำงาน</option>
@@ -722,7 +722,7 @@ export default function Employees({ lang }) {
                       key={emp.id}
                       onClick={() => setSelectedEmployee(emp)}
                       className={`border-b border-gray-100 cursor-pointer transition-colors ${
-                        selectedEmployee?.id === emp.id ? 'bg-blue-50' : 'hover:bg-gray-50'
+                        selectedEmployee?.id === emp.id ? 'bg-[#f0fce8]' : 'hover:bg-gray-50'
                       }`}
                     >
                       {allColumns.filter(c => visibleColumns.includes(c.key)).map(col => cellMap[col.key])}
@@ -784,7 +784,7 @@ export default function Employees({ lang }) {
                   </div>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  <button onClick={() => { handleOpenEditModal(emp); }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 flex items-center gap-1">
+                  <button onClick={() => { handleOpenEditModal(emp); }} className="px-3 py-2 bg-[#7DC242] text-white rounded-lg text-xs font-medium hover:bg-[#5A9020] flex items-center gap-1">
                     <Edit2 size={14} /> แก้ไข
                   </button>
                   <button onClick={() => setSelectedEmployee(null)} className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
@@ -882,7 +882,7 @@ export default function Employees({ lang }) {
               <div className="px-6 py-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-400">
                 <span>อัปเดตล่าสุด: {emp.updated_at ? formatThaiDate(emp.updated_at) : '-'}</span>
                 <div className="flex gap-2">
-                  <button onClick={() => { handleOpenEditModal(emp); }} className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 flex items-center gap-1">
+                  <button onClick={() => { handleOpenEditModal(emp); }} className="px-3 py-1.5 bg-[#7DC242] text-white rounded-lg text-xs font-medium hover:bg-[#5A9020] flex items-center gap-1">
                     <Edit2 size={12} /> แก้ไข
                   </button>
                   <button onClick={() => { if (window.confirm('ยืนยันการลบพนักงาน?')) { handleDelete(emp); setSelectedEmployee(null); } }}
@@ -926,7 +926,7 @@ export default function Employees({ lang }) {
                     value={formData.employee_code}
                     onChange={handleFormChange}
                     disabled={!!selectedEmployee}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242] disabled:bg-gray-100"
                     required
                   />
                   {formErrors.employee_code && <p className="text-red-500 text-xs mt-1">{formErrors.employee_code}</p>}
@@ -938,7 +938,7 @@ export default function Employees({ lang }) {
                     name="prefix_th"
                     value={formData.prefix_th}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   />
                 </div>
                 <div>
@@ -948,7 +948,7 @@ export default function Employees({ lang }) {
                     name="first_name_th"
                     value={formData.first_name_th}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                     required
                   />
                   {formErrors.first_name_th && <p className="text-red-500 text-xs mt-1">{formErrors.first_name_th}</p>}
@@ -960,7 +960,7 @@ export default function Employees({ lang }) {
                     name="last_name_th"
                     value={formData.last_name_th}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                     required
                   />
                   {formErrors.last_name_th && <p className="text-red-500 text-xs mt-1">{formErrors.last_name_th}</p>}
@@ -972,7 +972,7 @@ export default function Employees({ lang }) {
                     name="first_name_en"
                     value={formData.first_name_en}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                     required
                   />
                   {formErrors.first_name_en && <p className="text-red-500 text-xs mt-1">{formErrors.first_name_en}</p>}
@@ -984,7 +984,7 @@ export default function Employees({ lang }) {
                     name="last_name_en"
                     value={formData.last_name_en}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                     required
                   />
                   {formErrors.last_name_en && <p className="text-red-500 text-xs mt-1">{formErrors.last_name_en}</p>}
@@ -996,7 +996,7 @@ export default function Employees({ lang }) {
                     name="email"
                     value={formData.email}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   />
                 </div>
                 <div>
@@ -1006,7 +1006,7 @@ export default function Employees({ lang }) {
                     name="phone"
                     value={formData.phone}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   />
                 </div>
                 <div>
@@ -1015,7 +1015,7 @@ export default function Employees({ lang }) {
                     name="department_id"
                     value={formData.department_id}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                     required
                   >
                     <option value="">เลือก</option>
@@ -1032,7 +1032,7 @@ export default function Employees({ lang }) {
                     name="position_th"
                     value={formData.position_th}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   />
                 </div>
                 <div>
@@ -1041,7 +1041,7 @@ export default function Employees({ lang }) {
                     name="employment_type"
                     value={formData.employment_type}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   >
                     <option value="permanent">ประจำ</option>
                     <option value="contract">สัญญาจ้าง</option>
@@ -1056,7 +1056,7 @@ export default function Employees({ lang }) {
                     name="hire_date"
                     value={formData.hire_date}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                     required
                   />
                   {formErrors.hire_date && <p className="text-red-500 text-xs mt-1">{formErrors.hire_date}</p>}
@@ -1067,7 +1067,7 @@ export default function Employees({ lang }) {
                     name="status"
                     value={formData.status}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   >
                     <option value="active">ทำงาน</option>
                     <option value="probation">ทดลองงาน</option>
@@ -1081,7 +1081,7 @@ export default function Employees({ lang }) {
                     name="company_entity"
                     value={formData.company_entity}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   >
                     <option value="">เลือก</option>
                     {companies.map(c => (
@@ -1097,7 +1097,7 @@ export default function Employees({ lang }) {
                     name="base_salary"
                     value={formData.base_salary}
                     onChange={handleFormChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
                   />
                 </div>
                 )}
@@ -1119,7 +1119,7 @@ export default function Employees({ lang }) {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="px-4 py-2 bg-[#7DC242] text-white font-medium rounded-lg hover:bg-[#5A9020] disabled:opacity-50"
                 >
                   {isSubmitting ? 'กำลังบันทึก...' : 'บันทึก'}
                 </button>
@@ -1174,7 +1174,7 @@ export default function Employees({ lang }) {
                           <button
                             onClick={handleImportTemplate}
                             disabled={isSubmitting}
-                            className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                            className="px-4 py-2 bg-[#7DC242] text-white font-medium rounded-lg hover:bg-[#5A9020] disabled:opacity-50"
                           >
                             {isSubmitting ? 'กำลังนำเข้า...' : `นำเข้า ${importData.length} คน`}
                           </button>
@@ -1195,7 +1195,7 @@ export default function Employees({ lang }) {
                           </button>
                           <button
                             onClick={handleConfirmImport}
-                            className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700"
+                            className="px-4 py-2 bg-[#7DC242] text-white font-medium rounded-lg hover:bg-[#5A9020]"
                           >
                             นำเข้า
                           </button>

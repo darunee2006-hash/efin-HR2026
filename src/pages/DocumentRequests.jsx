@@ -266,7 +266,7 @@ function generateExperienceCert(emp, options) {
 }
 
 const colorMap = {
-  blue:   { bg: 'bg-blue-50',   border: 'border-blue-200',   btn: 'bg-blue-600 hover:bg-blue-700',   icon: 'text-blue-600'   },
+  blue:   { bg: 'bg-[#f0fce8]',   border: 'border-[#C5E888]',   btn: 'bg-[#7DC242] hover:bg-[#5A9020]',   icon: 'text-[#7DC242]'   },
   green:  { bg: 'bg-green-50',  border: 'border-green-200',  btn: 'bg-green-600 hover:bg-green-700',  icon: 'text-green-600'  },
   yellow: { bg: 'bg-yellow-50', border: 'border-yellow-200', btn: 'bg-yellow-600 hover:bg-yellow-700',icon: 'text-yellow-600' },
   purple: { bg: 'bg-purple-50', border: 'border-purple-200', btn: 'bg-purple-600 hover:bg-purple-700',icon: 'text-purple-600' },
@@ -407,16 +407,16 @@ export default function DocumentRequests() {
                 <div className="p-4 text-center text-gray-400 text-sm">ไม่พบพนักงาน</div>
               ) : filteredEmps.slice(0, 50).map(emp => (
                 <button key={emp.id} onClick={() => setSelectedEmpId(emp.id)}
-                  className={`w-full text-left px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors ${selectedEmpId === emp.id ? 'bg-blue-50' : ''}`}>
+                  className={`w-full text-left px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors ${selectedEmpId === emp.id ? 'bg-[#f0fce8]' : ''}`}>
                   <div className="font-medium text-sm text-gray-800">{emp.first_name} {emp.last_name}</div>
                   <div className="text-xs text-gray-400">{emp.employee_code} · {emp.position || emp.job_title || '—'} · {emp.department || '—'}</div>
                 </button>
               ))}
             </div>
             {selectedEmp && (
-              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="font-semibold text-blue-800 text-sm">{selectedEmp.first_name} {selectedEmp.last_name}</div>
-                <div className="text-xs text-blue-600">{selectedEmp.employee_code} · {selectedEmp.bu || selectedEmp.company}</div>
+              <div className="mt-3 p-3 bg-[#f0fce8] border border-[#C5E888] rounded-lg">
+                <div className="font-semibold text-[#4E7F1A] text-sm">{selectedEmp.first_name} {selectedEmp.last_name}</div>
+                <div className="text-xs text-[#7DC242]">{selectedEmp.employee_code} · {selectedEmp.bu || selectedEmp.company}</div>
               </div>
             )}
           </div>
@@ -515,7 +515,7 @@ export default function DocumentRequests() {
                   </>
                 )}
                 <button onClick={handleGenerate} disabled={!selectedEmp || !selectedType || generating}
-                  className={`w-full py-3 rounded-xl text-white font-semibold text-sm transition-all ${!selectedEmp || !selectedType ? 'bg-gray-300 cursor-not-allowed' : generating ? 'bg-gray-400 cursor-wait' : colors?.btn || 'bg-blue-600 hover:bg-blue-700'}`}>
+                  className={`w-full py-3 rounded-xl text-white font-semibold text-sm transition-all ${!selectedEmp || !selectedType ? 'bg-gray-300 cursor-not-allowed' : generating ? 'bg-gray-400 cursor-wait' : colors?.btn || 'bg-[#7DC242] hover:bg-[#5A9020]'}`}>
                   {generating ? '⏳ กำลังสร้าง PDF...' : `📄 สร้าง ${docType?.label || 'เอกสาร'}`}
                 </button>
               </div>

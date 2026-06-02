@@ -211,7 +211,7 @@ export default function Layout({ page, setPage, lang, setLang, children, onRefre
               <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-semibold rounded-full">ADMIN</span>
             )}
             {role === 'manager' && (
-              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-semibold rounded-full">MANAGER</span>
+              <span className="px-2 py-0.5 bg-[#E6F9F0] text-[#5A9020] text-[10px] font-semibold rounded-full">MANAGER</span>
             )}
           </div>
           <div className="flex items-center gap-2">

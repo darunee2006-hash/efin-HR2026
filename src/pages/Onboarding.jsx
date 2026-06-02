@@ -114,7 +114,7 @@ const getLabel = (key, lang) => LABELS[lang]?.[key] || LABELS.en[key];
 
 const statusColors = {
   pending: 'bg-yellow-100 text-yellow-700',
-  in_progress: 'bg-blue-100 text-blue-700',
+  in_progress: 'bg-[#E6F9F0] text-[#5A9020]',
   completed: 'bg-green-100 text-green-700',
   cancelled: 'bg-red-100 text-red-700',
 };
@@ -416,8 +416,8 @@ export default function Onboarding({ lang = 'en' }) {
         />
         <KPICard
           icon={AlertCircle}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-600"
+          iconBg="bg-[#E6F9F0]"
+          iconColor="text-[#7DC242]"
           label={getLabel('inProgress', lang)}
           value={kpis.inProgress}
         />
@@ -731,7 +731,7 @@ function DetailPanel({ onboarding, employee, buddy, lang, onClose }) {
           >
             <div className="space-y-3">
               {onboarding.notes ? (
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="p-4 bg-[#f0fce8] rounded-lg border border-[#C5E888]">
                   <p className="text-sm text-gray-700 whitespace-pre-wrap">{onboarding.notes}</p>
                 </div>
               ) : (

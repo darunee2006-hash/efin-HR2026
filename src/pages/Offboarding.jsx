@@ -124,7 +124,7 @@ const translations = {
 };
 
 const separationTypeColors = {
-  resign: 'bg-blue-100 text-blue-800',
+  resign: 'bg-[#E6F9F0] text-[#4E7F1A]',
   terminate: 'bg-red-100 text-red-800',
   retire: 'bg-green-100 text-green-800',
   end_contract: 'bg-yellow-100 text-yellow-800',
@@ -133,7 +133,7 @@ const separationTypeColors = {
 
 const statusColors = {
   pending: 'bg-gray-100 text-gray-800',
-  in_progress: 'bg-blue-100 text-blue-800',
+  in_progress: 'bg-[#E6F9F0] text-[#4E7F1A]',
   completed: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
 };

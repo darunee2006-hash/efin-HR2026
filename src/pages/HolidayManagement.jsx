@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 
 const TYPES = [
   { value: 'public', th: 'วันหยุดราชการ', en: 'Public Holiday', color: 'bg-red-100 text-red-700' },
-  { value: 'company', th: 'วันหยุดบริษัท', en: 'Company Holiday', color: 'bg-blue-100 text-blue-700' },
+  { value: 'company', th: 'วันหยุดบริษัท', en: 'Company Holiday', color: 'bg-[#E6F9F0] text-[#5A9020]' },
   { value: 'special', th: 'วันหยุดพิเศษ', en: 'Special Holiday', color: 'bg-purple-100 text-purple-700' },
 ];
 
@@ -249,7 +249,7 @@ export default function HolidayManagement({ lang }) {
         {TYPES.map(tp => (
           <div key={tp.value} className="bg-white rounded-xl border border-gray-200 p-4">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`inline-block w-2.5 h-2.5 rounded-full ${tp.value === 'public' ? 'bg-red-500' : tp.value === 'company' ? 'bg-blue-500' : 'bg-purple-500'}`} />
+              <span className={`inline-block w-2.5 h-2.5 rounded-full ${tp.value === 'public' ? 'bg-red-500' : tp.value === 'company' ? 'bg-[#7DC242]' : 'bg-purple-500'}`} />
               <span className="text-xs text-gray-500">{lang === 'th' ? tp.th : tp.en}</span>
             </div>
             <p className="text-2xl font-bold text-gray-800">{stats[tp.value] || 0}</p>

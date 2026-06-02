@@ -254,7 +254,7 @@ export default function Documents({ lang = 'th' }) {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-96">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7DC242]"></div>
       </div>
     );
   }
@@ -268,8 +268,8 @@ export default function Documents({ lang = 'th' }) {
       <div className="grid grid-cols-4 gap-4">
         <KPICard
           icon={FileText}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-600"
+          iconBg="bg-[#E6F9F0]"
+          iconColor="text-[#7DC242]"
           label={t.allDocs}
           value={kpis.total}
         />
@@ -309,9 +309,9 @@ export default function Documents({ lang = 'th' }) {
             placeholder={t.search}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
           />
-          <button className="px-4 py-2 bg-blue-50 text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-100 transition">
+          <button className="px-4 py-2 bg-[#f0fce8] text-[#7DC242] rounded-lg text-sm font-medium hover:bg-[#E6F9F0] transition">
             {t.filter}
           </button>
         </div>
@@ -356,7 +356,7 @@ export default function Documents({ lang = 'th' }) {
                       <tr
                         key={doc.id}
                         onClick={() => setSelectedDoc(doc)}
-                        className="border-b border-gray-50 hover:bg-blue-50 cursor-pointer transition"
+                        className="border-b border-gray-50 hover:bg-[#f0fce8] cursor-pointer transition"
                       >
                         <td className="px-4 py-3 text-xs text-gray-600">{idx + 1}</td>
                         <td className="px-4 py-3 text-xs font-medium text-gray-900 flex items-center gap-2">
@@ -424,7 +424,7 @@ export default function Documents({ lang = 'th' }) {
                   </div>
                 </div>
                 <div className="flex gap-2 pt-3">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700">
+                  <button className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#7DC242] text-white rounded-lg text-xs font-medium hover:bg-[#5A9020]">
                     <Download className="w-4 h-4" />
                     {t.download}
                   </button>

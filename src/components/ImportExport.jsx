@@ -146,7 +146,7 @@ export function ImportModal({ open, onClose, onImport, columns, tableName, lang 
         <div className="p-5 space-y-4">
           {/* Template download */}
           <button onClick={handleDownloadTemplate}
-            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm border border-dashed border-blue-300 text-blue-600 rounded-xl hover:bg-blue-50 transition">
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm border border-dashed border-blue-300 text-[#7DC242] rounded-xl hover:bg-[#f0fce8] transition">
             <Download className="w-4 h-4" />
             {T('ดาวน์โหลด Template', 'Download Template')}
           </button>
@@ -155,7 +155,7 @@ export function ImportModal({ open, onClose, onImport, columns, tableName, lang 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{T('เลือกไฟล์ (.xlsx, .csv)', 'Choose file (.xlsx, .csv)')}</label>
             <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFile}
-              className="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 file:font-medium hover:file:bg-blue-100 cursor-pointer" />
+              className="w-full text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#f0fce8] file:text-[#7DC242] file:font-medium hover:file:bg-[#E6F9F0] cursor-pointer" />
           </div>
 
           {/* Preview */}
@@ -210,7 +210,7 @@ export function ImportModal({ open, onClose, onImport, columns, tableName, lang 
               {T('ปิด', 'Close')}
             </button>
             <button onClick={handleImport} disabled={!file || importing || !!result}
-              className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+              className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-[#7DC242] rounded-xl hover:bg-[#5A9020] disabled:opacity-50 disabled:cursor-not-allowed transition">
               {importing ? T('กำลังนำเข้า...', 'Importing...') : T('นำเข้าข้อมูล', 'Import')}
             </button>
           </div>
@@ -229,7 +229,7 @@ export function ImportExportButtons({ onExport, onImportClick, lang = 'th' }) {
     <div className="flex gap-2">
       {onImportClick && (
         <button onClick={onImportClick}
-          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#7DC242] bg-[#f0fce8] rounded-lg hover:bg-[#E6F9F0] transition">
           <Upload size={14} /> {T('นำเข้า', 'Import')}
         </button>
       )}

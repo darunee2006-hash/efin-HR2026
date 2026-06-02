@@ -11,7 +11,7 @@ const T = (lang, th, en) => lang === 'th' ? th : en;
 
 const STATUS_COLOR = {
   completed:   'bg-green-100 text-green-700',
-  ongoing:     'bg-blue-100 text-blue-700',
+  ongoing:     'bg-[#E6F9F0] text-[#5A9020]',
   registering: 'bg-yellow-100 text-yellow-700',
   cancelled:   'bg-red-100 text-red-700',
 };
@@ -30,7 +30,7 @@ const CAT_LABEL = {
   Digital:      { th: 'ดิจิทัล',      en: 'Digital' },
 };
 const CAT_COLOR = {
-  Technical:    'bg-blue-100 text-blue-700',
+  Technical:    'bg-[#E6F9F0] text-[#5A9020]',
   'Soft Skills':'bg-pink-100 text-pink-700',
   Leadership:   'bg-purple-100 text-purple-700',
   Compliance:   'bg-orange-100 text-orange-700',
@@ -110,7 +110,7 @@ function TrainingModal({ open, onClose, onSaved, lang }) {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-            <BookOpen className="w-5 h-5 text-blue-600" />
+            <BookOpen className="w-5 h-5 text-[#7DC242]" />
             {T(lang, 'เพิ่มหลักสูตรฝึกอบรม', 'Add Training Course')}
           </h3>
           <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400" /></button>
@@ -181,7 +181,7 @@ function TrainingModal({ open, onClose, onSaved, lang }) {
         <div className="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
           <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">{T(lang,'ยกเลิก','Cancel')}</button>
           <button onClick={handleSave} disabled={saving}
-            className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg disabled:opacity-50">
+            className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white bg-[#7DC242] hover:bg-[#5A9020] rounded-lg disabled:opacity-50">
             <Save className="w-4 h-4" />{saving ? T(lang,'กำลังบันทึก...','Saving...') : T(lang,'บันทึก','Save')}
           </button>
         </div>
@@ -349,7 +349,7 @@ export default function Training({ lang = 'th' }) {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#7DC242]" />
     </div>
   );
 
@@ -360,7 +360,7 @@ export default function Training({ lang = 'th' }) {
         <PageHeader title={T(lang, 'ฝึกอบรม', 'Training')} lang={lang} />
         <div className="flex items-center gap-2">
           <button onClick={() => setShowAdd(true)}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-[#7DC242] hover:bg-[#5A9020] rounded-lg transition">
             <Plus className="w-4 h-4" />{T(lang, 'เพิ่มหลักสูตร', 'Add Course')}
           </button>
           <ImportExportButtons onExport={handleExport} onImportClick={() => setShowImport(true)} lang={lang} />
@@ -369,7 +369,7 @@ export default function Training({ lang = 'th' }) {
 
       {/* ── KPI Cards ── */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <KPICard icon={BookOpen}     iconBg="bg-blue-100"   iconColor="text-blue-600"   label={T(lang,'หลักสูตรทั้งหมด','Total Courses')}    value={stats.total} />
+        <KPICard icon={BookOpen}     iconBg="bg-[#E6F9F0]"   iconColor="text-[#7DC242]"   label={T(lang,'หลักสูตรทั้งหมด','Total Courses')}    value={stats.total} />
         <KPICard icon={CheckCircle}  iconBg="bg-green-100"  iconColor="text-green-600"  label={T(lang,'เสร็จสิ้น','Completed')}             value={stats.completed} sub={T(lang,'หลักสูตร','courses')} />
         <KPICard icon={Users}        iconBg="bg-purple-100" iconColor="text-purple-600" label={T(lang,'ผู้เข้าร่วมรวม','Total Participants')} value={stats.participants.toLocaleString('th-TH')} sub={T(lang,'คน','ppl')} />
         <KPICard icon={Clock}        iconBg="bg-orange-100" iconColor="text-orange-600" label={T(lang,'ชั่วโมงอบรมรวม','Total Hours')}       value={stats.totalHours.toLocaleString('th-TH')} sub={T(lang,'ชม.','hrs')} />
@@ -430,7 +430,7 @@ export default function Training({ lang = 'th' }) {
                 return (
                   <div key={s.id}
                     onClick={() => setSelectedId(s.id)}
-                    className={`p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-blue-300 bg-blue-50' : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'}`}>
+                    className={`p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'border-blue-300 bg-[#f0fce8]' : 'border-gray-100 bg-white hover:border-gray-200 hover:bg-gray-50'}`}>
                     <div className="flex items-start justify-between gap-2 mb-1.5">
                       <p className="text-sm font-semibold text-gray-900 leading-snug">{name}</p>
                       <span className={`shrink-0 px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLOR[s.status] || 'bg-gray-100 text-gray-500'}`}>
@@ -466,7 +466,7 @@ export default function Training({ lang = 'th' }) {
                     <p className="text-xs font-medium text-gray-800 truncate max-w-[200px]">{c.name}</p>
                     <span className="text-xs text-gray-500 shrink-0 ml-2">{c.participants} {T(lang,'คน','ppl')}</span>
                   </div>
-                  <ProgressBar value={c.pct} color="bg-blue-500" />
+                  <ProgressBar value={c.pct} color="bg-[#7DC242]" />
                 </div>
               ))}
               {popularCourses.length === 0 && <p className="text-xs text-gray-400 text-center py-4">{T(lang,'ไม่มีข้อมูล','No data')}</p>}
@@ -509,7 +509,7 @@ export default function Training({ lang = 'th' }) {
                   <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-100 text-xs">
                     <div><p className="text-gray-500">{T(lang,'วันเริ่มต้น','Start')}</p><p className="font-medium">{selected.start_date || '-'}</p></div>
                     <div><p className="text-gray-500">{T(lang,'วันสิ้นสุด','End')}</p><p className="font-medium">{selected.end_date || '-'}</p></div>
-                    <div><p className="text-gray-500">{T(lang,'ผู้เข้าร่วม','Participants')}</p><p className="font-bold text-blue-700">{(selected.participants_count||0).toLocaleString()}</p></div>
+                    <div><p className="text-gray-500">{T(lang,'ผู้เข้าร่วม','Participants')}</p><p className="font-bold text-[#5A9020]">{(selected.participants_count||0).toLocaleString()}</p></div>
                     <div><p className="text-gray-500">{T(lang,'ชั่วโมง','Hours')}</p><p className="font-bold text-orange-600">{selected.hours}</p></div>
                     <div className="col-span-2"><p className="text-gray-500">{T(lang,'งบประมาณ','Budget')}</p><p className="font-bold text-green-700">{(selected.budget||0).toLocaleString('th-TH')} {T(lang,'บาท','THB')}</p></div>
                   </div>

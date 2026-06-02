@@ -11,7 +11,7 @@ const LEVEL_COLORS = {
   G10: { bg: 'bg-red-500',   text: 'text-white', border: 'border-red-500',   label: 'C-Level' },
   G9:  { bg: 'bg-red-400',   text: 'text-white', border: 'border-red-400',   label: 'Director' },
   G8:  { bg: 'bg-rose-400',  text: 'text-white', border: 'border-rose-400',  label: 'Director' },
-  G7:  { bg: 'bg-blue-500',  text: 'text-white', border: 'border-blue-500',  label: 'Manager' },
+  G7:  { bg: 'bg-[#7DC242]',  text: 'text-white', border: 'border-[#7DC242]',  label: 'Manager' },
   G6:  { bg: 'bg-blue-400',  text: 'text-white', border: 'border-blue-400',  label: 'Manager' },
   G5:  { bg: 'bg-emerald-500',text:'text-white',  border: 'border-emerald-500',label:'Lead' },
   G4:  { bg: 'bg-purple-400',text: 'text-white', border: 'border-purple-400',label: 'Senior' },
@@ -89,7 +89,7 @@ function DeptSection({ dept, emps, lang, color, isSelected, onSelect }) {
 
   return (
     <div
-      className={`rounded-xl border-2 transition cursor-pointer ${isSelected ? 'border-blue-500 bg-blue-50/50 shadow-lg' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow'}`}
+      className={`rounded-xl border-2 transition cursor-pointer ${isSelected ? 'border-[#7DC242] bg-[#f0fce8]/50 shadow-lg' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow'}`}
       onClick={() => onSelect(dept)}
     >
       <div className="p-3 flex items-center gap-3">
@@ -183,7 +183,7 @@ function OrgDetailPanel({ deptName, emps, lang, color, onClose, groupBy = 'level
             return (
               <div key={groupName}>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#f0fce8] text-[#5A9020] border border-[#C5E888]">
                     <Building2 className="w-3 h-3 mr-1" />
                     {groupName}
                   </span>
@@ -529,7 +529,7 @@ export default function OrgChart({ lang }) {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-3" />
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-[#7DC242] mx-auto mb-3" />
           <div className="text-gray-500 text-sm">{t.loading}</div>
         </div>
       </div>
@@ -542,7 +542,7 @@ export default function OrgChart({ lang }) {
 
       {/* KPIs */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <KPICard icon={Users} iconBg="bg-blue-100" iconColor="text-blue-600" label={t.empCount} value={kpis.total} />
+        <KPICard icon={Users} iconBg="bg-[#E6F9F0]" iconColor="text-[#7DC242]" label={t.empCount} value={kpis.total} />
         <KPICard icon={Building2} iconBg="bg-green-100" iconColor="text-green-600" label={t.deptCount} value={kpis.depts} />
         <KPICard icon={GitBranch} iconBg="bg-orange-100" iconColor="text-orange-600" label={t.buCount} value={kpis.bus} />
         <KPICard icon={Layers} iconBg="bg-purple-100" iconColor="text-purple-600" label={t.levelCount} value={kpis.levels} />
@@ -552,15 +552,15 @@ export default function OrgChart({ lang }) {
       <div className="flex gap-2">
         <button
           onClick={() => setViewMode('chart')}
-          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'chart' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'chart' ? 'bg-[#7DC242] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
         >{t.chartView}</button>
         <button
           onClick={() => setViewMode('bu')}
-          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'bu' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'bu' ? 'bg-[#7DC242] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
         >{t.buView}</button>
         <button
           onClick={() => setViewMode('list')}
-          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'list' ? 'bg-[#7DC242] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
         >{t.listView}</button>
       </div>
 

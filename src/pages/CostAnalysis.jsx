@@ -115,7 +115,7 @@ function CostDetailPopup({ title, icon: Icon, iconBg, data, columns, onClose, su
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filtered.map((row, ri) => (
-                <tr key={ri} className="hover:bg-blue-50/40">
+                <tr key={ri} className="hover:bg-[#f0fce8]/40">
                   <td className="px-4 py-2 text-xs text-gray-400">{ri + 1}</td>
                   {columns.map((col, ci) => (
                     <td key={ci} className={`px-4 py-2 ${col.align==='right'?'text-right font-mono':''}`}>{col.render ? col.render(row) : row[col.key]}</td>
@@ -909,7 +909,7 @@ export default function CostAnalysis(){
           <Clock size={14}/>อัปเดตชั่วโมงทำงาน
         </button>
         <button onClick={()=>{setShowImport(true);setImportFile(null);setImportPreview(null);setImportError(null);setImportResult(null)}}
-          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+          className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-[#7DC242] bg-[#f0fce8] rounded-lg hover:bg-[#E6F9F0] transition">
           <Upload size={14}/>นำเข้า
         </button>
         <div className="relative group">
@@ -1228,7 +1228,7 @@ export default function CostAnalysis(){
               <td className="px-3 py-1.5 text-gray-700 font-medium whitespace-nowrap">{`${e.prefix_th||''}${e.first_name_th||''} ${e.last_name_th||''}`.trim()}</td>
               <td className="px-3 py-1.5 text-gray-500 text-xs truncate max-w-[150px]">{e.position_th||'-'}</td>
               <td className="px-3 py-1.5 text-gray-500 text-xs truncate max-w-[150px]">{deptLookup[e.department_id]||'-'}</td>
-              <td className="px-3 py-1.5 text-xs">{e.company_entity ? <span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 whitespace-nowrap">{e.company_entity}</span> : '-'}</td>
+              <td className="px-3 py-1.5 text-xs">{e.company_entity ? <span className="px-1.5 py-0.5 rounded bg-[#f0fce8] text-[#5A9020] whitespace-nowrap">{e.company_entity}</span> : '-'}</td>
               <td className="px-3 py-1.5 text-xs">{e.bu ? <span className="px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 whitespace-nowrap">{e.bu}</span> : '-'}</td>
               <td className="px-3 py-1.5 text-xs text-gray-500">{e.employment_type||'-'}</td>
               <td className="px-3 py-1.5 text-xs"><span className={`px-1.5 py-0.5 rounded ${statusColor}`}>{e.status||'-'}</span></td>
@@ -1370,7 +1370,7 @@ export default function CostAnalysis(){
               <tbody>
                 {depts.map(([name,dd])=><tr key={name} className="border-t border-gray-100 hover:bg-gray-50">
                   <td className="px-4 py-2 text-gray-700 text-xs">{name}</td>
-                  <td className="px-4 py-2 text-xs"><span className="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">{dd.company||'-'}</span></td>
+                  <td className="px-4 py-2 text-xs"><span className="px-1.5 py-0.5 rounded bg-[#f0fce8] text-[#5A9020]">{dd.company||'-'}</span></td>
                   <td className="px-4 py-2 text-right tabular-nums">{dd.headcount.size}</td>
                   <td className="px-4 py-2 text-right tabular-nums">฿{fmt(Math.round(dd.salary))}</td>
                   <td className="px-4 py-2 text-right tabular-nums">฿{fmt(Math.round(dd.ot))}</td>
@@ -1516,9 +1516,9 @@ export default function CostAnalysis(){
       </div>
 
       {/* Calculation note */}
-      <div className="bg-blue-50 rounded-xl border border-blue-100 p-4">
-        <p className="text-xs font-semibold text-blue-800 mb-2 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5"/>หลักการคำนวณ</p>
-        <div className="text-xs text-blue-700 space-y-1">
+      <div className="bg-[#f0fce8] rounded-xl border border-blue-100 p-4">
+        <p className="text-xs font-semibold text-[#4E7F1A] mb-2 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5"/>หลักการคำนวณ</p>
+        <div className="text-xs text-[#5A9020] space-y-1">
           <p>1. ดึงชั่วโมงทำงานของพนักงานแต่ละคนแยกตาม product code จาก hr_hours_allocation</p>
           <p>2. คำนวณสัดส่วน % ชั่วโมงในแต่ละ product ต่อชั่วโมงรวมของคนนั้น</p>
           <p>3. จัดสรรต้นทุน (เงินเดือน, OT, ประกันสังคม, กองทุน, สวัสดิการ) ตามสัดส่วนเข้า product</p>
@@ -1568,7 +1568,7 @@ export default function CostAnalysis(){
                 <span className="text-sm font-medium text-gray-800">เดือน: <span className="text-amber-600 font-bold">{hoursMonth}</span></span>
                 {hoursMonthStatus[hoursMonth]?.records>0 && <span className="ml-2 text-xs text-orange-500">(มีข้อมูลเดิม {hoursMonthStatus[hoursMonth].records} รายการ — จะถูกแทนที่)</span>}
               </div>
-              <button onClick={handleDownloadHoursTemplate} className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800">
+              <button onClick={handleDownloadHoursTemplate} className="flex items-center gap-1 text-xs text-[#7DC242] hover:text-[#4E7F1A]">
                 <Download size={12}/>ดาวน์โหลด Template
               </button>
             </div>
@@ -1655,7 +1655,7 @@ export default function CostAnalysis(){
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">เลือกไฟล์ Excel (.xlsx)</label>
             <input ref={fileRef} type="file" accept=".xlsx,.xls,.csv" onChange={handleFileSelect}
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 file:mr-3 file:px-3 file:py-1 file:rounded file:border-0 file:bg-blue-50 file:text-blue-600 file:text-xs file:font-medium"/>
+              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 file:mr-3 file:px-3 file:py-1 file:rounded file:border-0 file:bg-[#f0fce8] file:text-[#7DC242] file:text-xs file:font-medium"/>
           </div>
 
           {importPreview && <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
@@ -1676,7 +1676,7 @@ export default function CostAnalysis(){
           <div className="flex gap-2 pt-2">
             <button onClick={()=>setShowImport(false)} className="flex-1 px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50">ยกเลิก</button>
             <button onClick={handleImport} disabled={!importPreview?.length||importing}
-              className="flex-1 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+              className="flex-1 px-4 py-2 text-sm bg-[#7DC242] text-white rounded-lg hover:bg-[#5A9020] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
               {importing?<><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"/>กำลังนำเข้า...</>:<><Upload size={14}/>นำเข้า {importPreview?.length||0} รายการ</>}
             </button>
           </div>

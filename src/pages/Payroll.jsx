@@ -534,7 +534,7 @@ export default function Payroll({ lang }) {
           </div>
         </div>
 
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
+        <button className="px-4 py-2 bg-[#7DC242] text-white rounded-lg text-sm font-medium hover:bg-[#5A9020] flex items-center gap-2">
           <Plus className="w-4 h-4" />
           {T(lang, 'สร้างรายการเงินเดือน', 'Generate Payroll')}
         </button>
@@ -557,8 +557,8 @@ export default function Payroll({ lang }) {
         />
         <KPICard
           icon={Calculator}
-          iconBg="bg-blue-100"
-          iconColor="text-blue-600"
+          iconBg="bg-[#E6F9F0]"
+          iconColor="text-[#7DC242]"
           label={T(lang, 'เฉลี่ย/คน', 'Avg per Person')}
           value={formatCurrency(stats.avgPerPerson)}
         />
@@ -614,7 +614,7 @@ export default function Payroll({ lang }) {
               </div>
               <div>
                 <p className="text-xs text-gray-500 mb-1">{T(lang, 'สถานะ', 'Status')}</p>
-                <p className="text-sm font-semibold text-blue-600">{T(lang, 'คำนวณแล้ว', 'Calculated')}</p>
+                <p className="text-sm font-semibold text-[#7DC242]">{T(lang, 'คำนวณแล้ว', 'Calculated')}</p>
               </div>
             </div>
           </Section>
@@ -751,9 +751,9 @@ export default function Payroll({ lang }) {
           {/* Personnel Expense Summary */}
           <Section title={T(lang, 'สรุปค่าใช้จ่ายด้านบุคลากร', 'Personnel Expense Summary')}>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-[#f0fce8] rounded-lg">
                 <span className="text-xs font-medium text-gray-600">{T(lang, 'เงินเดือนรวม', 'Total Salary')}</span>
-                <span className="font-bold text-blue-600">{formatNumber(stats.totalSalary)}</span>
+                <span className="font-bold text-[#7DC242]">{formatNumber(stats.totalSalary)}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                 <span className="text-xs font-medium text-gray-600">{T(lang, 'กองทุนฯ นายจ้าง', 'PVD Employer')}</span>

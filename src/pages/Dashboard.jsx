@@ -14,17 +14,17 @@ import { useCompanyFilter } from '../lib/CompanyFilterContext'
 
 // ── Brand palette ──────────────────────────────────────────────────
 const G = {
-  primary: '#00A651',
-  dark:    '#007A3D',
-  darker:  '#005A2B',
-  light:   '#E6F9F0',
-  light2:  '#CCF0DE',
-  mid:     '#00C060',
+  primary: '#7DC242',
+  dark:    '#5A9020',
+  darker:  '#4E7F1A',
+  light:   '#E8F5D0',
+  light2:  '#C5E888',
+  mid:     '#8FCC4A',
   accent:  '#F5A623',
-  text:    '#005A2B',
+  text:    '#4E7F1A',
 }
 
-const BU_COLORS = ['#00A651','#007A3D','#00C060','#80DCA8','#F5A623','#A0C8B0','#C8DDD2']
+const BU_COLORS = ['#7DC242','#5A9020','#8FCC4A','#C5E888','#F5A623','#B8DC80','#D8EDE3']
 
 // ── Helpers ────────────────────────────────────────────────────────
 const fmt = (n) => (n ?? 0).toLocaleString('th-TH')
