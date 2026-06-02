@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Users, Calendar, DollarSign, Clock, Award, Home, Globe, Menu, ChevronRight, LogOut, Shield, Network, UserSearch, GraduationCap, Heart, FileText, BarChart3, ChevronLeft, UserPlus, UserMinus, Megaphone, Receipt, Scale, FileDown, RefreshCw, Settings, Building2, Key, Eye, EyeOff, X, Check, Calculator, CalendarDays } from 'lucide-react'
+import { Users, Calendar, DollarSign, Clock, Award, Home, Globe, Menu, ChevronRight, LogOut, Shield, Network, UserSearch, GraduationCap, Heart, FileText, BarChart3, ChevronLeft, UserPlus, UserMinus, Megaphone, Receipt, Scale, FileDown, RefreshCw, Settings, Building2, Key, Eye, EyeOff, X, Check, Calculator, CalendarDays, List } from 'lucide-react'
 import { t } from '../lib/translations'
 import { useAuth } from '../lib/AuthContext'
 import { useCompanyFilter } from '../lib/CompanyFilterContext'
@@ -8,6 +8,7 @@ import { useCompanyFilter } from '../lib/CompanyFilterContext'
 const NAV = [
   { key: 'dashboard', icon: Home, minRole: 'employee' },
   { key: 'employees', icon: Users, minRole: 'manager' },
+  { key: 'staffList', icon: List, minRole: 'supervisor' },
   { key: 'orgChart', icon: Network, minRole: 'manager' },
   { key: 'timeAttendance', icon: Clock, minRole: 'employee' },
   { key: 'leave', icon: Calendar, minRole: 'employee' },
@@ -34,7 +35,7 @@ const ADMIN_NAV = [
   { key: 'holidayManagement', icon: CalendarDays, minRole: 'admin' },
 ]
 
-const ROLE_LEVEL = { employee: 0, manager: 1, admin: 2, superuser: 3 }
+const ROLE_LEVEL = { employee: 0, supervisor: 1, manager: 2, admin: 3, superuser: 4 }
 
 // Labels for pages not in translations
 const extraLabels = {
@@ -54,6 +55,7 @@ const extraLabels = {
   employeeRelations: { th: 'แรงงานสัมพันธ์', en: 'Employee Relations' },
   myDocuments: { th: 'เอกสารของฉัน', en: 'My Documents' },
   costAnalysis: { th: 'วิเคราะห์ต้นทุน', en: 'Cost Analysis' },
+  staffList: { th: 'รายชื่อพนักงานรายบริษัท', en: 'Staff List' },
 }
 
 function label(key, lang) {

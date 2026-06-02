@@ -123,16 +123,18 @@ export function AuthProvider({ children }) {
     setProfile(null)
   }
 
-  // Check role
+  // Check role (4-tier: employee < supervisor < manager < admin < superuser)
   const role = profile?.role || 'employee'
   const isSuperUser = role === 'superuser'
   const isAdmin = role === 'admin' || isSuperUser
   const isManager = role === 'manager' || isAdmin
-  const isEmployee = role === 'employee' || isManager
+  const isSupervisor = role === 'supervisor' || isManager
+  const isEmployee = true // everyone is at least employee level
 
   // Permission helpers
   const canViewAll = isAdmin
-  const canViewTeam = isAdmin || isManager
+  const canViewTeam = isAdmin || isManager        // Tier 3+4: sees full BU/all
+  const canViewAssignedTeam = isSupervisor        // Tier 2+: sees assigned subordinates
   const canEdit = isAdmin
   const canManageUsers = isAdmin
   const canViewSalary = isSuperUser
@@ -140,8 +142,8 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider value={{
       user, profile, loading,
-      role, isSuperUser, isAdmin, isManager, isEmployee,
-      canViewAll, canViewTeam, canEdit, canManageUsers, canViewSalary,
+      role, isSuperUser, isAdmin, isManager, isSupervisor, isEmployee,
+      canViewAll, canViewTeam, canViewAssignedTeam, canEdit, canManageUsers, canViewSalary,
       signIn, signUp, signOut, changePassword,
       fetchProfile
     }}>

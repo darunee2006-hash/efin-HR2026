@@ -27,12 +27,14 @@ import EmployeeRelations from './pages/EmployeeRelations'
 import MyDocuments from './pages/MyDocuments'
 import CompanyManagement from './pages/CompanyManagement'
 import HolidayManagement from './pages/HolidayManagement'
+import StaffList from './pages/StaffList'
 
 // Pages by role level
 const ROLE_PAGES = {
   admin: {
     dashboard: Dashboard,
     employees: Employees,
+    staffList: StaffList,
     orgChart: OrgChart,
     leave: Leave,
     payroll: Payroll,
@@ -58,6 +60,7 @@ const ROLE_PAGES = {
   manager: {
     dashboard: Dashboard,
     employees: Employees,
+    staffList: StaffList,
     orgChart: OrgChart,
     leave: Leave,
     payroll: Payroll,
@@ -74,6 +77,19 @@ const ROLE_PAGES = {
     announcements: Announcements,
     expenses: Expenses,
     employeeRelations: EmployeeRelations,
+    myDocuments: MyDocuments,
+  },
+  supervisor: {
+    dashboard: Dashboard,
+    staffList: StaffList,
+    leave: Leave,
+    timeAttendance: TimeAttendance,
+    performance: Performance,
+    training: Training,
+    welfare: Welfare,
+    documents: Documents,
+    announcements: Announcements,
+    expenses: Expenses,
     myDocuments: MyDocuments,
   },
   employee: {
@@ -113,7 +129,7 @@ function AppContent() {
     return <Login lang={lang} />
   }
 
-  // Determine available pages based on role (admin > manager > employee)
+  // Determine available pages based on role (superuser/admin > manager > supervisor > employee)
   const pages = ROLE_PAGES[role] || (role === 'superuser' ? ROLE_PAGES.admin : ROLE_PAGES.employee)
 
   // If current page not available for role, redirect to dashboard
