@@ -395,4 +395,32 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
                   <div style={{ fontSize:9, color:'#00875A', textTransform:'uppercase' }}>{mm}</div>
                 </div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:12, f
+                  <div style={{ fontSize:12, fontWeight:500, color:'#1a2e1a', lineHeight:1.3 }}>{t.course_name}</div>
+                  <div style={{ fontSize:11, color:'#7A9E8A', marginTop:2 }}>{t.notes || `${t.participants_count||0}/${t.hours||0} คน`}</div>
+                  <button style={{
+                    fontSize:10, padding:'3px 10px', borderRadius:20, border:'none', cursor:'pointer', marginTop:4, whiteSpace:'nowrap',
+                    background: isReg ? G.primary : G.light,
+                    color:      isReg ? '#fff'      : G.dark,
+                    ...(isReg ? {} : { border:`0.5px solid ${G.light2}` })
+                  }}>
+                    {isReg
+                      ? (lang==='th' ? `ลงทะเบียน ${t.participants_count||0}/${t.hours||40}` : `Register ${t.participants_count||0}/${t.hours||40}`)
+                      : (lang==='th' ? `ลงทะเบียนแล้ว ${t.participants_count||0}/${t.hours||40}` : `Registered ${t.participants_count||0}/${t.hours||40}`)
+                    }
+                  </button>
+                </div>
+              </div>
+            )
+          })}
+        </Card>
+      </div>
+
+      {/* Footer */}
+      <div style={{ textAlign:'center', fontSize:11, color:'#A0B8A8', marginTop:18, paddingTop:12, borderTop:'0.5px solid #D8EDE3' }}>
+        © {new Date().getFullYear()} efin HR Management System — Online Asset Co., Ltd.
+      </div>
+
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  )
+}
