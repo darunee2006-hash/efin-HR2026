@@ -139,7 +139,7 @@ function AppContent() {
   return (
     <Layout page={currentPage} setPage={setPage} lang={lang} setLang={setLang} onRefresh={() => setRefreshKey(k => k + 1)}>
       <ErrorBoundary key={`${currentPage}-${refreshKey}`}>
-        <PageComponent lang={lang} />
+        <PageComponent lang={lang} onNavigate={setPage} />
       </ErrorBoundary>
     </Layout>
   )
@@ -156,5 +156,3 @@ function App() {
     </ErrorBoundary>
   )
 }
-
-export default App

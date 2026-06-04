@@ -69,74 +69,6 @@ function getPvdTierLabel(yearsOfService, lang) {
     : `${pct}% (${yrs} yrs)`;
 }
 
-// Generate mock payroll data from employees
-const generateMockPayrollData = (employees, month, year) => {
-  const salaryGrades = {
-    'G3': 18000,
-    'G4': 25000,
-    'G5': 35000,
-    'G6': 45000,
-    'G7': 55000,
-    'G8': 70000,
-    'G9': 90000,
-  };
-
-  const asOfDate = new Date(year, month - 1, 1);
-
-  return employees.map(emp => {
-    const salary = Number(emp.base_salary) || salaryGrades[emp.level] || 25000;
-    const sso = Math.min(salary * 0.05, 750);
-
-    // PVD calculation — อายุสมาชิกภาพ (ใช้ hire_date เป็นฐาน)
-    const yearsOfService = calcYearsOfService(emp.hire_date, asOfDate);
-    const pvdRate = getPvdRate(yearsOfService);
-    const pvdEmployee = Math.round(salary * pvdRate);    // เงินสะสม (พนักงาน)
-    const pvdEmployer = Math.round(salary * pvdRate);    // เงินสมทบ (นายจ้าง)
-    const vestingPct = getVestingPct(yearsOfService);    // สิทธิ์รับเงินสมทบนายจ้าง
-
-    // Progressive tax (simplified) — PVD ลดหย่อนภาษีได้
-    const taxableIncome = salary - sso - pvdEmployee;
-    let tax = 0;
-    if (taxableIncome > 50000) {
-      tax = (taxableIncome - 50000) * 0.05;
-    }
-
-    const ot = Math.floor(Math.random() * 15000);
-    const net = salary + ot - sso - pvdEmployee - tax;
-
-    const fullName = (lang) => {
-      let n = lang === 'th'
-        ? `${emp.first_name_th || ''} ${emp.last_name_th || ''}`.trim()
-        : `${emp.first_name_en || ''} ${emp.last_name_en || ''}`.trim();
-      if (emp.nickname) n += ` (${emp.nickname})`;
-      return n;
-    };
-
-    return {
-      id: emp.id,
-      employee_id: emp.id,
-      employee_code: emp.employee_code,
-      employee_name_th: fullName('th'),
-      employee_name_en: fullName('en'),
-      position: emp.position_th || emp.position_en || '',
-      department_id: emp.department_id,
-      department_name: emp.department_name,
-      hire_date: emp.hire_date,
-      years_of_service: yearsOfService,
-      pvd_rate: pvdRate,
-      pvd_employee: pvdEmployee,
-      pvd_employer: pvdEmployer,
-      vesting_pct: vestingPct,
-      salary: salary,
-      sso: sso,
-      tax: tax,
-      ot: ot,
-      net: net,
-      status: 'calculated',
-      pay_period: `${year}-${String(month).padStart(2, '0')}-01`,
-    };
-  });
-};
 
 export default function Payroll({ lang }) {
   const { filterByCompany } = useCompanyFilter();
@@ -223,8 +155,7 @@ export default function Payroll({ lang }) {
           });
           setPayrollData(merged);
         } else {
-          const mockPayroll = generateMockPayrollData(enriched, selectedMonth, selectedYear);
-          setPayrollData(mockPayroll);
+          setPayrollData([]);
         }
       } catch (error) {
         console.error('Error fetching data:', error);

@@ -55,12 +55,20 @@ function StatCard({ icon: Icon, iconStyle, label, value, unit, change, changeUp 
 }
 
 // ── Section Card ──────────────────────────────────────────────────
-function Card({ title, action, children }) {
+function Card({ title, action, onAction, children }) {
   return (
     <div style={{ background:'#fff', borderRadius:12, border:'0.5px solid #D8EDE3', padding:15, height:'100%' }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:11 }}>
         <span style={{ fontSize:14, fontWeight:500, color:'#1a2e1a' }}>{title}</span>
-        {action && <span style={{ fontSize:12, color:G.primary, fontWeight:500, cursor:'pointer' }}>{action}</span>}
+        {action && (
+          <span onClick={onAction}
+            style={{ fontSize:12, color:G.primary, fontWeight:500, cursor: onAction ? 'pointer' : 'default',
+              padding:'2px 8px', borderRadius:6, transition:'background .15s' }}
+            onMouseEnter={e => onAction && (e.target.style.background='#E6F9F0')}
+            onMouseLeave={e => onAction && (e.target.style.background='transparent')}>
+            {action} {onAction ? '→' : ''}
+          </span>
+        )}
       </div>
       {children}
     </div>
@@ -78,7 +86,8 @@ function Av({ name = '' }) {
 }
 
 // ── Main Dashboard ────────────────────────────────────────────────
-export default function Dashboard({ lang = 'th', setPage }) {
+export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
+  const nav = onNavigate || setPage || (() => {})
   const { profile, role } = useAuth()
   const { filterByCompany } = useCompanyFilter()
 
@@ -134,28 +143,24 @@ export default function Dashboard({ lang = 'th', setPage }) {
       const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,7)
       setBuData(sorted.map(([name, count]) => ({ name, value: Math.round((count/total)*1000)/10 })))
     } else {
-      // fallback mock
-      setBuData([
-        { name:'BU efin.finance', value:28.1 },
-        { name:'BU IT Solution',  value:18.9 },
-        { name:'BU IR',           value:16.0 },
-        { name:'BU Content',      value:12.3 },
-        { name:'HR & Finance',    value:8.0  },
-        { name:'การตลาด',         value:6.1  },
-        { name:'อื่น ๆ',          value:10.6 },
-      ])
+      setBuData([])
     }
 
-    // Employee trend (12 months) — mock data relative to current count
-    const base = Math.max((empRes.count || 198) - 28, 100)
-    const months12 = Array.from({length:12}, (_,i) => {
-      const d = new Date(today.getFullYear(), today.getMonth()-11+i, 1)
-      const label = lang === 'th' ? MONTHS_TH[d.getMonth()] + String(d.getFullYear()).slice(2) : MONTHS_EN[d.getMonth()] + String(d.getFullYear()).slice(2)
-      const employees = Math.round(base + (i/11) * 28)
-      const newJoin = [3,5,3,4,3,3,2,2,1,2,1,5][i]
-      return { month: label, employees, newJoin }
-    })
-    setTrendData(months12)
+    // Employee trend — load from hr_monthly_headcount snapshot table
+    const { data: headcountData } = await supabase
+      .from('hr_monthly_headcount')
+      .select('snapshot_month, headcount, new_hires')
+      .order('snapshot_month', { ascending: true })
+      .limit(12)
+    if (headcountData && headcountData.length > 0) {
+      setTrendData(headcountData.map(row => {
+        const d = new Date(row.snapshot_month)
+        const label = lang === 'th' ? MONTHS_TH[d.getMonth()] + String(d.getFullYear()).slice(2) : MONTHS_EN[d.getMonth()] + String(d.getFullYear()).slice(2)
+        return { month: label, employees: row.headcount, newJoin: row.new_hires || 0 }
+      }))
+    } else {
+      setTrendData([])
+    }
 
     setLoading(false)
   }
@@ -197,18 +202,28 @@ export default function Dashboard({ lang = 'th', setPage }) {
 
       {/* ── KPI Cards ── */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:11, marginBottom:16 }}>
-        <StatCard icon={Users}      iconStyle={{background:G.light,  color:G.primary}} label={lang==='th'?'พนักงานทั้งหมด':'Total Employees'}  value={fmt(empTotal)}  unit={lang==='th'?'คน':'ppl'} change="4.3% จากเดือนที่แล้ว" changeUp />
-        <StatCard icon={UserPlus}   iconStyle={{background:'#E0F7EE',color:'#00875A'}} label={lang==='th'?'พนักงานใหม่':'New Employees'}       value={fmt(empNew)}    unit={lang==='th'?'คน':'ppl'} change="12.5% จากเดือนที่แล้ว" changeUp />
-        <StatCard icon={Briefcase}  iconStyle={{background:'#FFF3E0',color:'#E07000'}} label={lang==='th'?'ตำแหน่งงานว่าง':'Open Positions'}    value={fmt(openPositions)} unit={lang==='th'?'ตำแหน่ง':'pos'} change="4.0% จากเดือนที่แล้ว" changeUp={false} />
-        <StatCard icon={CalendarX}  iconStyle={{background:'#F3E5F5',color:'#7B1FA2'}} label={lang==='th'?'คำขอลา (รออนุมัติ)':'Leave Requests'}  value={fmt(leaveCount)} unit={lang==='th'?'รายการ':'items'} change="8.7% จากเดือนที่แล้ว" changeUp />
-        <StatCard icon={TrendingUp} iconStyle={{background:'#E0F7F4',color:'#009688'}} label={lang==='th'?'อัตราการเข้างาน':'Attendance Rate'}   value="96.2" unit="%" change="1.8% จากเดือนที่แล้ว" changeUp />
+        <div onClick={() => nav('employees')} style={{ cursor:'pointer' }}>
+          <StatCard icon={Users}      iconStyle={{background:G.light,  color:G.primary}} label={lang==='th'?'พนักงานทั้งหมด':'Total Employees'}  value={fmt(empTotal)}  unit={lang==='th'?'คน':'ppl'} change="4.3% จากเดือนที่แล้ว" changeUp />
+        </div>
+        <div onClick={() => nav('onboarding')} style={{ cursor:'pointer' }}>
+          <StatCard icon={UserPlus}   iconStyle={{background:'#E0F7EE',color:'#00875A'}} label={lang==='th'?'พนักงานใหม่':'New Employees'}       value={fmt(empNew)}    unit={lang==='th'?'คน':'ppl'} change="12.5% จากเดือนที่แล้ว" changeUp />
+        </div>
+        <div onClick={() => nav('recruitment')} style={{ cursor:'pointer' }}>
+          <StatCard icon={Briefcase}  iconStyle={{background:'#FFF3E0',color:'#E07000'}} label={lang==='th'?'ตำแหน่งงานว่าง':'Open Positions'}    value={fmt(openPositions)} unit={lang==='th'?'ตำแหน่ง':'pos'} change="4.0% จากเดือนที่แล้ว" changeUp={false} />
+        </div>
+        <div onClick={() => nav('leave')} style={{ cursor:'pointer' }}>
+          <StatCard icon={CalendarX}  iconStyle={{background:'#F3E5F5',color:'#7B1FA2'}} label={lang==='th'?'คำขอลา (รออนุมัติ)':'Leave Requests'}  value={fmt(leaveCount)} unit={lang==='th'?'รายการ':'items'} change="8.7% จากเดือนที่แล้ว" changeUp />
+        </div>
+        <div onClick={() => nav('timeAttendance')} style={{ cursor:'pointer' }}>
+          <StatCard icon={TrendingUp} iconStyle={{background:'#E0F7F4',color:'#009688'}} label={lang==='th'?'อัตราการเข้างาน':'Attendance Rate'}   value="96.2" unit="%" change="1.8% จากเดือนที่แล้ว" changeUp />
+        </div>
       </div>
 
       {/* ── Mid Grid ── */}
       <div style={{ display:'grid', gridTemplateColumns:'1.6fr 1.3fr 1fr', gap:13, marginBottom:16 }}>
 
         {/* Trend chart */}
-        <Card title={lang==='th'?'แนวโน้มจำนวนพนักงาน':'Employee Trend'}>
+        <Card title={lang==='th'?'แนวโน้มจำนวนพนักงาน':'Employee Trend'} action={lang==='th'?'ดูรายงาน':'Reports'} onAction={() => nav('reports')}>
           <div style={{ display:'flex', gap:16, marginBottom:10, fontSize:11, color:'#6B9E84' }}>
             <span style={{ display:'flex', alignItems:'center', gap:4 }}>
               <span style={{ width:10, height:10, borderRadius:2, background:'#B2E5C8', display:'inline-block' }}/>
@@ -232,7 +247,7 @@ export default function Dashboard({ lang = 'th', setPage }) {
         </Card>
 
         {/* Donut chart — BU breakdown */}
-        <Card title={lang==='th'?'สัดส่วนพนักงานตามแผนก':'Employees by BU'}>
+        <Card title={lang==='th'?'สัดส่วนพนักงานตามแผนก':'Employees by BU'} action={lang==='th'?'ดูโครงสร้าง':'OrgChart'} onAction={() => nav('orgChart')}>
           <div style={{ display:'flex', gap:12, alignItems:'center' }}>
             <div style={{ position:'relative', width:110, height:110, flexShrink:0 }}>
               <PieChart width={110} height={110}>
@@ -247,7 +262,10 @@ export default function Dashboard({ lang = 'th', setPage }) {
             </div>
             <div style={{ flex:1 }}>
               {buData.map((d, i) => (
-                <div key={i} style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:'#6B9E84', marginBottom:5 }}>
+                <div key={i} onClick={() => nav('staffList')}
+                  style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:'#6B9E84', marginBottom:5, cursor:'pointer', padding:'2px 4px', borderRadius:4, transition:'background .15s' }}
+                  onMouseEnter={e=>e.currentTarget.style.background='#E6F9F0'}
+                  onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
                   <span style={{ width:10, height:10, borderRadius:2, background:BU_COLORS[i%BU_COLORS.length], flexShrink:0 }}/>
                   <span style={{ flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{d.name}</span>
                   <span style={{ marginLeft:'auto', fontWeight:500, color:'#1a2e1a' }}>{d.value}%</span>
@@ -269,7 +287,7 @@ export default function Dashboard({ lang = 'th', setPage }) {
             { icon:CalendarX, iconStyle:{background:'#E3F2FD',color:'#1565C0'}, title:lang==='th'?'อนุมัติลา':'Approve Leave', sub:lang==='th'?'ตรวจสอบคำขอลา':'Review leave requests', page:'leave', badge: leaveCount || null },
             { icon:TrendingUp, iconStyle:{background:'#FCE4EC',color:'#C62828'}, title:lang==='th'?'ออกรายงาน':'Reports', sub:lang==='th'?'สร้างรายงานวิเคราะห์':'Generate analytics', page:'reports', badge:null },
           ].map((qa, i) => (
-            <div key={i} onClick={() => setPage && setPage(qa.page)}
+            <div key={i} onClick={() => nav(qa.page)}
               style={{ display:'flex', alignItems:'center', gap:10, background:'rgba(255,255,255,.75)', borderRadius:8, padding:'9px 11px', marginBottom: i<2 ? 8 : 0, cursor:'pointer', border:`0.5px solid rgba(0,166,81,.2)` }}
               onMouseOver={e => e.currentTarget.style.background='rgba(255,255,255,.95)'}
               onMouseOut={e  => e.currentTarget.style.background='rgba(255,255,255,.75)'}
@@ -294,7 +312,7 @@ export default function Dashboard({ lang = 'th', setPage }) {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:13 }}>
 
         {/* Recent leave requests */}
-        <Card title={lang==='th'?'คำขอลางานล่าสุด':'Recent Leave Requests'} action={lang==='th'?'ดูทั้งหมด':'View All'}>
+        <Card title={lang==='th'?'คำขอลางานล่าสุด':'Recent Leave Requests'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => nav('leave')}>
           {/* Header row */}
           <div style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr 80px', gap:8, fontSize:11, color:'#8ABFA3', borderBottom:'0.5px solid #D8EDE3', paddingBottom:7, marginBottom:7 }}>
             <span>{lang==='th'?'ชื่อพนักงาน':'Employee'}</span>
@@ -328,35 +346,16 @@ export default function Dashboard({ lang = 'th', setPage }) {
             )
           })}
 
-          {/* Fallback mock rows when DB has no data */}
-          {recentLeave.length === 0 && [
-            { name:'ศีรินาถ พงค์เจริญ', type:'ลาป่วย',       date:'24 พ.ค.', status:'pending'  },
-            { name:'นนทพัทธ์ อินทรี',  type:'ลาพักร้อน',    date:'23-24 พ.ค.', status:'pending'  },
-            { name:'วรากรณ์ คำสง',     type:'ลากิจส่วนตัว', date:'22 พ.ค.', status:'approved' },
-            { name:'ธนพล วิสุทธิ์',    type:'ลาป่วย',       date:'21 พ.ค.', status:'approved' },
-          ].map((r, i) => {
-            const pill = STATUS_PILL[r.status]
-            return (
-              <div key={i} style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr 80px', gap:8, alignItems:'center', padding:'7px 0', borderBottom: i<3 ? '0.5px solid #F0F7F3' : 'none' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:7 }}>
-                  <Av name={r.name} />
-                  <span style={{ fontSize:12, color:'#1a2e1a', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{r.name}</span>
-                </div>
-                <span style={{ fontSize:12, color:'#7A9E8A' }}>{r.type}</span>
-                <span style={{ fontSize:12, color:'#7A9E8A' }}>{r.date}</span>
-                <span style={{ borderRadius:20, padding:'3px 9px', fontSize:11, fontWeight:500, background:pill.bg, color:pill.color }}>{pill.label}</span>
-              </div>
-            )
-          })}
         </Card>
 
         {/* Announcements */}
-        <Card title={lang==='th'?'ประกาศภายใน':'Announcements'} action={lang==='th'?'ดูทั้งหมด':'View All'}>
-          {(announcements.length > 0 ? announcements : [
-            { id:1, title_th:'ประกาศปรับนโยบายการทำงานแบบ Hybrid', title_en:'Hybrid Work Policy Update',       body_th:'เริ่มมีผลตั้งแต่วันที่ 1 มิถุนายน 2567', created_at:'2024-05-20', _icon:0 },
-            { id:2, title_th:'กิจกรรม efin Family Day 2024',        title_en:'efin Family Day 2024',            body_th:'เชิญร่วมกิจกรรมสานสัมพันธ์ประจำปี',    created_at:'2024-05-17', _icon:1 },
-            { id:3, title_th:'อัปเดตนโยบายความปลอดภัยข้อมูล',    title_en:'Data Security Policy Update',      body_th:'โปรดศึกษาแนวทางปฏิบัติใหม่',            created_at:'2024-05-15', _icon:2 },
-          ]).map((a, i) => {
+        <Card title={lang==='th'?'ประกาศภายใน':'Announcements'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => nav('announcements')}>
+          {announcements.length === 0 ? (
+            <p style={{ fontSize:12, color:'#A0B8A8', textAlign:'center', padding:'16px 0' }}>
+              {lang==='th'?'ไม่มีประกาศ':'No announcements'}
+            </p>
+          ) : null}
+          {announcements.map((a, i) => {
             const ic = annIcons[a._icon ?? (i % 3)]
             const IcComp = ic.icon
             const title = lang==='th' ? (a.title_th || a.title_en) : (a.title_en || a.title_th)
@@ -378,12 +377,13 @@ export default function Dashboard({ lang = 'th', setPage }) {
         </Card>
 
         {/* Upcoming training */}
-        <Card title={lang==='th'?'กิจกรรม / อบรมที่กำลังจะถึง':'Upcoming Training'} action={lang==='th'?'ดูทั้งหมด':'View All'}>
-          {(upcomingTraining.length > 0 ? upcomingTraining : [
-            { id:1, course_name:'Data Analytics for Business',  start_date:'2026-05-28', notes:'09:00-16:00 | ห้อง Training 2 ชั้น 3', participants_count:32, hours:40, status:'ongoing'     },
-            { id:2, course_name:'Leadership in the Digital Era', start_date:'2026-06-05', notes:'09:00-16:00 | ห้อง Training 1 ชั้น 3', participants_count:18, hours:40, status:'registering' },
-            { id:3, course_name:'Excel Advanced for HR',         start_date:'2026-06-12', notes:'09:00-12:00 | ห้อง Computer Lab',       participants_count:15, hours:30, status:'registering' },
-          ]).map((t, i) => {
+        <Card title={lang==='th'?'กิจกรรม / อบรมที่กำลังจะถึง':'Upcoming Training'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => nav('training')}>
+          {upcomingTraining.length === 0 ? (
+            <p style={{ fontSize:12, color:'#A0B8A8', textAlign:'center', padding:'16px 0' }}>
+              {lang==='th'?'ไม่มีกิจกรรม / อบรม':'No upcoming training'}
+            </p>
+          ) : null}
+          {upcomingTraining.map((t, i) => {
             const d = t.start_date ? new Date(t.start_date) : new Date()
             const dd = d.getDate()
             const mm = lang==='th' ? MONTHS_TH[d.getMonth()] : MONTHS_EN[d.getMonth()].slice(0,3)
@@ -395,32 +395,4 @@ export default function Dashboard({ lang = 'th', setPage }) {
                   <div style={{ fontSize:9, color:'#00875A', textTransform:'uppercase' }}>{mm}</div>
                 </div>
                 <div style={{ flex:1 }}>
-                  <div style={{ fontSize:12, fontWeight:500, color:'#1a2e1a', lineHeight:1.3 }}>{t.course_name}</div>
-                  <div style={{ fontSize:11, color:'#7A9E8A', marginTop:2 }}>{t.notes || `${t.participants_count||0}/${t.hours||0} คน`}</div>
-                  <button style={{
-                    fontSize:10, padding:'3px 10px', borderRadius:20, border:'none', cursor:'pointer', marginTop:4, whiteSpace:'nowrap',
-                    background: isReg ? G.primary : G.light,
-                    color:      isReg ? '#fff'      : G.dark,
-                    ...(isReg ? {} : { border:`0.5px solid ${G.light2}` })
-                  }}>
-                    {isReg
-                      ? (lang==='th' ? `ลงทะเบียน ${t.participants_count||0}/${t.hours||40}` : `Register ${t.participants_count||0}/${t.hours||40}`)
-                      : (lang==='th' ? `ลงทะเบียนแล้ว ${t.participants_count||0}/${t.hours||40}` : `Registered ${t.participants_count||0}/${t.hours||40}`)
-                    }
-                  </button>
-                </div>
-              </div>
-            )
-          })}
-        </Card>
-      </div>
-
-      {/* Footer */}
-      <div style={{ textAlign:'center', fontSize:11, color:'#A0B8A8', marginTop:18, paddingTop:12, borderTop:'0.5px solid #D8EDE3' }}>
-        © {new Date().getFullYear()} efin HR Management System — Online Asset Co., Ltd.
-      </div>
-
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-    </div>
-  )
-}
+                  <div style={{ fontSize:12, f

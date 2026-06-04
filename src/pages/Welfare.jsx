@@ -93,14 +93,21 @@ export default function Welfare({ lang = 'th' }) {
         }));
         setEmployees(enriched);
 
-        // Generate mock welfare usage data
-        if (enriched && enriched.length > 0) {
-          const mockUsage = generateMockWelfareData(enriched);
-          setWelfareData(mockUsage);
-          if (mockUsage.length > 0) {
-            setSelectedEmployee(mockUsage[0].employee);
-          }
-        }
+        // Fetch real welfare records from DB
+        const { data: welfareRecords } = await supabase
+          .from('hr_welfare_records')
+          .select('*, hr_employees(id, employee_code, first_name_th, last_name_th, nickname, company_entity, hr_departments(name_th))')
+          .order('created_at', { ascending: false });
+        const formatted = (welfareRecords || []).map(r => ({
+          id: r.id,
+          employee: { ...r.hr_employees, department_th: r.hr_employees?.hr_departments?.name_th || '-' },
+          category: r.category,
+          amount: r.amount,
+          date: r.record_date ? new Date(r.record_date).toLocaleDateString('th-TH') : '-',
+          status: r.status || '-',
+        }));
+        setWelfareData(formatted);
+        if (formatted.length > 0) setSelectedEmployee(formatted[0].employee);
       } catch (err) {
         console.error('Error fetching data:', err);
       } finally {
@@ -111,24 +118,6 @@ export default function Welfare({ lang = 'th' }) {
     fetchData();
   }, []);
 
-  const generateMockWelfareData = (employees) => {
-    const records = [];
-    employees.forEach((emp, idx) => {
-      const categoryCount = Math.floor(Math.random() * 4) + 2;
-      for (let i = 0; i < categoryCount; i++) {
-        const category = MOCK_CATEGORIES_DATA[Math.floor(Math.random() * MOCK_CATEGORIES_DATA.length)];
-        records.push({
-          id: `${emp.id}-${i}`,
-          employee: emp,
-          category: category.name,
-          amount: Math.floor(category.amount / (categoryCount * 2)) + Math.floor(Math.random() * 100000),
-          date: new Date(2024, Math.floor(Math.random() * 12), Math.floor(Math.random() * 28) + 1).toLocaleDateString('th-TH'),
-          status: ['อนุมัติ', 'รออนุมัติ', 'เสร็จสิ้น'][Math.floor(Math.random() * 3)],
-        });
-      }
-    });
-    return records;
-  };
 
   // Company-filtered employees and welfare data
   const companyFilteredEmployees = useMemo(() => filterByCompany(employees), [employees, filterByCompany]);
@@ -145,10 +134,10 @@ export default function Welfare({ lang = 'th' }) {
     return matchesSearch && matchesCategory;
   }).sort((a, b) => (b.amount || 0) - (a.amount || 0));
 
-  const pieChartData = MOCK_CATEGORIES_DATA.map((cat) => ({
-    name: cat.name,
-    value: cat.amount / 1000000,
-  }));
+  const pieChartData = MOCK_CATEGORIES_DATA.map((cat) => {
+    const total = welfareData.filter(r => r.category === cat.name).reduce((s, r) => s + (r.amount || 0), 0);
+    return { name: cat.name, value: Math.round(total / 1000) / 1000 };
+  }).filter(d => d.value > 0);
 
   const COLORS = ['#ef4444', '#22c55e', '#3b82f6', '#f97316', '#a855f7', '#6b7280'];
 
@@ -156,8 +145,8 @@ export default function Welfare({ lang = 'th' }) {
     .filter((r) => selectedEmployee && r.employee.id === selectedEmployee.id)
     .reduce((sum, r) => sum + r.amount, 0);
 
-  const employeeBudget = 2500000;
-  const employeeRemaining = employeeBudget - employeeWelfareTotal;
+  const employeeBudget = 0; // ตั้งงบประมาณจริงใน database
+  const employeeRemaining = employeeBudget > 0 ? employeeBudget - employeeWelfareTotal : null;
 
   // Export handler
   const handleExport = () => {

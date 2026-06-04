@@ -55,88 +55,293 @@ function KpiCard({ icon, iconBg, label, value, active, onClick }) {
   )
 }
 
-// ── Edit User Modal ──────────────────────────────────────────
+// ── Field Input helper ───────────────────────────────────────
+function FInput({ label, value, onChange, type='text', options, half }) {
+  const cls = `w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00A651]`
+  return (
+    <div className={half ? 'col-span-1' : 'col-span-2'}>
+      <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
+      {options ? (
+        <select value={value||''} onChange={e=>onChange(e.target.value)} className={cls}>
+          <option value="">—</option>
+          {options.map(o => <option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}
+        </select>
+      ) : (
+        <input type={type} value={value||''} onChange={e=>onChange(e.target.value)} className={cls}/>
+      )}
+    </div>
+  )
+}
+
+// ── Edit Employee Modal (full fields) ────────────────────────
 function EditUserModal({ user, employees, onClose, onSaved, lang }) {
-  const [form, setForm] = useState({
-    role:         user.role || 'employee',
+  const emp = user.hr_employees || {}
+  const [tab, setTab] = useState('personal')
+  const [profileForm, setProfileForm] = useState({
+    role: user.role || 'employee',
     display_name: user.display_name || '',
-    employee_id:  user.employee_id || '',
+    employee_id: user.employee_id || '',
+  })
+  const [empForm, setEmpForm] = useState({
+    // Personal
+    prefix_th: emp.prefix_th || '',
+    first_name_th: emp.first_name_th || '',
+    last_name_th: emp.last_name_th || '',
+    prefix_en: emp.prefix_en || '',
+    first_name_en: emp.first_name_en || '',
+    last_name_en: emp.last_name_en || '',
+    nickname: emp.nickname || '',
+    gender: emp.gender || '',
+    date_of_birth: emp.date_of_birth || '',
+    national_id: emp.national_id || '',
+    blood_type: emp.blood_type || '',
+    nationality: emp.nationality || '',
+    religion: emp.religion || '',
+    marital_status: emp.marital_status || '',
+    // Work
+    position_th: emp.position_th || '',
+    position_en: emp.position_en || '',
+    department_name_th: emp.department_name_th || '',
+    department_name_en: emp.department_name_en || '',
+    bu: emp.bu || '',
+    level: emp.level || '',
+    employment_type: emp.employment_type || '',
+    hire_date: emp.hire_date || '',
+    work_schedule: emp.work_schedule || '',
+    company_entity: emp.company_entity || '',
+    // Contact
+    email: emp.email || '',
+    phone: emp.phone || '',
+    personal_email: emp.personal_email || '',
+    address: emp.address || '',
+    // Education
+    education_level: emp.education_level || '',
+    education_major: emp.education_major || '',
+    education_faculty: emp.education_faculty || '',
+    education_university: emp.education_university || '',
+    // Financial
+    base_salary: emp.base_salary || '',
+    bank_name: emp.bank_name || '',
+    bank_account: emp.bank_account || '',
+    employment_type_detail: emp.employment_type || '',
   })
   const [saving, setSaving] = useState(false)
-  const [error, setError]   = useState('')
+  const [error, setError] = useState('')
+  const sf = (k) => (v) => setEmpForm(p=>({...p,[k]:v}))
 
   const handleSave = async () => {
     setSaving(true); setError('')
-    const { error: err } = await supabase
-      .from('hr_user_profiles')
-      .update({ role: form.role, display_name: form.display_name || null, employee_id: form.employee_id || null })
-      .eq('id', user.id)
-    if (err) { setError(err.message); setSaving(false); return }
-    onSaved()
-    onClose()
+    try {
+      // Save profile
+      const { error: pe } = await supabase.from('hr_user_profiles')
+        .update({ role: profileForm.role, display_name: profileForm.display_name || null, employee_id: profileForm.employee_id || null })
+        .eq('id', user.id)
+      if (pe) throw pe
+
+      // Save employee data if linked
+      const empId = profileForm.employee_id || user.employee_id
+      if (empId) {
+        const empData = {
+          prefix_th: empForm.prefix_th || null,
+          first_name_th: empForm.first_name_th || null,
+          last_name_th: empForm.last_name_th || null,
+          prefix_en: empForm.prefix_en || null,
+          first_name_en: empForm.first_name_en || null,
+          last_name_en: empForm.last_name_en || null,
+          nickname: empForm.nickname || null,
+          gender: empForm.gender || null,
+          date_of_birth: empForm.date_of_birth || null,
+          national_id: empForm.national_id || null,
+          blood_type: empForm.blood_type || null,
+          nationality: empForm.nationality || null,
+          religion: empForm.religion || null,
+          marital_status: empForm.marital_status || null,
+          position_th: empForm.position_th || null,
+          position_en: empForm.position_en || null,
+          department_name_th: empForm.department_name_th || null,
+          department_name_en: empForm.department_name_en || null,
+          bu: empForm.bu || null,
+          level: empForm.level || null,
+          employment_type: empForm.employment_type || null,
+          hire_date: empForm.hire_date || null,
+          work_schedule: empForm.work_schedule || null,
+          company_entity: empForm.company_entity || null,
+          email: empForm.email || null,
+          phone: empForm.phone || null,
+          personal_email: empForm.personal_email || null,
+          address: empForm.address || null,
+          education_level: empForm.education_level || null,
+          education_major: empForm.education_major || null,
+          education_faculty: empForm.education_faculty || null,
+          education_university: empForm.education_university || null,
+          base_salary: empForm.base_salary ? parseFloat(empForm.base_salary) : null,
+          bank_name: empForm.bank_name || null,
+          bank_account: empForm.bank_account || null,
+        }
+        const { error: ee } = await supabase.from('hr_employees').update(empData).eq('id', empId)
+        if (ee) throw ee
+      }
+      onSaved(); onClose()
+    } catch(e) { setError(e.message || 'เกิดข้อผิดพลาด'); setSaving(false) }
   }
 
+  const TABS = [
+    { key:'account', label:'บัญชี/Role' },
+    { key:'personal', label:'ข้อมูลส่วนตัว' },
+    { key:'work', label:'ข้อมูลงาน' },
+    { key:'contact', label:'ติดต่อ' },
+    { key:'education', label:'การศึกษา' },
+    { key:'financial', label:'การเงิน' },
+  ]
+
+  const hasEmp = !!(profileForm.employee_id || user.employee_id)
+
   return (
-    <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" onClick={e=>e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col" onClick={e=>e.stopPropagation()}>
+        {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <Av name={user.display_name || user.email} size={36} />
+            <Av name={user.display_name || user.email} size={38}/>
             <div>
-              <p className="font-semibold text-gray-900 text-sm">{user.display_name || '-'}</p>
-              <p className="text-xs text-gray-400">{user.email}</p>
+              <p className="font-bold text-gray-900">{user.display_name || user.email}</p>
+              <p className="text-xs text-gray-400">{emp.employee_code ? `รหัส: ${emp.employee_code}` : 'ไม่ได้เชื่อมพนักงาน'}</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg"><X className="w-4 h-4 text-gray-400"/></button>
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-400"/></button>
         </div>
 
-        <div className="px-5 py-4 space-y-4">
-          {error && <div className="bg-red-50 text-red-600 text-xs px-3 py-2 rounded-lg">{error}</div>}
+        {/* Tabs */}
+        <div className="flex gap-0 border-b border-gray-100 overflow-x-auto">
+          {TABS.map(t => (
+            <button key={t.key} onClick={()=>setTab(t.key)}
+              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${tab===t.key ? 'border-[#00A651] text-[#007A3D]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+              {t.label}
+            </button>
+          ))}
+        </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">ชื่อแสดง (Display Name)</label>
-            <input type="text" value={form.display_name} onChange={e=>setForm(p=>({...p,display_name:e.target.value}))}
-              placeholder="ชื่อ-นามสกุล"
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:outline-none" style={{'--tw-ring-color':G.primary}} />
-          </div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          {error && <div className="bg-red-50 text-red-600 text-xs px-3 py-2 rounded-lg mb-3">{error}</div>}
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-2">สิทธิ์การเข้าถึง (Role)</label>
-            <div className="grid grid-cols-2 gap-2">
-              {ROLES.map(r => (
-                <button key={r.key} onClick={()=>setForm(p=>({...p,role:r.key}))}
-                  className={`flex items-start gap-2 p-2.5 rounded-xl border text-left transition-all ${form.role===r.key ? 'border-[#00A651] bg-[#E6F9F0]' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <span className="text-base leading-none mt-0.5">{r.icon}</span>
-                  <div>
-                    <div className="text-xs font-semibold text-gray-800">{r.label}</div>
-                    <div className="text-[10px] text-gray-400 leading-tight mt-0.5">{r.desc}</div>
-                  </div>
-                  {form.role===r.key && <Check className="w-3.5 h-3.5 text-[#00A651] ml-auto shrink-0 mt-0.5"/>}
-                </button>
-              ))}
+          {/* Tab: Account */}
+          {tab === 'account' && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">ชื่อแสดง</label>
+                <input className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00A651]"
+                  value={profileForm.display_name} onChange={e=>setProfileForm(p=>({...p,display_name:e.target.value}))}/>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-2">สิทธิ์การเข้าถึง (Role)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {ROLES.map(r => (
+                    <button key={r.key} onClick={()=>setProfileForm(p=>({...p,role:r.key}))}
+                      className={`flex items-start gap-2 p-2.5 rounded-xl border text-left transition-all ${profileForm.role===r.key ? 'border-[#00A651] bg-[#E6F9F0]' : 'border-gray-200 hover:border-gray-300'}`}>
+                      <span className="text-base leading-none mt-0.5">{r.icon}</span>
+                      <div><div className="text-xs font-semibold text-gray-800">{r.label}</div>
+                      <div className="text-[10px] text-gray-400 leading-tight mt-0.5">{r.desc}</div></div>
+                      {profileForm.role===r.key && <Check className="w-3.5 h-3.5 text-[#00A651] ml-auto shrink-0 mt-0.5"/>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">เชื่อมกับพนักงาน</label>
+                <select value={profileForm.employee_id} onChange={e=>setProfileForm(p=>({...p,employee_id:e.target.value}))}
+                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2">
+                  <option value="">— ไม่เชื่อม —</option>
+                  {employees.map(e2 => {
+                    const n = `${e2.first_name_th||''} ${e2.last_name_th||''}`.trim()
+                    return <option key={e2.id} value={e2.id}>{e2.employee_code} — {n}</option>
+                  })}
+                </select>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div>
-            <label className="block text-xs font-semibold text-gray-700 mb-1">เชื่อมกับพนักงาน (Employee)</label>
-            <select value={form.employee_id} onChange={e=>setForm(p=>({...p,employee_id:e.target.value}))}
-              className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2">
-              <option value="">— ไม่เชื่อม —</option>
-              {employees.map(emp => {
-                const name = `${emp.first_name_th||emp.first_name_en||''} ${emp.last_name_th||emp.last_name_en||''}`.trim()
-                return <option key={emp.id} value={emp.id}>{emp.employee_code} — {name}</option>
-              })}
-            </select>
-          </div>
+          {/* Tab: Personal */}
+          {tab === 'personal' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="คำนำหน้า (TH)" value={empForm.prefix_th} onChange={sf('prefix_th')} half options={['นาย','นาง','นางสาว','น.ส.','ดร.']}/>
+              <FInput label="ชื่อ (TH)" value={empForm.first_name_th} onChange={sf('first_name_th')} half/>
+              <FInput label="นามสกุล (TH)" value={empForm.last_name_th} onChange={sf('last_name_th')} half/>
+              <FInput label="ชื่อเล่น" value={empForm.nickname} onChange={sf('nickname')} half/>
+              <FInput label="Prefix (EN)" value={empForm.prefix_en} onChange={sf('prefix_en')} half options={['Mr.','Mrs.','Ms.','Dr.']}/>
+              <FInput label="First Name (EN)" value={empForm.first_name_en} onChange={sf('first_name_en')} half/>
+              <FInput label="Last Name (EN)" value={empForm.last_name_en} onChange={sf('last_name_en')} half/>
+              <FInput label="เพศ" value={empForm.gender} onChange={sf('gender')} half options={[{value:'male',label:'ชาย'},{value:'female',label:'หญิง'}]}/>
+              <FInput label="วันเกิด" value={empForm.date_of_birth} onChange={sf('date_of_birth')} type="date" half/>
+              <FInput label="เลขบัตรประชาชน" value={empForm.national_id} onChange={sf('national_id')} half/>
+              <FInput label="หมู่เลือด" value={empForm.blood_type} onChange={sf('blood_type')} half options={['A','B','AB','O','เอ','บี','เอบี','โอ']}/>
+              <FInput label="สัญชาติ" value={empForm.nationality} onChange={sf('nationality')} half/>
+              <FInput label="ศาสนา" value={empForm.religion} onChange={sf('religion')} half options={['พุทธ','คริสต์','อิสลาม','อื่นๆ']}/>
+              <FInput label="สถานภาพสมรส" value={empForm.marital_status} onChange={sf('marital_status')} half options={[{value:'single',label:'โสด'},{value:'married',label:'สมรส'},{value:'divorced',label:'หย่าร้าง'},{value:'widowed',label:'หม้าย'}]}/>
+            </div>
+          )}
+
+          {/* Tab: Work */}
+          {tab === 'work' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="บริษัท" value={empForm.company_entity} onChange={sf('company_entity')} half options={['ONL','EFINX','ATESS','SMT']}/>
+              <FInput label="BU" value={empForm.bu} onChange={sf('bu')} half options={['efin.finance','Content','IR Plus','IT Solution','Cost Center','Expert','Green+MOL']}/>
+              <FInput label="ตำแหน่ง (TH)" value={empForm.position_th} onChange={sf('position_th')} half/>
+              <FInput label="Position (EN)" value={empForm.position_en} onChange={sf('position_en')} half/>
+              <FInput label="ฝ่าย/แผนก (TH)" value={empForm.department_name_th} onChange={sf('department_name_th')} half/>
+              <FInput label="Department (EN)" value={empForm.department_name_en} onChange={sf('department_name_en')} half/>
+              <FInput label="ระดับ (Grade)" value={empForm.level} onChange={sf('level')} half options={['G1','G2','G3','G4','G5','G6','G7','G8','G9','G10','G11','G12']}/>
+              <FInput label="ประเภทการจ้าง" value={empForm.employment_type} onChange={sf('employment_type')} half options={['ประจำ','สัญญาจ้าง 1 ปี','รายวัน','Part-time','Outsource']}/>
+              <FInput label="วันเริ่มงาน" value={empForm.hire_date} onChange={sf('hire_date')} type="date" half/>
+              <FInput label="เวลาทำงาน" value={empForm.work_schedule} onChange={sf('work_schedule')} half options={['09.00-18.00','08.30-17.30','08.00-17.00']}/>
+            </div>
+          )}
+
+          {/* Tab: Contact */}
+          {tab === 'contact' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="Email บริษัท" value={empForm.email} onChange={sf('email')} type="email"/>
+              <FInput label="Email ส่วนตัว" value={empForm.personal_email} onChange={sf('personal_email')} type="email"/>
+              <FInput label="เบอร์โทรศัพท์" value={empForm.phone} onChange={sf('phone')} half/>
+              <div className="col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">ที่อยู่</label>
+                <textarea value={empForm.address||''} onChange={e=>sf('address')(e.target.value)} rows={3}
+                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00A651] resize-none"/>
+              </div>
+            </div>
+          )}
+
+          {/* Tab: Education */}
+          {tab === 'education' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="ระดับการศึกษา" value={empForm.education_level} onChange={sf('education_level')} half options={['ป.ตรี','ป.โท','ป.เอก','ปวส.','ปวช.','มัธยม']}/>
+              <FInput label="สาขาวิชา" value={empForm.education_major} onChange={sf('education_major')} half/>
+              <FInput label="คณะ" value={empForm.education_faculty} onChange={sf('education_faculty')} half/>
+              <FInput label="มหาวิทยาลัย" value={empForm.education_university} onChange={sf('education_university')} half/>
+            </div>
+          )}
+
+          {/* Tab: Financial */}
+          {tab === 'financial' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="เงินเดือน (บาท)" value={empForm.base_salary} onChange={sf('base_salary')} type="number" half/>
+              <FInput label="ธนาคาร" value={empForm.bank_name} onChange={sf('bank_name')} half options={['ธ.กรุงศรีอยุธยา','ธ.ไทยพาณิชย์','ธ.กสิกรไทย','ธ.กรุงเทพ','ธ.กรุงไทย','ธ.ออมสิน','ธ.ทหารไทยธนชาต','ธ.ยูโอบี']}/>
+              <FInput label="เลขที่บัญชี" value={empForm.bank_account} onChange={sf('bank_account')} half/>
+            </div>
+          )}
         </div>
 
-        <div className="px-5 py-3 border-t border-gray-100 flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">ยกเลิก</button>
-          <button onClick={handleSave} disabled={saving}
-            className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50"
-            style={{background:G.primary}}>
-            <Save className="w-4 h-4"/>{saving ? 'กำลังบันทึก...' : 'บันทึก'}
-          </button>
+        {/* Footer */}
+        <div className="px-5 py-3 border-t border-gray-100 flex justify-between items-center">
+          <span className="text-xs text-gray-400">{hasEmp ? `ID: ${emp.employee_code}` : 'ยังไม่เชื่อมพนักงาน'}</span>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">ยกเลิก</button>
+            <button onClick={handleSave} disabled={saving}
+              className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white rounded-lg disabled:opacity-50"
+              style={{background:G.primary}}>
+              <Save className="w-4 h-4"/>{saving ? 'กำลังบันทึก...' : 'บันทึกทั้งหมด'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -273,7 +478,7 @@ export default function UserManagement({ lang = 'th' }) {
     setLoading(true)
     const [profilesRes, empsRes] = await Promise.all([
       supabase.from('hr_user_profiles')
-        .select('*, hr_employees(id, employee_code, first_name_th, last_name_th, first_name_en, last_name_en, position_th, department_id, company_entity, status)')
+        .select('*, hr_employees(id, employee_code, prefix_th, first_name_th, last_name_th, prefix_en, first_name_en, last_name_en, nickname, gender, date_of_birth, national_id, blood_type, nationality, religion, marital_status, phone, email, personal_email, address, position_th, position_en, department_name_th, department_name_en, bu, level, employment_type, hire_date, work_schedule, company_entity, education_level, education_major, education_faculty, education_university, base_salary, bank_name, bank_account, status)')
         .order('created_at', { ascending: false }),
       supabase.from('hr_employees')
         .select('id, employee_code, first_name_th, last_name_th, first_name_en, last_name_en, position_th, company_entity, status')
@@ -400,113 +605,149 @@ export default function UserManagement({ lang = 'th' }) {
 
       {/* ── Tab: Users ── */}
       {activeTab === 'users' && (
-        <div className="bg-white rounded-xl border" style={{borderColor:'#D8EDE3'}}>
+        <div className="bg-white rounded-xl border overflow-hidden" style={{borderColor:'#D8EDE3'}}>
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{borderColor:G.primary}}/>
             </div>
           ) : (
             <>
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b" style={{borderColor:'#D8EDE3',background:'#F4F7F5'}}>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">ผู้ใช้งาน</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Role</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">พนักงานที่เชื่อม</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">บริษัท</th>
-                    <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">วันที่สร้าง</th>
-                    <th className="py-3 px-4"/>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {filtered.length === 0 ? (
-                    <tr><td colSpan={6} className="text-center py-12 text-gray-400">ไม่พบข้อมูล</td></tr>
-                  ) : filtered.map(u => {
-                    const emp = u.hr_employees
-                    const empName = emp ? `${emp.first_name_th||emp.first_name_en||''} ${emp.last_name_th||emp.last_name_en||''}`.trim() : null
-                    const displayName = u.display_name || u.email || '-'
-                    const createdAt = u.created_at ? new Date(u.created_at).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '-'
+              <div className="overflow-x-auto">
+                <table className="text-xs whitespace-nowrap" style={{minWidth:'2400px'}}>
+                  <thead>
+                    <tr style={{background:'#F4F7F5',borderBottom:'1px solid #D8EDE3'}}>
+                      {/* Sticky name col */}
+                      <th className="sticky left-0 z-10 text-left py-3 px-3 font-semibold text-gray-500 bg-[#F4F7F5] border-r border-gray-200" style={{minWidth:180}}>ชื่อ-นามสกุล</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:90}}>รหัส</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>ชื่อเล่น</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>Name (EN)</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:60}}>เพศ</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>วันเกิด</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:130}}>เลขบัตร</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>หมู่เลือด</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:80}}>สมรส</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>บริษัท</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>BU</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:200}}>แผนก</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>ตำแหน่ง</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:60}}>ระดับ</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>ประเภทจ้าง</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>วันเริ่มงาน</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:180}}>Email บริษัท</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:110}}>เบอร์โทร</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:180}}>Email ส่วนตัว</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:80}}>วุฒิ</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>มหาวิทยาลัย</th>
+                      <th className="text-right py-3 px-3 font-semibold text-gray-500" style={{minWidth:90}}>เงินเดือน</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:130}}>ธนาคาร</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:120}}>เลขบัญชี</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>Role</th>
+                      <th className="py-3 px-3 sticky right-0 bg-[#F4F7F5] border-l border-gray-200" style={{minWidth:70}}/>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.length === 0 ? (
+                      <tr><td colSpan={26} className="text-center py-12 text-gray-400">ไม่พบข้อมูล</td></tr>
+                    ) : filtered.map((u, ri) => {
+                      const emp = u.hr_employees
+                      const fullName = emp ? `${emp.prefix_th||''} ${emp.first_name_th||''} ${emp.last_name_th||''}`.trim() : (u.display_name || '-')
+                      const nameEn = emp ? `${emp.prefix_en||''} ${emp.first_name_en||''} ${emp.last_name_en||''}`.trim() : '-'
+                      const genderLabel = emp?.gender === 'male' ? 'ชาย' : emp?.gender === 'female' ? 'หญิง' : '-'
+                      const maritalMap = {single:'โสด',married:'สมรส',divorced:'หย่า',widowed:'หม้าย'}
+                      const fmtDate = (d) => d ? new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '-'
+                      const fmtSalary = (s) => s ? Number(s).toLocaleString('th-TH') : '-'
+                      const rowBg = ri % 2 === 0 ? '#fff' : '#FAFDFB'
 
-                    return (
-                      <tr key={u.id} className="hover:bg-[#F4F7F5] transition-colors">
-                        {/* User */}
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-3">
-                            <Av name={displayName} size={34}/>
-                            <div>
-                              <p className="font-medium text-gray-900 text-sm">{displayName}</p>
-                              <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
-                                <Mail className="w-3 h-3"/>{u.email || '-'}
-                              </p>
-                            </div>
-                          </div>
+                      const TD = ({children, right, mono}) => (
+                        <td className={`py-2 px-3 text-gray-700 border-b border-gray-50 ${right?'text-right':''} ${mono?'font-mono':''}`}
+                          style={{background:rowBg}}>
+                          {children ?? <span className="text-gray-300">—</span>}
                         </td>
+                      )
 
-                        {/* Role — inline quick-change dropdown */}
-                        <td className="py-3 px-4">
-                          <div className="relative group inline-block">
-                            <RoleBadge role={u.role}/>
-                            {myRole === 'superuser' && (
-                              <select
-                                value={u.role}
-                                onChange={e => handleRoleQuickChange(u.id, e.target.value)}
-                                className="absolute inset-0 opacity-0 cursor-pointer w-full"
-                                title="เปลี่ยน Role">
-                                {ROLES.map(r=><option key={r.key} value={r.key}>{r.label}</option>)}
-                              </select>
-                            )}
-                          </div>
-                        </td>
-
-                        {/* Linked employee */}
-                        <td className="py-3 px-4">
-                          {emp ? (
-                            <div className="flex items-center gap-1.5">
-                              <Link2 className="w-3 h-3" style={{color:G.primary}}/>
-                              <div>
-                                <p className="text-sm text-gray-800 font-medium">{empName}</p>
-                                <p className="text-xs text-gray-400">{emp.employee_code} · {emp.position_th || '-'}</p>
+                      return (
+                        <tr key={u.id} className="hover:bg-[#F0FBF5] transition-colors group">
+                          {/* Sticky: Name */}
+                          <td className="sticky left-0 z-10 py-2 px-3 border-b border-r border-gray-100 group-hover:bg-[#F0FBF5]"
+                            style={{background:rowBg, minWidth:180}}>
+                            <div className="flex items-center gap-2">
+                              <Av name={fullName} size={28}/>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-gray-900 text-xs truncate">{fullName}</p>
+                                <p className="text-[10px] text-gray-400 truncate">{u.email||'-'}</p>
                               </div>
                             </div>
-                          ) : (
-                            <span className="text-xs text-gray-400 flex items-center gap-1">
-                              <UserX className="w-3.5 h-3.5"/>ไม่ได้เชื่อม
-                            </span>
-                          )}
-                        </td>
-
-                        {/* Company */}
-                        <td className="py-3 px-4">
-                          <span className="text-xs px-2 py-0.5 rounded-full" style={{background:G.light,color:G.dark}}>
-                            {emp?.company_entity || '-'}
-                          </span>
-                        </td>
-
-                        {/* Created */}
-                        <td className="py-3 px-4 text-xs text-gray-400">{createdAt}</td>
-
-                        {/* Actions */}
-                        <td className="py-3 px-4">
-                          <div className="flex items-center gap-1 justify-end">
-                            <button onClick={() => setEditUser(u)}
-                              className="p-1.5 rounded-lg hover:bg-[#E6F9F0] text-gray-400 hover:text-[#007A3D] transition-colors" title="แก้ไข">
-                              <Edit3 className="w-4 h-4"/>
-                            </button>
-                            {myRole === 'superuser' && (
-                              <button onClick={() => handleDelete(u.id)} disabled={deleting===u.id}
-                                className="p-1.5 rounded-lg hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors" title="ลบ">
-                                <Trash2 className="w-4 h-4"/>
+                          </td>
+                          <TD mono>{emp?.employee_code||'-'}</TD>
+                          <TD>{emp?.nickname||'-'}</TD>
+                          <TD>{nameEn||'-'}</TD>
+                          <TD>{genderLabel}</TD>
+                          <TD>{fmtDate(emp?.date_of_birth)}</TD>
+                          <TD mono>{emp?.national_id||'-'}</TD>
+                          <TD>{emp?.blood_type||'-'}</TD>
+                          <TD>{maritalMap[emp?.marital_status]||'-'}</TD>
+                          <TD>
+                            {emp?.company_entity ? (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{background:G.light,color:G.dark}}>
+                                {emp.company_entity}
+                              </span>
+                            ) : '-'}
+                          </TD>
+                          <TD>{emp?.bu||'-'}</TD>
+                          <TD><span className="truncate block max-w-[190px]">{emp?.department_name_th||'-'}</span></TD>
+                          <TD><span className="truncate block max-w-[150px]">{emp?.position_th||'-'}</span></TD>
+                          <TD>
+                            {emp?.level ? (
+                              <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-mono text-[10px]">{emp.level}</span>
+                            ) : '-'}
+                          </TD>
+                          <TD>{emp?.employment_type||'-'}</TD>
+                          <TD>{fmtDate(emp?.hire_date)}</TD>
+                          <TD><span className="truncate block max-w-[170px] text-[10px]">{emp?.email||'-'}</span></TD>
+                          <TD mono>{emp?.phone||'-'}</TD>
+                          <TD><span className="truncate block max-w-[170px] text-[10px]">{emp?.personal_email||'-'}</span></TD>
+                          <TD>{emp?.education_level||'-'}</TD>
+                          <TD><span className="truncate block max-w-[150px]">{emp?.education_university||'-'}</span></TD>
+                          <TD right>{fmtSalary(emp?.base_salary)}</TD>
+                          <TD><span className="truncate block max-w-[120px]">{emp?.bank_name||'-'}</span></TD>
+                          <TD mono>{emp?.bank_account||'-'}</TD>
+                          <td className="py-2 px-3 border-b border-gray-50" style={{background:rowBg}}>
+                            <div className="relative inline-block">
+                              <RoleBadge role={u.role}/>
+                              {myRole === 'superuser' && (
+                                <select value={u.role} onChange={e=>handleRoleQuickChange(u.id,e.target.value)}
+                                  className="absolute inset-0 opacity-0 cursor-pointer w-full" title="เปลี่ยน Role">
+                                  {ROLES.map(r=><option key={r.key} value={r.key}>{r.label}</option>)}
+                                </select>
+                              )}
+                            </div>
+                          </td>
+                          {/* Sticky: Actions */}
+                          <td className="sticky right-0 z-10 py-2 px-2 border-b border-l border-gray-100 group-hover:bg-[#F0FBF5]"
+                            style={{background:rowBg}}>
+                            <div className="flex items-center gap-1">
+                              <button onClick={()=>setEditUser(u)}
+                                className="p-1.5 rounded hover:bg-[#E6F9F0] text-gray-400 hover:text-[#007A3D]" title="แก้ไข">
+                                <Edit3 className="w-3.5 h-3.5"/>
                               </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-              <div className="px-4 py-3 border-t text-xs text-gray-400" style={{borderColor:'#EEF5F0'}}>
-                แสดง {filtered.length} จาก {users.length} บัญชี
+                              {myRole==='superuser' && (
+                                <button onClick={()=>handleDelete(u.id)} disabled={deleting===u.id}
+                                  className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500" title="ลบ">
+                                  <Trash2 className="w-3.5 h-3.5"/>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-4 py-2.5 border-t text-xs text-gray-400 flex items-center gap-3" style={{borderColor:'#EEF5F0'}}>
+                <span>แสดง {filtered.length} จาก {users.length} บัญชี</span>
+                <span className="text-gray-300">•</span>
+                <span className="text-gray-400">เลื่อนซ้าย-ขวาเพื่อดูทุกคอลัมน์ · คลิก ✏️ เพื่อแก้ไข</span>
               </div>
             </>
           )}
@@ -616,6 +857,268 @@ export default function UserManagement({ lang = 'th' }) {
           employees={employees}
           onClose={() => setEditUser(null)}
           onSaved={() => { fetchData(); showToast('อัปเดต User สำเร็จ') }}
+          lang={lang}
+        />
+      )}
+      {showCreate && (
+        <CreateUserModal
+          employees={employees}
+          onClose={() => setShowCreate(false)}
+          onSaved={() => { fetchData(); showToast('สร้าง User Profile สำเร็จ') }}
+        />
+      )}
+    </div>
+  )
+}
+          <select value={filterRole} onChange={e=>setFilterRole(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm">
+            <option value="all">ทุก Role</option>
+            {ROLES.map(r=><option key={r.key} value={r.key}>{r.icon} {r.label}</option>)}
+          </select>
+          <button onClick={fetchData} className="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 text-gray-500">
+            <RefreshCw className="w-4 h-4"/>
+          </button>
+        </div>
+      )}
+
+      {/* ── Tab: Users ── */}
+      {activeTab === 'users' && (
+        <div className="bg-white rounded-xl border overflow-hidden" style={{borderColor:'#D8EDE3'}}>
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{borderColor:G.primary}}/>
+            </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <table className="text-xs whitespace-nowrap" style={{minWidth:'2400px'}}>
+                  <thead>
+                    <tr style={{background:'#F4F7F5',borderBottom:'1px solid #D8EDE3'}}>
+                      <th className="sticky left-0 z-10 text-left py-3 px-3 font-semibold text-gray-500 bg-[#F4F7F5] border-r border-gray-200" style={{minWidth:180}}>ชื่อ-นามสกุล</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:90}}>รหัส</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>ชื่อเล่น</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>Name (EN)</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:60}}>เพศ</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>วันเกิด</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:130}}>เลขบัตร</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>หมู่เลือด</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:80}}>สมรส</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>บริษัท</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>BU</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:200}}>แผนก</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>ตำแหน่ง</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:60}}>ระดับ</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>ประเภทจ้าง</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>วันเริ่มงาน</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:180}}>Email บริษัท</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:110}}>เบอร์โทร</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:180}}>Email ส่วนตัว</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:80}}>วุฒิ</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>มหาวิทยาลัย</th>
+                      <th className="text-right py-3 px-3 font-semibold text-gray-500" style={{minWidth:90}}>เงินเดือน</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:130}}>ธนาคาร</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:120}}>เลขบัญชี</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>Role</th>
+                      <th className="py-3 px-3 sticky right-0 bg-[#F4F7F5] border-l border-gray-200" style={{minWidth:70}}/>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filtered.length === 0 ? (
+                      <tr><td colSpan={26} className="text-center py-12 text-gray-400">ไม่พบข้อมูล</td></tr>
+                    ) : filtered.map((u, ri) => {
+                      const emp = u.hr_employees
+                      const fullName = emp ? `${emp.prefix_th||''} ${emp.first_name_th||''} ${emp.last_name_th||''}`.trim() : (u.display_name || '-')
+                      const nameEn = emp ? `${emp.prefix_en||''} ${emp.first_name_en||''} ${emp.last_name_en||''}`.trim() : '-'
+                      const genderLabel = emp?.gender === 'male' ? 'ชาย' : emp?.gender === 'female' ? 'หญิง' : '-'
+                      const maritalMap = {single:'โสด',married:'สมรส',divorced:'หย่า',widowed:'หม้าย'}
+                      const fmtDate = (d) => d ? new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '-'
+                      const fmtSalary = (s) => s ? Number(s).toLocaleString('th-TH') : '-'
+                      const rowBg = ri % 2 === 0 ? '#fff' : '#FAFDFB'
+                      const TD = ({children, right, mono}) => (
+                        <td className={`py-2 px-3 text-gray-700 border-b border-gray-50 ${right?'text-right':''} ${mono?'font-mono':''}`}
+                          style={{background:rowBg}}>
+                          {children ?? <span className="text-gray-300">—</span>}
+                        </td>
+                      )
+                      return (
+                        <tr key={u.id} className="hover:bg-[#F0FBF5] transition-colors group">
+                          <td className="sticky left-0 z-10 py-2 px-3 border-b border-r border-gray-100 group-hover:bg-[#F0FBF5]"
+                            style={{background:rowBg, minWidth:180}}>
+                            <div className="flex items-center gap-2">
+                              <Av name={fullName} size={28}/>
+                              <div className="min-w-0">
+                                <p className="font-semibold text-gray-900 text-xs truncate">{fullName}</p>
+                                <p className="text-[10px] text-gray-400 truncate">{u.email||'-'}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <TD mono>{emp?.employee_code||'-'}</TD>
+                          <TD>{emp?.nickname||'-'}</TD>
+                          <TD>{nameEn||'-'}</TD>
+                          <TD>{genderLabel}</TD>
+                          <TD>{fmtDate(emp?.date_of_birth)}</TD>
+                          <TD mono>{emp?.national_id||'-'}</TD>
+                          <TD>{emp?.blood_type||'-'}</TD>
+                          <TD>{maritalMap[emp?.marital_status]||'-'}</TD>
+                          <TD>{emp?.company_entity ? <span className="px-1.5 py-0.5 rounded text-[10px] font-medium" style={{background:G.light,color:G.dark}}>{emp.company_entity}</span> : '-'}</TD>
+                          <TD>{emp?.bu||'-'}</TD>
+                          <TD><span className="truncate block max-w-[190px]">{emp?.department_name_th||'-'}</span></TD>
+                          <TD><span className="truncate block max-w-[150px]">{emp?.position_th||'-'}</span></TD>
+                          <TD>{emp?.level ? <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-mono text-[10px]">{emp.level}</span> : '-'}</TD>
+                          <TD>{emp?.employment_type||'-'}</TD>
+                          <TD>{fmtDate(emp?.hire_date)}</TD>
+                          <TD><span className="truncate block max-w-[170px] text-[10px]">{emp?.email||'-'}</span></TD>
+                          <TD mono>{emp?.phone||'-'}</TD>
+                          <TD><span className="truncate block max-w-[170px] text-[10px]">{emp?.personal_email||'-'}</span></TD>
+                          <TD>{emp?.education_level||'-'}</TD>
+                          <TD><span className="truncate block max-w-[150px]">{emp?.education_university||'-'}</span></TD>
+                          <TD right>{fmtSalary(emp?.base_salary)}</TD>
+                          <TD><span className="truncate block max-w-[120px]">{emp?.bank_name||'-'}</span></TD>
+                          <TD mono>{emp?.bank_account||'-'}</TD>
+                          <td className="py-2 px-3 border-b border-gray-50" style={{background:rowBg}}>
+                            <div className="relative inline-block">
+                              <RoleBadge role={u.role}/>
+                              {myRole === 'superuser' && (
+                                <select value={u.role} onChange={e=>handleRoleQuickChange(u.id,e.target.value)}
+                                  className="absolute inset-0 opacity-0 cursor-pointer w-full" title="เปลี่ยน Role">
+                                  {ROLES.map(r=><option key={r.key} value={r.key}>{r.label}</option>)}
+                                </select>
+                              )}
+                            </div>
+                          </td>
+                          <td className="sticky right-0 z-10 py-2 px-2 border-b border-l border-gray-100 group-hover:bg-[#F0FBF5]"
+                            style={{background:rowBg}}>
+                            <div className="flex items-center gap-1">
+                              <button onClick={()=>setEditUser(u)} className="p-1.5 rounded hover:bg-[#E6F9F0] text-gray-400 hover:text-[#007A3D]" title="แก้ไข">
+                                <Edit3 className="w-3.5 h-3.5"/>
+                              </button>
+                              {myRole==='superuser' && (
+                                <button onClick={()=>handleDelete(u.id)} disabled={deleting===u.id}
+                                  className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500" title="ลบ">
+                                  <Trash2 className="w-3.5 h-3.5"/>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-4 py-2.5 border-t text-xs text-gray-400 flex items-center gap-3" style={{borderColor:'#EEF5F0'}}>
+                <span>แสดง {filtered.length} จาก {users.length} บัญชี</span>
+                <span className="text-gray-300">•</span>
+                <span>เลื่อนซ้าย-ขวาเพื่อดูทุกคอลัมน์ · คลิก ✏️ เพื่อแก้ไข</span>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Tab: Unlinked Employees ── */}
+      {activeTab === 'unlinked' && (
+        <div className="bg-white rounded-xl border" style={{borderColor:'#D8EDE3'}}>
+          <div className="px-4 py-3 border-b flex items-center gap-2" style={{borderColor:'#D8EDE3',background:'#FFFBF0'}}>
+            <AlertTriangle className="w-4 h-4 text-amber-500"/>
+            <span className="text-sm text-amber-700 font-medium">
+              พนักงาน {unlinkedEmps.length} คน ยังไม่มีบัญชีเข้าระบบ
+            </span>
+          </div>
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{borderColor:G.primary}}/>
+            </div>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b" style={{borderColor:'#D8EDE3',background:'#F4F7F5'}}>
+                  {['รหัส','ชื่อ-นามสกุล','ตำแหน่ง','บริษัท','สถานะ'].map(h=>(
+                    <th key={h} className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {unlinkedEmps.length === 0 ? (
+                  <tr><td colSpan={5} className="text-center py-12">
+                    <UserCheck className="w-10 h-10 mx-auto mb-2" style={{color:G.primary}}/>
+                    <p className="text-gray-500 text-sm">พนักงานทุกคนมีบัญชีแล้ว</p>
+                  </td></tr>
+                ) : unlinkedEmps.map(emp => {
+                  const name = `${emp.first_name_th||''} ${emp.last_name_th||''}`.trim() || `${emp.first_name_en||''} ${emp.last_name_en||''}`.trim()
+                  return (
+                    <tr key={emp.id} className="hover:bg-[#F4F7F5] transition-colors">
+                      <td className="py-3 px-4 font-mono text-xs text-gray-500">{emp.employee_code}</td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <Av name={name} size={28}/>
+                          <span className="font-medium text-gray-800">{name || '-'}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-gray-500">{emp.position_th || '-'}</td>
+                      <td className="py-3 px-4">
+                        <span className="text-xs px-2 py-0.5 rounded-full" style={{background:G.light,color:G.dark}}>
+                          {emp.company_entity || '-'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">{emp.status}</span>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* ── Role Permission Reference ── */}
+      <div className="bg-white rounded-xl border p-4" style={{borderColor:'#D8EDE3'}}>
+        <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+          <Key className="w-4 h-4" style={{color:G.primary}}/>ตารางสิทธิ์การเข้าถึง
+        </h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr style={{borderBottom:'1px solid #D8EDE3'}}>
+                <th className="text-left py-2 px-3 text-gray-500 font-medium">ฟีเจอร์</th>
+                {ROLES.map(r=><th key={r.key} className="py-2 px-3 text-center font-medium text-gray-500">{r.icon} {r.label}</th>)}
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {[
+                ['ดูข้อมูลส่วนตัว',true,true,true,true],
+                ['ดูข้อมูลทีม',true,true,true,false],
+                ['ดูข้อมูลพนักงานทั้งหมด',true,true,true,false],
+                ['อนุมัติลา / OT',true,true,true,false],
+                ['แก้ไขข้อมูลพนักงาน',true,true,false,false],
+                ['ดูเงินเดือน',true,false,false,false],
+                ['จัดการผู้ใช้งาน',true,true,false,false],
+                ['จัดการบริษัท',true,true,false,false],
+                ['วิเคราะห์ต้นทุน',true,false,false,false],
+              ].map(([feat,su,ad,mg,em]) => (
+                <tr key={feat} className="hover:bg-gray-50">
+                  <td className="py-2 px-3 text-gray-700 font-medium">{feat}</td>
+                  {[su,ad,mg,em].map((v,i)=>(
+                    <td key={i} className="py-2 px-3 text-center">
+                      {v ? <Check className="w-4 h-4 mx-auto" style={{color:G.primary}}/> : <X className="w-4 h-4 mx-auto text-gray-200"/>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Modals */}
+      {editUser && (
+        <EditUserModal
+          user={editUser}
+          employees={employees}
+          onClose={() => setEditUser(null)}
+          onSaved={() => { fetchData(); showToast('อัปเดตข้อมูลสำเร็จ') }}
           lang={lang}
         />
       )}

@@ -322,6 +322,211 @@ function DeptListItem({ deptName, data, color, lang }) {
   );
 }
 
+/* ─── Company Config ────────────────────────────────── */
+const COMPANIES = [
+  { code: 'ONL',   name: 'Online Asset',   nameTh: 'Online Asset Co., Ltd.',                  color: '#7DC242', bg: '#f0fce8' },
+  { code: 'EFINX', name: 'EFIN Xpert',     nameTh: 'EFIN Xpert Company Limited',              color: '#2563EB', bg: '#eff6ff' },
+  { code: 'ATESS', name: 'ATESS',          nameTh: 'ATESS Power Technology (Thailand) Co., Ltd.', color: '#DC2626', bg: '#fef2f2' },
+  { code: 'SMT',   name: 'Smart Medtech',  nameTh: 'Smart Medtech Co., Ltd.',                 color: '#7C3AED', bg: '#f5f3ff' },
+];
+
+/* ─── Company Org View ──────────────────────────────── */
+function CompanyOrgView({ employees, deptMap, lang, company }) {
+  const [selectedBU, setSelectedBU] = useState(null);
+
+  const compEmps = useMemo(() => {
+    return employees.filter(e => {
+      const code = e.company_entity || '';
+      if (company.code === 'ONL') return code === 'ONL' || (!code && /^5/.test(e.employee_code || ''));
+      if (company.code === 'EFINX') return code === 'EFINX';
+      if (company.code === 'ATESS') return code === 'ATESS';
+      if (company.code === 'SMT') return code === 'SMT';
+      return false;
+    }).sort((a, b) => {
+      const la = parseInt((a.level || '').replace('G', '')) || 0;
+      const lb = parseInt((b.level || '').replace('G', '')) || 0;
+      return lb - la;
+    });
+  }, [employees, company]);
+
+  const ceo = compEmps.find(e => parseInt((e.level || '').replace('G', '')) >= 12);
+  const cLevel = compEmps.filter(e => {
+    const n = parseInt((e.level || '').replace('G', '')) || 0;
+    return n >= 10 && n < 12;
+  });
+
+  // For ONL: group by BU; for others: group by department
+  const isONL = company.code === 'ONL';
+
+  const buGroups = useMemo(() => {
+    if (!isONL) return [];
+    const groups = {};
+    compEmps.forEach(emp => {
+      const buName = emp.bu || (lang === 'th' ? 'ไม่ระบุ BU' : 'Unassigned');
+      if (!groups[buName]) groups[buName] = [];
+      groups[buName].push(emp);
+    });
+    return Object.entries(groups).sort((a, b) => {
+      const aU = a[0].includes('ไม่ระบุ') || a[0] === 'Unassigned';
+      const bU = b[0].includes('ไม่ระบุ') || b[0] === 'Unassigned';
+      if (aU && !bU) return 1; if (!aU && bU) return -1;
+      return b[1].length - a[1].length;
+    });
+  }, [compEmps, isONL, lang]);
+
+  const deptGroups = useMemo(() => {
+    if (isONL) return [];
+    const groups = {};
+    compEmps.forEach(emp => {
+      const dept = deptMap[emp.department_id];
+      const name = dept ? (lang === 'th' ? dept.name_th : (dept.name_en || dept.name_th)) : (lang === 'th' ? 'ไม่ระบุแผนก' : 'Unassigned');
+      if (!groups[name]) groups[name] = [];
+      groups[name].push(emp);
+    });
+    return Object.entries(groups).sort((a, b) => {
+      const la = parseInt((a[1][0]?.level || '').replace('G', '')) || 0;
+      const lb = parseInt((b[1][0]?.level || '').replace('G', '')) || 0;
+      if (lb !== la) return lb - la;
+      return b[1].length - a[1].length;
+    });
+  }, [compEmps, isONL, deptMap, lang]);
+
+  const groups = isONL ? buGroups : deptGroups;
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const selectedData = groups.find(([n]) => n === selectedGroup);
+
+  if (compEmps.length === 0) {
+    return (
+      <div className="text-center py-16 text-gray-400 text-sm">
+        {lang === 'th' ? 'ไม่มีข้อมูลพนักงานในบริษัทนี้' : 'No employee data for this company'}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Company Header */}
+      <div className="rounded-xl p-4 flex items-center justify-between" style={{ background: company.bg, border: `1.5px solid ${company.color}30` }}>
+        <div>
+          <div className="text-lg font-bold" style={{ color: company.color }}>{company.name}</div>
+          <div className="text-xs text-gray-500 mt-0.5">{company.nameTh}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold" style={{ color: company.color }}>{compEmps.length}</div>
+          <div className="text-xs text-gray-400">{lang === 'th' ? 'คน' : 'employees'}</div>
+        </div>
+      </div>
+
+      {/* CEO */}
+      {ceo && (
+        <div className="flex justify-center">
+          <div className="rounded-xl p-4 shadow text-center min-w-56" style={{ background: company.color }}>
+            <div className="w-12 h-12 mx-auto rounded-full bg-white/20 flex items-center justify-center mb-2">
+              <User className="w-6 h-6 text-white" />
+            </div>
+            <div className="text-white font-bold text-sm">
+              {lang === 'th' ? `${ceo.first_name_th} ${ceo.last_name_th}` : `${ceo.first_name_en || ceo.first_name_th} ${ceo.last_name_en || ceo.last_name_th}`}
+            </div>
+            {ceo.nickname && <div className="text-white/70 text-xs">({ceo.nickname})</div>}
+            <div className="text-white/80 text-[11px] mt-1">{lang === 'th' ? ceo.position_th : (ceo.position_en || ceo.position_th)}</div>
+            <LevelBadge level={ceo.level} />
+          </div>
+        </div>
+      )}
+
+      {/* C-Level */}
+      {cLevel.length > 0 && (
+        <>
+          {ceo && <div className="flex justify-center"><div className="w-px h-5 bg-gray-300" /></div>}
+          <div className="text-center text-xs text-gray-400 font-medium mb-1">{lang === 'th' ? 'บอร์ดบริหาร' : 'Executive Board'}</div>
+          <div className="flex flex-wrap justify-center gap-3">
+            {cLevel.map(emp => (
+              <div key={emp.id} className="bg-white rounded-lg border-2 p-3 shadow-sm text-center min-w-44" style={{ borderColor: company.color + '80' }}>
+                <div className="w-9 h-9 mx-auto rounded-full flex items-center justify-center mb-1" style={{ background: company.bg }}>
+                  <User className="w-4 h-4" style={{ color: company.color }} />
+                </div>
+                <div className="text-xs font-semibold text-gray-900">
+                  {lang === 'th' ? `${emp.first_name_th} ${emp.last_name_th}` : `${emp.first_name_en || emp.first_name_th} ${emp.last_name_en || emp.last_name_th}`}
+                </div>
+                {emp.nickname && <div className="text-[10px] text-gray-400">({emp.nickname})</div>}
+                <div className="text-[10px] text-gray-500 mt-0.5 line-clamp-2">{lang === 'th' ? emp.position_th : (emp.position_en || emp.position_th)}</div>
+                <div className="mt-1"><LevelBadge level={emp.level} /></div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* BU / Department Groups */}
+      {(ceo || cLevel.length > 0) && <div className="flex justify-center"><div className="w-px h-5 bg-gray-300" /></div>}
+      <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
+        <Building2 className="w-4 h-4" style={{ color: company.color }} />
+        {isONL ? (lang === 'th' ? 'Business Unit' : 'Business Units') : (lang === 'th' ? 'ฝ่ายงาน' : 'Departments')}
+        <span className="text-gray-400 font-normal">({groups.length})</span>
+      </div>
+
+      <div className="flex gap-6">
+        <div className={`${selectedData ? 'w-1/2' : 'w-full'} transition-all duration-300`}>
+          <div className={`grid ${selectedData ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-3`}>
+            {groups.map(([name, emps], i) => {
+              const color = DEPT_PALETTE[i % DEPT_PALETTE.length];
+              const head = emps.find(e => {
+                const pos = (e.position_th || '').toLowerCase();
+                return pos.includes('head') || pos.includes('ผู้อำนวยการ') || pos.includes('ceo') || pos.includes('ประธาน');
+              }) || emps[0];
+              const isSelected = selectedGroup === name;
+              return (
+                <div
+                  key={name}
+                  className={`rounded-xl border-2 transition cursor-pointer ${isSelected ? 'shadow-lg' : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow'}`}
+                  style={isSelected ? { borderColor: company.color, background: company.bg } : {}}
+                  onClick={() => setSelectedGroup(prev => prev === name ? null : name)}
+                >
+                  <div className="p-3 flex items-center gap-3">
+                    <div className="w-1.5 h-12 rounded-full flex-shrink-0" style={{ backgroundColor: color }} />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-bold text-gray-900 truncate">{name}</div>
+                      <div className="text-xs text-gray-500 truncate">
+                        {lang === 'th'
+                          ? `${head?.first_name_th || ''} ${head?.last_name_th || ''}${head?.nickname ? ' (' + head.nickname + ')' : ''}`.trim()
+                          : `${head?.first_name_en || head?.first_name_th || ''} ${head?.last_name_en || head?.last_name_th || ''}`.trim()}
+                      </div>
+                    </div>
+                    <div className="text-right flex-shrink-0">
+                      <div className="text-lg font-bold" style={{ color }}>{emps.length}</div>
+                      <div className="text-[10px] text-gray-400">{lang === 'th' ? 'คน' : 'emp'}</div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {selectedData && (
+          <div className="w-1/2 transition-all duration-300">
+            <OrgDetailPanel
+              deptName={selectedData[0]}
+              emps={selectedData[1]}
+              lang={lang}
+              color={DEPT_PALETTE[groups.findIndex(([n]) => n === selectedGroup) % DEPT_PALETTE.length]}
+              onClose={() => setSelectedGroup(null)}
+              groupBy="level"
+              deptMap={deptMap}
+            />
+          </div>
+        )}
+      </div>
+
+      {!selectedData && (
+        <div className="text-center text-gray-400 text-sm mt-2">
+          {lang === 'th' ? 'คลิกเลือกเพื่อดูรายละเอียดพนักงาน' : 'Click to view employee details'}
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ─── Main Component ────────────────────────────────── */
 export default function OrgChart({ lang }) {
   const { filterByCompany } = useCompanyFilter();
@@ -329,8 +534,9 @@ export default function OrgChart({ lang }) {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDept, setSelectedDept] = useState(null);
-  const [viewMode, setViewMode] = useState('chart'); // chart | list | bu
+  const [viewMode, setViewMode] = useState('company'); // company | chart | list | bu
   const [selectedBU, setSelectedBU] = useState(null);
+  const [selectedCompany, setSelectedCompany] = useState('ONL');
 
   const t = {
     title: lang === 'th' ? 'โครงสร้างองค์กร' : 'Organization Chart',
@@ -341,7 +547,8 @@ export default function OrgChart({ lang }) {
     cLevel: lang === 'th' ? 'บอร์ดบริหาร' : 'Executive Board',
     seniorExecs: lang === 'th' ? 'บอร์ดบริหาร' : 'Executive Board',
     loading: lang === 'th' ? 'กำลังโหลดข้อมูล...' : 'Loading...',
-    chartView: lang === 'th' ? 'บริษัท/ฝ่าย' : 'Dept View',
+    companyView: lang === 'th' ? 'แยกบริษัท' : 'By Company',
+    chartView: lang === 'th' ? 'ภาพรวม' : 'Overview',
     listView: lang === 'th' ? 'รายชื่อ' : 'List View',
     buView: lang === 'th' ? 'โครงสร้าง BU' : 'BU Structure',
     selectDept: lang === 'th' ? 'เลือกแผนกเพื่อดูรายละเอียดพนักงาน' : 'Select a department to view employees',
@@ -549,7 +756,11 @@ export default function OrgChart({ lang }) {
       </div>
 
       {/* View Mode Toggle */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
+        <button
+          onClick={() => setViewMode('company')}
+          className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'company' ? 'bg-[#7DC242] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+        >{t.companyView}</button>
         <button
           onClick={() => setViewMode('chart')}
           className={`px-4 py-1.5 rounded-lg text-sm font-medium transition ${viewMode === 'chart' ? 'bg-[#7DC242] text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
@@ -564,7 +775,36 @@ export default function OrgChart({ lang }) {
         >{t.listView}</button>
       </div>
 
-      {viewMode === 'bu' ? (
+      {/* Company tabs (shown when viewMode === 'company') */}
+      {viewMode === 'company' && (
+        <div className="flex gap-2 flex-wrap">
+          {COMPANIES.map(c => (
+            <button
+              key={c.code}
+              onClick={() => setSelectedCompany(c.code)}
+              className="px-4 py-1.5 rounded-lg text-sm font-semibold border-2 transition"
+              style={selectedCompany === c.code
+                ? { background: c.color, color: '#fff', borderColor: c.color }
+                : { background: '#fff', color: c.color, borderColor: c.color + '60' }}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {viewMode === 'company' ? (
+        /* ═══ COMPANY VIEW ═══ */
+        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+          <CompanyOrgView
+            key={selectedCompany}
+            employees={employees}
+            deptMap={deptMap}
+            lang={lang}
+            company={COMPANIES.find(c => c.code === selectedCompany) || COMPANIES[0]}
+          />
+        </div>
+      ) : viewMode === 'bu' ? (
         /* ═══ BU VIEW ═══ */
         <div className="bg-gradient-to-b from-orange-50/50 to-white rounded-2xl border border-gray-200 p-6">
           <div className="flex gap-6">

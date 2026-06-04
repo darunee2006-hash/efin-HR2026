@@ -114,64 +114,7 @@ export default function Documents({ lang = 'th' }) {
 
   const t = labels[lang] || labels.th;
 
-  // Generate mock documents
-  const generateMockDocuments = (empList) => {
-    if (empList.length === 0) return [];
-
-    const docTypes = [
-      'สัญญาจ้าง',
-      'ใบอนุญาต',
-      'ใบรับรอง',
-      'PDPA Consent',
-      'เอกสารอื่นๆ',
-    ];
-    const mockDocs = [];
-    const baseDate = new Date('2024-01-01');
-
-    for (let i = 0; i < 20; i++) {
-      const emp = empList[i % empList.length];
-      const docType = docTypes[i % docTypes.length];
-      const uploadDate = new Date(baseDate.getTime() + i * 7 * 24 * 60 * 60 * 1000);
-      const expiryDate = new Date(uploadDate.getTime() + (90 + Math.random() * 180) * 24 * 60 * 60 * 1000);
-      const now = new Date();
-      const daysUntilExpiry = Math.floor((expiryDate - now) / (24 * 60 * 60 * 1000));
-
-      let status = 'normal';
-      if (daysUntilExpiry < 0) status = 'expired';
-      else if (daysUntilExpiry < 30) status = 'expiring';
-      else if (i % 5 === 0) status = 'pending';
-
-      mockDocs.push({
-        id: `doc_${i}`,
-        name: `${docType}_${emp.employee_code}`,
-        type: docType,
-        owner: {
-          id: emp.id,
-          name: `${emp.first_name_th} ${emp.last_name_th}${emp.nickname ? ' (' + emp.nickname + ')' : ''}`,
-          initials: emp.first_name_th.charAt(0),
-        },
-        uploadDate,
-        expiryDate,
-        status,
-        fileSize: `${(Math.random() * 5 + 0.5).toFixed(1)}MB`,
-        tabCategory:
-          docType === 'ใบอนุญาต'
-            ? 'ใบอนุญาต'
-            : docType === 'สัญญาจ้าง'
-            ? 'สัญญาจ้าง'
-            : docType === 'ใบรับรอง'
-            ? 'ใบรับรอง'
-            : docType === 'PDPA Consent'
-            ? 'PDPA Consent'
-            : 'เอกสารอื่นๆ',
-        daysUntilExpiry,
-      });
-    }
-
-    return mockDocs;
-  };
-
-  // Fetch employees and generate mock docs
+  // Fetch employees and documents from DB
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -186,9 +129,12 @@ export default function Documents({ lang = 'th' }) {
         const empList = empData || [];
         setEmployees(empList);
 
-        // Generate mock documents
-        const mockDocs = generateMockDocuments(empList);
-        setDocuments(mockDocs);
+        // Fetch real documents from hr_documents table (empty until uploaded)
+        const { data: docData } = await supabase
+          .from('hr_documents')
+          .select('*')
+          .order('created_at', { ascending: false });
+        setDocuments(docData || []);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
