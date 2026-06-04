@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend,
@@ -86,6 +86,71 @@ function Av({ name = '' }) {
 }
 
 // ── Main Dashboard ────────────────────────────────────────────────
+
+// ── DrillDown Panel ─────────────────────────────────────────────────
+function DrillDownPanel({ title, rows, columns, onClose, onNavigate, navPage, lang }) {
+  const [search, setSearch] = React.useState('')
+  if (!rows) return null
+  const filtered = search
+    ? rows.filter(r => columns.some(c => String(c.get(r)||'').toLowerCase().includes(search.toLowerCase())))
+    : rows
+  return (
+    <div style={{ position:'fixed', inset:0, zIndex:50, display:'flex', justifyContent:'flex-end' }} onClick={onClose}>
+      <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.35)' }}/>
+      <div style={{ position:'relative', width:'min(640px,95vw)', background:'#fff', height:'100vh', display:'flex', flexDirection:'column', boxShadow:'-4px 0 24px rgba(0,0,0,0.12)' }}
+        onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div style={{ padding:'16px 20px', borderBottom:'1px solid #E8F5D0', display:'flex', alignItems:'center', justifyContent:'space-between', background:G.light }}>
+          <div>
+            <div style={{ fontSize:16, fontWeight:600, color:G.darker }}>{title}</div>
+            <div style={{ fontSize:12, color:G.dark, marginTop:2 }}>{filtered.length} รายการ</div>
+          </div>
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            {navPage && (
+              <button onClick={() => { onClose(); onNavigate && onNavigate(navPage) }}
+                style={{ fontSize:12, color:G.primary, border:`1px solid ${G.light2}`, borderRadius:6, padding:'4px 12px', background:'#fff', cursor:'pointer' }}>
+                ดูหน้าเต็ม →
+              </button>
+            )}
+            <button onClick={onClose} style={{ fontSize:20, color:'#999', background:'none', border:'none', cursor:'pointer', lineHeight:1 }}>×</button>
+          </div>
+        </div>
+        {/* Search */}
+        <div style={{ padding:'10px 20px', borderBottom:'1px solid #F0F7F0' }}>
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="ค้นหา..."
+            style={{ width:'100%', border:'1px solid #D8EDE3', borderRadius:8, padding:'6px 12px', fontSize:13, outline:'none', boxSizing:'border-box' }} />
+        </div>
+        {/* Table */}
+        <div style={{ flex:1, overflowY:'auto' }}>
+          <table style={{ width:'100%', fontSize:12, borderCollapse:'collapse' }}>
+            <thead>
+              <tr style={{ background:'#F8FDF4', position:'sticky', top:0 }}>
+                {columns.map(c => (
+                  <th key={c.key} style={{ textAlign:'left', padding:'8px 12px', color:'#7A9E8A', fontWeight:600, borderBottom:'1px solid #E8F5D0', whiteSpace:'nowrap' }}>{c.label}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr><td colSpan={columns.length} style={{ textAlign:'center', padding:24, color:'#A0B8A8' }}>ไม่พบข้อมูล</td></tr>
+              ) : filtered.map((row, i) => (
+                <tr key={i} style={{ borderBottom:'1px solid #F4F9F0', background: i%2===0?'#fff':'#FAFDF7' }}>
+                  {columns.map(c => (
+                    <td key={c.key} style={{ padding:'7px 12px', color:'#2a4a2a', maxWidth:200, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      {c.render ? c.render(row) : (c.get ? c.get(row) : row[c.key]) ?? '—'}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const nav = onNavigate || setPage || (() => {})
   const { profile, role } = useAuth()
@@ -182,6 +247,51 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     rejected: { bg:'#FEECEC', color:'#c62828', label: lang==='th' ? 'ไม่อนุมัติ' : 'Rejected' },
   }
 
+
+  const fmtHireDate = (d) => d ? new Date(d).toLocaleDateString('th-TH', {day:'numeric',month:'short',year:'2-digit'}) : '—'
+  const empCols = [
+    { key:'employee_code', label:'รหัส', get: r => r.employee_code },
+    { key:'name', label:'ชื่อ-นามสกุล', get: r => `${r.first_name_th||''} ${r.last_name_th||''}${r.nickname?' ('+r.nickname+')':''}`.trim() },
+    { key:'position_th', label:'ตำแหน่ง', get: r => r.position_th || '—' },
+    { key:'bu', label:'BU', get: r => r.bu || '—' },
+    { key:'company_entity', label:'บริษัท', get: r => r.company_entity || '—' },
+    { key:'hire_date', label:'วันเริ่มงาน', get: r => fmtHireDate(r.hire_date) },
+  ]
+
+  const thisMonth = new Date(); thisMonth.setDate(1); thisMonth.setHours(0,0,0,0)
+  const newEmps = allEmployees.filter(e => e.hire_date && new Date(e.hire_date) >= thisMonth)
+
+  const openDrill = (type) => {
+    if (type === 'total') setDrillDown({ title: `พนักงานทั้งหมด (${allEmployees.length} คน)`, rows: allEmployees, columns: empCols, navPage: 'employees' })
+    else if (type === 'new') setDrillDown({ title: `พนักงานใหม่เดือนนี้ (${newEmps.length} คน)`, rows: newEmps, columns: empCols, navPage: 'onboarding' })
+    else if (type === 'leave') setDrillDown({
+      title: `คำขอลา รออนุมัติ (${recentLeave.length} รายการ)`,
+      rows: recentLeave,
+      columns: [
+        { key:'name', label:'ชื่อ', get: r => { const e=r.hr_employees; return e?`${e.first_name_th||''} ${e.last_name_th||''}`.trim():'—' } },
+        { key:'type', label:'ประเภท', get: r => r.hr_leave_types?.name_th || '—' },
+        { key:'start', label:'วันที่', get: r => r.start_date || '—' },
+        { key:'status', label:'สถานะ', get: r => ({pending:'รออนุมัติ',approved:'อนุมัติ',rejected:'ไม่อนุมัติ'})[r.status]||r.status },
+      ],
+      navPage: 'leave'
+    })
+    else if (type === 'attendance') setDrillDown({ title: 'อัตราการเข้างาน', rows: [], columns: [], navPage: 'timeAttendance' })
+    else if (type === 'open') setDrillDown({ title: 'ตำแหน่งงานว่าง', rows: [], columns: [], navPage: 'recruitment' })
+    else if (type.startsWith('bu:')) {
+      const buName = type.slice(3)
+      const buEmps = allEmployees.filter(e => e.bu === buName)
+      setDrillDown({ title: `${buName} (${buEmps.length} คน)`, rows: buEmps, columns: empCols, navPage: 'staffList' })
+    }
+    else if (type.startsWith('announce')) setDrillDown({ title: 'ประกาศภายใน', rows: announcements, columns: [
+      { key:'title', label:'หัวข้อ', get: a => a.title_th || a.title_en || '—' },
+      { key:'date', label:'วันที่', get: a => a.created_at ? new Date(a.created_at).toLocaleDateString('th-TH') : '—' },
+    ], navPage: 'announcements' })
+    else if (type.startsWith('training')) setDrillDown({ title: 'กิจกรรม/อบรม', rows: upcomingTraining, columns: [
+      { key:'course', label:'หลักสูตร', get: t => t.course_name || '—' },
+      { key:'date', label:'วันที่', get: t => t.start_date || '—' },
+      { key:'count', label:'ผู้เข้าร่วม', get: t => t.participants_count || '—' },
+    ], navPage: 'training' })
+  }
   if (loading) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:400 }}>
       <div style={{ width:36, height:36, borderRadius:'50%', border:`3px solid ${G.light}`, borderTopColor:G.primary, animation:'spin 0.8s linear infinite' }} />
@@ -202,19 +312,19 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
 
       {/* ── KPI Cards ── */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:11, marginBottom:16 }}>
-        <div onClick={() => nav('employees')} style={{ cursor:'pointer' }}>
+        <div onClick={() => openDrill('total')} style={{ cursor:'pointer' }}>
           <StatCard icon={Users}      iconStyle={{background:G.light,  color:G.primary}} label={lang==='th'?'พนักงานทั้งหมด':'Total Employees'}  value={fmt(empTotal)}  unit={lang==='th'?'คน':'ppl'} change="4.3% จากเดือนที่แล้ว" changeUp />
         </div>
-        <div onClick={() => nav('onboarding')} style={{ cursor:'pointer' }}>
+        <div onClick={() => openDrill('new')} style={{ cursor:'pointer' }}>
           <StatCard icon={UserPlus}   iconStyle={{background:'#E0F7EE',color:'#00875A'}} label={lang==='th'?'พนักงานใหม่':'New Employees'}       value={fmt(empNew)}    unit={lang==='th'?'คน':'ppl'} change="12.5% จากเดือนที่แล้ว" changeUp />
         </div>
-        <div onClick={() => nav('recruitment')} style={{ cursor:'pointer' }}>
+        <div onClick={() => openDrill('open')} style={{ cursor:'pointer' }}>
           <StatCard icon={Briefcase}  iconStyle={{background:'#FFF3E0',color:'#E07000'}} label={lang==='th'?'ตำแหน่งงานว่าง':'Open Positions'}    value={fmt(openPositions)} unit={lang==='th'?'ตำแหน่ง':'pos'} change="4.0% จากเดือนที่แล้ว" changeUp={false} />
         </div>
-        <div onClick={() => nav('leave')} style={{ cursor:'pointer' }}>
+        <div onClick={() => openDrill('leave')} style={{ cursor:'pointer' }}>
           <StatCard icon={CalendarX}  iconStyle={{background:'#F3E5F5',color:'#7B1FA2'}} label={lang==='th'?'คำขอลา (รออนุมัติ)':'Leave Requests'}  value={fmt(leaveCount)} unit={lang==='th'?'รายการ':'items'} change="8.7% จากเดือนที่แล้ว" changeUp />
         </div>
-        <div onClick={() => nav('timeAttendance')} style={{ cursor:'pointer' }}>
+        <div onClick={() => openDrill('attendance')} style={{ cursor:'pointer' }}>
           <StatCard icon={TrendingUp} iconStyle={{background:'#E0F7F4',color:'#009688'}} label={lang==='th'?'อัตราการเข้างาน':'Attendance Rate'}   value="96.2" unit="%" change="1.8% จากเดือนที่แล้ว" changeUp />
         </div>
       </div>
@@ -262,7 +372,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
             </div>
             <div style={{ flex:1 }}>
               {buData.map((d, i) => (
-                <div key={i} onClick={() => nav('staffList')}
+                <div key={i} onClick={() => openDrill(`bu:${d.name}`)}
                   style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:'#6B9E84', marginBottom:5, cursor:'pointer', padding:'2px 4px', borderRadius:4, transition:'background .15s' }}
                   onMouseEnter={e=>e.currentTarget.style.background='#E6F9F0'}
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
@@ -312,7 +422,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:13 }}>
 
         {/* Recent leave requests */}
-        <Card title={lang==='th'?'คำขอลางานล่าสุด':'Recent Leave Requests'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => nav('leave')}>
+        <Card title={lang==='th'?'คำขอลางานล่าสุด':'Recent Leave Requests'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => openDrill('leave')}>
           {/* Header row */}
           <div style={{ display:'grid', gridTemplateColumns:'1.4fr 1fr 1fr 80px', gap:8, fontSize:11, color:'#8ABFA3', borderBottom:'0.5px solid #D8EDE3', paddingBottom:7, marginBottom:7 }}>
             <span>{lang==='th'?'ชื่อพนักงาน':'Employee'}</span>
@@ -349,7 +459,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
         </Card>
 
         {/* Announcements */}
-        <Card title={lang==='th'?'ประกาศภายใน':'Announcements'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => nav('announcements')}>
+        <Card title={lang==='th'?'ประกาศภายใน':'Announcements'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => openDrill('announce')}>
           {announcements.length === 0 ? (
             <p style={{ fontSize:12, color:'#A0B8A8', textAlign:'center', padding:'16px 0' }}>
               {lang==='th'?'ไม่มีประกาศ':'No announcements'}
@@ -377,7 +487,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
         </Card>
 
         {/* Upcoming training */}
-        <Card title={lang==='th'?'กิจกรรม / อบรมที่กำลังจะถึง':'Upcoming Training'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => nav('training')}>
+        <Card title={lang==='th'?'กิจกรรม / อบรมที่กำลังจะถึง':'Upcoming Training'} action={lang==='th'?'ดูทั้งหมด':'View All'} onAction={() => openDrill('training')}>
           {upcomingTraining.length === 0 ? (
             <p style={{ fontSize:12, color:'#A0B8A8', textAlign:'center', padding:'16px 0' }}>
               {lang==='th'?'ไม่มีกิจกรรม / อบรม':'No upcoming training'}
@@ -421,6 +531,20 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       </div>
 
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+
+      {/* DrillDown Panel */}
+      {drillDown && (
+        <DrillDownPanel
+          title={drillDown.title}
+          rows={drillDown.rows}
+          columns={drillDown.columns}
+          onClose={() => setDrillDown(null)}
+          onNavigate={nav}
+          navPage={drillDown.navPage}
+          lang={lang}
+        />
+      )}
     </div>
   )
 }
+
