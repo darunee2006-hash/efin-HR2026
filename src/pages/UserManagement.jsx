@@ -161,6 +161,9 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
     pvd_employee_rate: emp.pvd_employee_rate || '',
     pvd_prev_employee_amount: emp.pvd_prev_employee_amount || '',
     pvd_prev_employer_amount: emp.pvd_prev_employer_amount || '',
+    // Offboarding
+    resignation_date: emp.resignation_date || '',
+    resignation_reason: emp.resignation_reason || '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -247,6 +250,8 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
           pvd_employee_rate: empForm.pvd_employee_rate ? parseFloat(empForm.pvd_employee_rate) : null,
           pvd_prev_employee_amount: empForm.pvd_prev_employee_amount ? parseFloat(empForm.pvd_prev_employee_amount) : null,
           pvd_prev_employer_amount: empForm.pvd_prev_employer_amount ? parseFloat(empForm.pvd_prev_employer_amount) : null,
+          resignation_date: empForm.resignation_date || null,
+          resignation_reason: empForm.resignation_reason || null,
         }
         const { error: ee } = await supabase.from('hr_employees').update(empData).eq('id', empId)
         if (ee) throw ee
@@ -378,6 +383,8 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
               <FInput label="วันที่บรรจุ" value={empForm.confirmed_date} onChange={sf('confirmed_date')} type="date" half/>
               <FInput label="วันที่เริ่มคำนวณเงินเดือน" value={empForm.payroll_start_date} onChange={sf('payroll_start_date')} type="date" half/>
               <FInput label="เวลาทำงาน" value={empForm.work_schedule} onChange={sf('work_schedule')} half options={['09.00-18.00','08.30-17.30','08.00-17.00']}/>
+              <FInput label="วันที่ลาออก" value={empForm.resignation_date} onChange={sf('resignation_date')} type="date" half/>
+              <FInput label="สาเหตุลาออก" value={empForm.resignation_reason} onChange={sf('resignation_reason')} half options={['ลาออก','เลิกจ้าง','ไม่ผ่านทดลองงาน','เกษียณ']}/>
             </div>
           )}
 
@@ -597,7 +604,7 @@ export default function UserManagement({ lang = 'th' }) {
     setLoading(true)
     const [profilesRes, empsRes] = await Promise.all([
       supabase.from('hr_user_profiles')
-        .select('*, hr_employees(id, employee_code, badge_number, prefix_th, first_name_th, last_name_th, prefix_en, first_name_en, last_name_en, nickname, gender, date_of_birth, national_id, id_card_expiry, id_card_issued_at, blood_type, nationality, ethnicity, religion, marital_status, hometown, height, weight, phone, email, personal_email, address, emergency_contact_name, emergency_contact_relation, position_th, position_en, department_name_th, department_name_en, bu, branch, level, employment_type, employee_status, hire_date, confirmed_date, payroll_start_date, payroll_cycle, payment_method, work_schedule, company_entity, education_level, education_major, education_faculty, education_university, base_salary, bank_code, bank_name, bank_account, salary_effective_date, tax_calculation_method, tax_salary_multiplier, father_name, father_occupation, mother_name, mother_occupation, sso_deduct, social_security_no, sso_start_date, sso_method, sso_hospital, pvd_method, pvd_start_date, pvd_account, pvd_employee_rate, pvd_prev_employee_amount, pvd_prev_employer_amount, status)')
+        .select('*, hr_employees(id, employee_code, badge_number, prefix_th, first_name_th, last_name_th, prefix_en, first_name_en, last_name_en, nickname, gender, date_of_birth, national_id, id_card_expiry, id_card_issued_at, blood_type, nationality, ethnicity, religion, marital_status, hometown, height, weight, phone, email, personal_email, address, emergency_contact_name, emergency_contact_relation, position_th, position_en, department_name_th, department_name_en, bu, branch, level, employment_type, employee_status, hire_date, confirmed_date, payroll_start_date, payroll_cycle, payment_method, work_schedule, company_entity, education_level, education_major, education_faculty, education_university, base_salary, bank_code, bank_name, bank_account, salary_effective_date, tax_calculation_method, tax_salary_multiplier, father_name, father_occupation, mother_name, mother_occupation, sso_deduct, social_security_no, sso_start_date, sso_method, sso_hospital, pvd_method, pvd_start_date, pvd_account, pvd_employee_rate, pvd_prev_employee_amount, pvd_prev_employer_amount, resignation_date, resignation_reason, status)')
         .order('created_at', { ascending: false }),
       supabase.from('hr_employees')
         .select('id, employee_code, first_name_th, last_name_th, first_name_en, last_name_en, position_th, company_entity, status')
@@ -752,6 +759,7 @@ export default function UserManagement({ lang = 'th' }) {
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:60}}>ระดับ</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>ประเภทจ้าง</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>วันเริ่มงาน</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:95}}>วันที่ลาออก</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:180}}>Email บริษัท</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:110}}>เบอร์โทร</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:180}}>Email ส่วนตัว</th>
@@ -766,7 +774,7 @@ export default function UserManagement({ lang = 'th' }) {
                   </thead>
                   <tbody>
                     {filtered.length === 0 ? (
-                      <tr><td colSpan={26} className="text-center py-12 text-gray-400">ไม่พบข้อมูล</td></tr>
+                      <tr><td colSpan={27} className="text-center py-12 text-gray-400">ไม่พบข้อมูล</td></tr>
                     ) : filtered.map((u, ri) => {
                       const emp = u.hr_employees
                       const fullName = emp ? `${emp.prefix_th||''} ${emp.first_name_th||''} ${emp.last_name_th||''}`.trim() : (u.display_name || '-')
@@ -822,6 +830,7 @@ export default function UserManagement({ lang = 'th' }) {
                           </TD>
                           <TD>{emp?.employment_type||'-'}</TD>
                           <TD>{fmtDate(emp?.hire_date)}</TD>
+                          <TD>{fmtDate(emp?.resignation_date)}</TD>
                           <TD><span className="truncate block max-w-[170px] text-[10px]">{emp?.email||'-'}</span></TD>
                           <TD mono>{emp?.phone||'-'}</TD>
                           <TD><span className="truncate block max-w-[170px] text-[10px]">{emp?.personal_email||'-'}</span></TD>
