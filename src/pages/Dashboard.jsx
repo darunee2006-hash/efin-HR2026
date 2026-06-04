@@ -166,6 +166,8 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const [buData, setBuData]             = useState([])
   const [trendData, setTrendData]       = useState([])
   const [loading, setLoading]           = useState(true)
+  const [drillDown, setDrillDown]       = useState(null)
+  const [allEmployees, setAllEmployees] = useState([])
 
   useEffect(() => { fetchAll() }, [])
 
@@ -227,6 +229,12 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       setTrendData([])
     }
 
+    const { data: empAll } = await supabase
+      .from('hr_employees')
+      .select('employee_code,prefix_th,first_name_th,last_name_th,nickname,position_th,department_name_th,bu,level,hire_date,company_entity')
+      .eq('status','active')
+      .order('first_name_th')
+    setAllEmployees(empAll || [])
     setLoading(false)
   }
 
