@@ -123,7 +123,44 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
     base_salary: emp.base_salary || '',
     bank_name: emp.bank_name || '',
     bank_account: emp.bank_account || '',
-    employment_type_detail: emp.employment_type || '',
+    bank_code: emp.bank_code || '',
+    payment_method: emp.payment_method || '',
+    payroll_cycle: emp.payroll_cycle || '',
+    salary_effective_date: emp.salary_effective_date || '',
+    tax_calculation_method: emp.tax_calculation_method || '',
+    tax_salary_multiplier: emp.tax_salary_multiplier || '',
+    // Personal extra
+    badge_number: emp.badge_number || '',
+    id_card_expiry: emp.id_card_expiry || '',
+    id_card_issued_at: emp.id_card_issued_at || '',
+    hometown: emp.hometown || '',
+    ethnicity: emp.ethnicity || '',
+    height: emp.height || '',
+    weight: emp.weight || '',
+    // Work extra
+    branch: emp.branch || '',
+    employee_status: emp.employee_status || '',
+    payroll_start_date: emp.payroll_start_date || '',
+    // Family
+    father_name: emp.father_name || '',
+    father_occupation: emp.father_occupation || '',
+    mother_name: emp.mother_name || '',
+    mother_occupation: emp.mother_occupation || '',
+    emergency_contact_name: emp.emergency_contact_name || '',
+    emergency_contact_relation: emp.emergency_contact_relation || '',
+    // SSO
+    sso_deduct: emp.sso_deduct || '',
+    social_security_no: emp.social_security_no || '',
+    sso_start_date: emp.sso_start_date || '',
+    sso_method: emp.sso_method || '',
+    sso_hospital: emp.sso_hospital || '',
+    // PVD
+    pvd_method: emp.pvd_method || '',
+    pvd_start_date: emp.pvd_start_date || '',
+    pvd_account: emp.pvd_account || '',
+    pvd_employee_rate: emp.pvd_employee_rate || '',
+    pvd_prev_employee_amount: emp.pvd_prev_employee_amount || '',
+    pvd_prev_employer_amount: emp.pvd_prev_employer_amount || '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -177,6 +214,39 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
           base_salary: empForm.base_salary ? parseFloat(empForm.base_salary) : null,
           bank_name: empForm.bank_name || null,
           bank_account: empForm.bank_account || null,
+          bank_code: empForm.bank_code || null,
+          payment_method: empForm.payment_method || null,
+          payroll_cycle: empForm.payroll_cycle || null,
+          salary_effective_date: empForm.salary_effective_date || null,
+          tax_calculation_method: empForm.tax_calculation_method || null,
+          tax_salary_multiplier: empForm.tax_salary_multiplier ? parseFloat(empForm.tax_salary_multiplier) : null,
+          badge_number: empForm.badge_number || null,
+          id_card_expiry: empForm.id_card_expiry || null,
+          id_card_issued_at: empForm.id_card_issued_at || null,
+          hometown: empForm.hometown || null,
+          ethnicity: empForm.ethnicity || null,
+          height: empForm.height ? parseFloat(empForm.height) : null,
+          weight: empForm.weight ? parseFloat(empForm.weight) : null,
+          branch: empForm.branch || null,
+          employee_status: empForm.employee_status || null,
+          payroll_start_date: empForm.payroll_start_date || null,
+          father_name: empForm.father_name || null,
+          father_occupation: empForm.father_occupation || null,
+          mother_name: empForm.mother_name || null,
+          mother_occupation: empForm.mother_occupation || null,
+          emergency_contact_name: empForm.emergency_contact_name || null,
+          emergency_contact_relation: empForm.emergency_contact_relation || null,
+          sso_deduct: empForm.sso_deduct || null,
+          social_security_no: empForm.social_security_no || null,
+          sso_start_date: empForm.sso_start_date || null,
+          sso_method: empForm.sso_method || null,
+          sso_hospital: empForm.sso_hospital || null,
+          pvd_method: empForm.pvd_method || null,
+          pvd_start_date: empForm.pvd_start_date || null,
+          pvd_account: empForm.pvd_account || null,
+          pvd_employee_rate: empForm.pvd_employee_rate ? parseFloat(empForm.pvd_employee_rate) : null,
+          pvd_prev_employee_amount: empForm.pvd_prev_employee_amount ? parseFloat(empForm.pvd_prev_employee_amount) : null,
+          pvd_prev_employer_amount: empForm.pvd_prev_employer_amount ? parseFloat(empForm.pvd_prev_employer_amount) : null,
         }
         const { error: ee } = await supabase.from('hr_employees').update(empData).eq('id', empId)
         if (ee) throw ee
@@ -192,6 +262,9 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
     { key:'contact', label:'ติดต่อ' },
     { key:'education', label:'การศึกษา' },
     { key:'financial', label:'การเงิน' },
+    { key:'family', label:'ครอบครัว' },
+    { key:'sso', label:'ประกันสังคม' },
+    { key:'pvd', label:'กองทุนสำรอง' },
   ]
 
   const hasEmp = !!(profileForm.employee_id || user.employee_id)
@@ -271,13 +344,20 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
               <FInput label="Prefix (EN)" value={empForm.prefix_en} onChange={sf('prefix_en')} half options={['Mr.','Mrs.','Ms.','Dr.']}/>
               <FInput label="First Name (EN)" value={empForm.first_name_en} onChange={sf('first_name_en')} half/>
               <FInput label="Last Name (EN)" value={empForm.last_name_en} onChange={sf('last_name_en')} half/>
+              <FInput label="เลขที่บัตรพนักงาน" value={empForm.badge_number} onChange={sf('badge_number')} half/>
               <FInput label="เพศ" value={empForm.gender} onChange={sf('gender')} half options={[{value:'male',label:'ชาย'},{value:'female',label:'หญิง'}]}/>
               <FInput label="วันเกิด" value={empForm.date_of_birth} onChange={sf('date_of_birth')} type="date" half/>
               <FInput label="เลขบัตรประชาชน" value={empForm.national_id} onChange={sf('national_id')} half/>
-              <FInput label="หมู่เลือด" value={empForm.blood_type} onChange={sf('blood_type')} half options={['A','B','AB','O','เอ','บี','เอบี','โอ']}/>
+              <FInput label="วันหมดอายุบัตร" value={empForm.id_card_expiry} onChange={sf('id_card_expiry')} type="date" half/>
+              <FInput label="ออกให้ ณ" value={empForm.id_card_issued_at} onChange={sf('id_card_issued_at')} half/>
+              <FInput label="ภูมิลำเนา" value={empForm.hometown} onChange={sf('hometown')} half/>
+              <FInput label="เชื้อชาติ" value={empForm.ethnicity} onChange={sf('ethnicity')} half/>
               <FInput label="สัญชาติ" value={empForm.nationality} onChange={sf('nationality')} half/>
               <FInput label="ศาสนา" value={empForm.religion} onChange={sf('religion')} half options={['พุทธ','คริสต์','อิสลาม','อื่นๆ']}/>
               <FInput label="สถานภาพสมรส" value={empForm.marital_status} onChange={sf('marital_status')} half options={[{value:'single',label:'โสด'},{value:'married',label:'สมรส'},{value:'divorced',label:'หย่าร้าง'},{value:'widowed',label:'หม้าย'}]}/>
+              <FInput label="หมู่เลือด" value={empForm.blood_type} onChange={sf('blood_type')} half options={['A','B','AB','O','เอ','บี','เอบี','โอ']}/>
+              <FInput label="ส่วนสูง (ซม.)" value={empForm.height} onChange={sf('height')} type="number" half/>
+              <FInput label="น้ำหนัก (กก.)" value={empForm.weight} onChange={sf('weight')} type="number" half/>
             </div>
           )}
 
@@ -285,14 +365,18 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
           {tab === 'work' && (
             <div className="grid grid-cols-2 gap-3">
               <FInput label="บริษัท" value={empForm.company_entity} onChange={sf('company_entity')} half options={['ONL','EFINX','ATESS','SMT']}/>
-              <FInput label="BU" value={empForm.bu} onChange={sf('bu')} half options={['efin.finance','Content','IR Plus','IT Solution','Cost Center','Expert','Green+MOL']}/>
+              <FInput label="BU/หน่วยงานหลัก" value={empForm.bu} onChange={sf('bu')} half/>
+              <FInput label="แผนก" value={empForm.department_name_th} onChange={sf('department_name_th')} half/>
+              <FInput label="Department (EN)" value={empForm.department_name_en} onChange={sf('department_name_en')} half/>
               <FInput label="ตำแหน่ง (TH)" value={empForm.position_th} onChange={sf('position_th')} half/>
               <FInput label="Position (EN)" value={empForm.position_en} onChange={sf('position_en')} half/>
-              <FInput label="ฝ่าย/แผนก (TH)" value={empForm.department_name_th} onChange={sf('department_name_th')} half/>
-              <FInput label="Department (EN)" value={empForm.department_name_en} onChange={sf('department_name_en')} half/>
+              <FInput label="สังกัดสาขา" value={empForm.branch} onChange={sf('branch')} half/>
+              <FInput label="สถานภาพพนักงาน" value={empForm.employee_status} onChange={sf('employee_status')} half options={['พนักงาน','ทดลองงาน','ลาออก','เลิกจ้าง']}/>
               <FInput label="ระดับ (Grade)" value={empForm.level} onChange={sf('level')} half options={['G1','G2','G3','G4','G5','G6','G7','G8','G9','G10','G11','G12']}/>
               <FInput label="ประเภทการจ้าง" value={empForm.employment_type} onChange={sf('employment_type')} half options={['ประจำ','สัญญาจ้าง 1 ปี','รายวัน','Part-time','Outsource']}/>
               <FInput label="วันเริ่มงาน" value={empForm.hire_date} onChange={sf('hire_date')} type="date" half/>
+              <FInput label="วันที่บรรจุ" value={empForm.confirmed_date} onChange={sf('confirmed_date')} type="date" half/>
+              <FInput label="วันที่เริ่มคำนวณเงินเดือน" value={empForm.payroll_start_date} onChange={sf('payroll_start_date')} type="date" half/>
               <FInput label="เวลาทำงาน" value={empForm.work_schedule} onChange={sf('work_schedule')} half options={['09.00-18.00','08.30-17.30','08.00-17.00']}/>
             </div>
           )}
@@ -324,9 +408,44 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
           {/* Tab: Financial */}
           {tab === 'financial' && (
             <div className="grid grid-cols-2 gap-3">
-              <FInput label="เงินเดือน (บาท)" value={empForm.base_salary} onChange={sf('base_salary')} type="number" half/>
-              <FInput label="ธนาคาร" value={empForm.bank_name} onChange={sf('bank_name')} half options={['ธ.กรุงศรีอยุธยา','ธ.ไทยพาณิชย์','ธ.กสิกรไทย','ธ.กรุงเทพ','ธ.กรุงไทย','ธ.ออมสิน','ธ.ทหารไทยธนชาต','ธ.ยูโอบี']}/>
+              <FInput label="อัตราเงินเดือน (บาท)" value={empForm.base_salary} onChange={sf('base_salary')} type="number" half/>
+              <FInput label="รอบจ่าย" value={empForm.payroll_cycle} onChange={sf('payroll_cycle')} half options={['ทุกสิ้นเดือน','ทุกครึ่งเดือน','ทุกสัปดาห์']}/>
+              <FInput label="วิธีจ่าย" value={empForm.payment_method} onChange={sf('payment_method')} half options={['ผ่านธนาคาร','เงินสด']}/>
+              <FInput label="รหัสธนาคาร" value={empForm.bank_code} onChange={sf('bank_code')} half/>
+              <FInput label="ธนาคาร" value={empForm.bank_name} onChange={sf('bank_name')} half/>
               <FInput label="เลขที่บัญชี" value={empForm.bank_account} onChange={sf('bank_account')} half/>
+              <FInput label="วันที่ปรับเงินเดือนล่าสุด" value={empForm.salary_effective_date} onChange={sf('salary_effective_date')} type="date" half/>
+              <FInput label="วิธีคำนวณภาษี" value={empForm.tax_calculation_method} onChange={sf('tax_calculation_method')} half options={['หัก ณ ที่จ่าย','เหมาจ่าย']}/>
+              <FInput label="ตัวคูณเงินเดือน (ภาษี)" value={empForm.tax_salary_multiplier} onChange={sf('tax_salary_multiplier')} type="number" half/>
+            </div>
+          )}
+          {tab === 'family' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="ชื่อบิดา" value={empForm.father_name} onChange={sf('father_name')} half/>
+              <FInput label="อาชีพบิดา" value={empForm.father_occupation} onChange={sf('father_occupation')} half/>
+              <FInput label="ชื่อมารดา" value={empForm.mother_name} onChange={sf('mother_name')} half/>
+              <FInput label="อาชีพมารดา" value={empForm.mother_occupation} onChange={sf('mother_occupation')} half/>
+              <FInput label="ผู้ติดต่อฉุกเฉิน" value={empForm.emergency_contact_name} onChange={sf('emergency_contact_name')} half/>
+              <FInput label="ความสัมพันธ์" value={empForm.emergency_contact_relation} onChange={sf('emergency_contact_relation')} half/>
+            </div>
+          )}
+          {tab === 'sso' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="หักประกันสังคม" value={empForm.sso_deduct} onChange={sf('sso_deduct')} half options={['หัก','ไม่หัก']}/>
+              <FInput label="เลขที่บัตรประกันสังคม" value={empForm.social_security_no} onChange={sf('social_security_no')} half/>
+              <FInput label="วันที่สมัครประกันสังคม" value={empForm.sso_start_date} onChange={sf('sso_start_date')} type="date" half/>
+              <FInput label="วิธีหักประกันสังคม" value={empForm.sso_method} onChange={sf('sso_method')} half/>
+              <FInput label="สถานพยาบาล" value={empForm.sso_hospital} onChange={sf('sso_hospital')}/>
+            </div>
+          )}
+          {tab === 'pvd' && (
+            <div className="grid grid-cols-2 gap-3">
+              <FInput label="วิธีหักกองทุน" value={empForm.pvd_method} onChange={sf('pvd_method')} half options={['%คงที่ของเงินเดือนเต็มเดือน','ไม่หัก']}/>
+              <FInput label="วันที่สมัครกองทุน" value={empForm.pvd_start_date} onChange={sf('pvd_start_date')} type="date" half/>
+              <FInput label="เลขที่บัญชีกองทุน" value={empForm.pvd_account} onChange={sf('pvd_account')} half/>
+              <FInput label="% หักพนักงานเข้ากองทุน" value={empForm.pvd_employee_rate} onChange={sf('pvd_employee_rate')} type="number" half/>
+              <FInput label="เงินสะสมก่อนปีปัจจุบัน" value={empForm.pvd_prev_employee_amount} onChange={sf('pvd_prev_employee_amount')} type="number" half/>
+              <FInput label="เงินสมทบบริษัทก่อนปีปัจจุบัน" value={empForm.pvd_prev_employer_amount} onChange={sf('pvd_prev_employer_amount')} type="number" half/>
             </div>
           )}
         </div>
@@ -478,7 +597,7 @@ export default function UserManagement({ lang = 'th' }) {
     setLoading(true)
     const [profilesRes, empsRes] = await Promise.all([
       supabase.from('hr_user_profiles')
-        .select('*, hr_employees(id, employee_code, prefix_th, first_name_th, last_name_th, prefix_en, first_name_en, last_name_en, nickname, gender, date_of_birth, national_id, blood_type, nationality, religion, marital_status, phone, email, personal_email, address, position_th, position_en, department_name_th, department_name_en, bu, level, employment_type, hire_date, work_schedule, company_entity, education_level, education_major, education_faculty, education_university, base_salary, bank_name, bank_account, status)')
+        .select('*, hr_employees(id, employee_code, badge_number, prefix_th, first_name_th, last_name_th, prefix_en, first_name_en, last_name_en, nickname, gender, date_of_birth, national_id, id_card_expiry, id_card_issued_at, blood_type, nationality, ethnicity, religion, marital_status, hometown, height, weight, phone, email, personal_email, address, emergency_contact_name, emergency_contact_relation, position_th, position_en, department_name_th, department_name_en, bu, branch, level, employment_type, employee_status, hire_date, confirmed_date, payroll_start_date, payroll_cycle, payment_method, work_schedule, company_entity, education_level, education_major, education_faculty, education_university, base_salary, bank_code, bank_name, bank_account, salary_effective_date, tax_calculation_method, tax_salary_multiplier, father_name, father_occupation, mother_name, mother_occupation, sso_deduct, social_security_no, sso_start_date, sso_method, sso_hospital, pvd_method, pvd_start_date, pvd_account, pvd_employee_rate, pvd_prev_employee_amount, pvd_prev_employer_amount, status)')
         .order('created_at', { ascending: false }),
       supabase.from('hr_employees')
         .select('id, employee_code, first_name_th, last_name_th, first_name_en, last_name_en, position_th, company_entity, status')
