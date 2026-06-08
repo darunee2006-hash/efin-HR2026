@@ -177,6 +177,7 @@ export default function CostAnalysis(){
   const hoursFileRef=useRef(null)
   const [costDetailPopup,setCostDetailPopup]=useState(null)
   const [buEmpPopup,setBuEmpPopup]=useState(null)
+  const [prodEmpPopup,setProdEmpPopup]=useState(null)
   // Hours Update Modal state
   const [showHoursUpdate,setShowHoursUpdate]=useState(false)
   const [hoursMonth,setHoursMonth]=useState(null)
@@ -1185,7 +1186,14 @@ export default function CostAnalysis(){
                   <td className="px-3 py-2 text-right tabular-nums font-medium">{d.cost>0?`฿${fmt(Math.round(d.cost))}`:'-'}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{d.hours>0?fmt(Math.round(d.hours)):'-'}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{cph>0?`฿${fmt(Math.round(cph))}`:'-'}</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{d.people.size||'-'}</td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {d.people.size > 0 ? (
+                      <button onClick={(e)=>{e.stopPropagation();setProdEmpPopup({code:d.code,name:d.name,uids:d.people,hours:d.hours})}}
+                        className="text-[#7DC242] font-semibold underline underline-offset-2 hover:text-[#5A9020] cursor-pointer">
+                        {d.people.size}
+                      </button>
+                    ) : '-'}
+                  </td>
                   <td className="px-3 py-2 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden"><div className="h-full rounded-full" style={{width:`${pct}%`,backgroundColor:color}}/></div>
@@ -1865,6 +1873,67 @@ export default function CostAnalysis(){
       return <CostDetailPopup title={popupTitle} icon={popupIcon} iconBg={popupIconBg} data={popupData}
         columns={popupCols} summary={popupSummary} onClose={()=>setCostDetailPopup(null)} />
     })()}
+
+      {/* Product Employee List Popup */}
+      {prodEmpPopup && (() => {
+        const empList = [...prodEmpPopup.uids].map(uid => hrById[uid]).filter(Boolean)
+        const prodHoursAlloc = fHoursAlloc.filter(r => r.product_code === prodEmpPopup.code)
+        return (
+          <div className="fixed inset-0 bg-black/50 z-[60] flex items-start justify-center pt-10 pb-8 px-4 overflow-y-auto" onClick={()=>setProdEmpPopup(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col" onClick={e=>e.stopPropagation()}>
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
+                <div className="w-10 h-10 rounded-xl bg-[#7DC242] flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-white"/>
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-base font-bold text-gray-900">{prodEmpPopup.code} · {prodEmpPopup.name}</h2>
+                  <p className="text-xs text-gray-500">{empList.length} คน · {fmt(Math.round(prodEmpPopup.hours))} ชม.</p>
+                </div>
+                <button onClick={()=>setProdEmpPopup(null)} className="p-1.5 hover:bg-gray-100 rounded-lg">
+                  <X className="w-5 h-5 text-gray-500"/>
+                </button>
+              </div>
+              <div className="overflow-auto flex-1">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-gray-50">
+                    <tr>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 w-10">#</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">รหัส</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">ชื่อ-นามสกุล</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">ตำแหน่ง</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500">ชม.ที่ทำ</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500">ต้นทุน (฿)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {empList.map((emp, i) => {
+                      const haRec = prodHoursAlloc.find(r => r.employee_id === emp.employee_code)
+                      const hrs = haRec ? Number(haRec.hours) : 0
+                      const costRec = fCostEmp.find(r => r.hr_employee_id === emp.id && r.period_month === (filterMonth === 'all' ? r.period_month : filterMonth))
+                      const cph = costRec ? (Number(costRec.cost_per_hour)||0) : 0
+                      const prodCost = cph * hrs
+                      return (
+                        <tr key={emp.id} className="hover:bg-[#f0fce8]/40">
+                          <td className="px-4 py-2 text-xs text-gray-400">{i+1}</td>
+                          <td className="px-4 py-2 font-mono text-xs text-gray-500">{emp.employee_code}</td>
+                          <td className="px-4 py-2 font-medium text-gray-900">{emp.prefix_th}{emp.first_name_th} {emp.last_name_th}</td>
+                          <td className="px-4 py-2 text-xs text-gray-500">{emp.position_th||'-'}</td>
+                          <td className="px-4 py-2 text-right font-mono text-gray-700">{hrs > 0 ? fmt(hrs) : '-'}</td>
+                          <td className="px-4 py-2 text-right font-mono font-semibold text-[#5A9020]">{prodCost > 0 ? '฿'+fmt(Math.round(prodCost)) : '-'}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-6 py-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
+                <span>{empList.length} คน</span>
+                <span>รวม {fmt(Math.round(prodEmpPopup.hours))} ชม.</span>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
 
       {/* BU Employee List Sub-Popup */}
       {buEmpPopup && (() => {
