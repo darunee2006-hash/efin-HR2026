@@ -153,7 +153,12 @@ export default function CostAnalysis(){
   const [costAllocRaw,setCostAllocRaw]=useState([])
   const [hoursAllocRaw,setHoursAllocRaw]=useState([])
   const [tab,setTab]=useState('overview')
-  const [filterMonth,setFilterMonth]=useState('all')
+  // Default to previous month ISO date (e.g. '2026-05-01')
+  const defaultMonth = (() => {
+    const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - 1)
+    return d.toISOString().slice(0,7) + '-01'
+  })()
+  const [filterMonth,setFilterMonth]=useState(defaultMonth)
   const [filterBU,setFilterBU]=useState('all')
   const [expandedBU,setExpandedBU]=useState({})
   const [expandedCostBU,setExpandedCostBU]=useState({})
@@ -240,10 +245,19 @@ export default function CostAnalysis(){
   // Available BUs from actual employee data (not product map)
   const buList = useMemo(()=>[...new Set(hrEmployees.map(e=>e.bu).filter(Boolean))].sort(),[hrEmployees])
 
+  // Available months as ISO date strings (sorted desc)
   const availableMonths = useMemo(()=>{
-    const s=new Set(costEmp.map(r=>r.period_month))
-    return MONTH_ORDER.filter(m=>s.has(m))
+    const s=[...new Set(costEmp.map(r=>r.period_month).filter(Boolean))]
+    return s.sort((a,b)=>b.localeCompare(a))
   },[costEmp])
+
+  // Convert ISO date to Thai display label e.g. '2026-04-01' -> 'เมษายน 2569'
+  const monthLabel = (iso) => {
+    if(!iso) return '-'
+    const [yr, mo] = iso.split('-')
+    const thaiYear = parseInt(yr) + 543
+    return MONTH_ORDER[parseInt(mo)-1] + ' ' + thaiYear
+  }
 
   // ========== Filtered data (month + BU) ==========
   const fCostEmp = useMemo(()=>{
@@ -925,7 +939,7 @@ export default function CostAnalysis(){
         </div>
         <select value={filterMonth} onChange={e=>setFilterMonth(e.target.value)} className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white">
           <option value="all">ทุกเดือน</option>
-          {availableMonths.map(m=><option key={m} value={m}>{m}</option>)}
+          {availableMonths.map(m=><option key={m} value={m}>{monthLabel(m)}</option>)}
         </select>
         <select value={filterBU} onChange={e=>setFilterBU(e.target.value)} className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white">
           <option value="all">ทุก BU ({hrEmployees.length} คน)</option>
@@ -936,7 +950,7 @@ export default function CostAnalysis(){
 
     {/* KPIs — clickable */}
     <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-      <KPI icon={<DollarSign className="w-5 h-5"/>} label="ต้นทุนรวม" value={`฿${fmtM(totalCost)}`} sub={filterMonth==='all'?`${availableMonths.length} เดือน`:filterMonth} color="indigo"
+      <KPI icon={<DollarSign className="w-5 h-5"/>} label="ต้นทุนรวม" value={`฿${fmtM(totalCost)}`} sub={filterMonth==='all'?`${availableMonths.length} เดือน`:monthLabel(filterMonth)} color="indigo"
         onClick={()=>setCostDetailPopup({type:'totalCost'})}/>
       <KPI icon={<Clock className="w-5 h-5"/>} label="ชม.ทำงานรวม" value={fmt(Math.round(totalHours))} sub="ชั่วโมง" color="cyan"
         onClick={()=>setCostDetailPopup({type:'totalHours'})}/>
@@ -1693,7 +1707,7 @@ export default function CostAnalysis(){
         case 'totalCost': {
           popupTitle = `ต้นทุนรวม ฿${fmt(Math.round(totalCost))} — แยกรายเดือน`
           popupIcon = DollarSign; popupIconBg = 'bg-[#7DC242]'
-          popupSummary = `ที่มา: hr_cost_employee (total_cost) รวม ${fCostEmp.length} records · filter: ${filterMonth==='all'?'ทุกเดือน':filterMonth}${filterBU!=='all'?' · BU: '+filterBU:''}`
+          popupSummary = `ที่มา: hr_cost_employee (total_cost) รวม ${fCostEmp.length} records · filter: ${filterMonth==='all'?'ทุกเดือน':monthLabel(filterMonth)}${filterBU!=='all'?' · BU: '+filterBU:''}`
           // Aggregate by month
           const byMonth = {}
           fCostEmp.forEach(r => {
@@ -1747,7 +1761,7 @@ export default function CostAnalysis(){
         case 'employees': {
           popupTitle = `จำนวนพนักงาน ${fmt(uniqueEmp)} คน`
           popupIcon = Users; popupIconBg = 'bg-purple-500'
-          popupSummary = `ที่มา: hr_cost_employee JOIN hr_employees · นับ employee_id ที่ไม่ซ้ำกัน (Unique) · filter: ${filterMonth==='all'?'ทุกเดือน':filterMonth}${filterBU!=='all'?' · BU: '+filterBU:''}`
+          popupSummary = `ที่มา: hr_cost_employee JOIN hr_employees · นับ employee_id ที่ไม่ซ้ำกัน (Unique) · filter: ${filterMonth==='all'?'ทุกเดือน':monthLabel(filterMonth)}${filterBU!=='all'?' · BU: '+filterBU:''}`
           // Show per-employee aggregate
           const empAgg = {}
           fCostEmp.forEach(r => {
