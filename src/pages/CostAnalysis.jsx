@@ -171,6 +171,7 @@ export default function CostAnalysis(){
   const fileRef=useRef(null)
   const hoursFileRef=useRef(null)
   const [costDetailPopup,setCostDetailPopup]=useState(null)
+  const [buEmpPopup,setBuEmpPopup]=useState(null)
   // Hours Update Modal state
   const [showHoursUpdate,setShowHoursUpdate]=useState(false)
   const [hoursMonth,setHoursMonth]=useState(null)
@@ -1813,7 +1814,12 @@ export default function CostAnalysis(){
           popupData = Object.values(buAgg).map(d=>({...d,count:d.people.size,costPerHr:d.hours>0?d.cost/d.hours:0,pct:totalCost>0?(d.cost/totalCost*100):0})).sort((a,b)=>b.cost-a.cost)
           popupCols = [
             { label: 'BU', key: 'bu', render: r=>r.bu },
-            { label: 'จำนวนคน', key: 'count', render: r=>fmt(r.count), sortKey: r=>r.count, align:'right' },
+            { label: 'จำนวนคน', key: 'count', render: r=>(
+              <button
+                onClick={(e)=>{e.stopPropagation();setBuEmpPopup({bu:r.bu,people:r.people})}}
+                className="text-[#7DC242] font-semibold underline underline-offset-2 hover:text-[#5A9020] cursor-pointer"
+              >{fmt(r.count)}</button>
+            ), sortKey: r=>r.count, align:'right' },
             { label: 'ต้นทุนรวม', key: 'cost', render: r=>'฿'+fmtM(r.cost), sortKey: r=>r.cost, align:'right' },
             { label: 'สัดส่วน', key: 'pct', render: r=>r.pct.toFixed(1)+'%', sortKey: r=>r.pct, align:'right' },
             { label: 'ชม.ทำงาน', key: 'hours', render: r=>fmt(Math.round(r.hours)), sortKey: r=>r.hours, align:'right' },
@@ -1845,5 +1851,65 @@ export default function CostAnalysis(){
       return <CostDetailPopup title={popupTitle} icon={popupIcon} iconBg={popupIconBg} data={popupData}
         columns={popupCols} summary={popupSummary} onClose={()=>setCostDetailPopup(null)} />
     })()}
+
+      {/* BU Employee List Sub-Popup */}
+      {buEmpPopup && (() => {
+        const buEmps = hrEmployees.filter(e => e.bu === buEmpPopup.bu)
+        return (
+          <div className="fixed inset-0 bg-black/50 z-[60] flex items-start justify-center pt-10 pb-8 px-4 overflow-y-auto" onClick={()=>setBuEmpPopup(null)}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col" onClick={e=>e.stopPropagation()}>
+              <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100">
+                <div className="w-10 h-10 rounded-xl bg-[#7DC242] flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-white"/>
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-lg font-bold text-gray-900">{buEmpPopup.bu}</h2>
+                  <p className="text-xs text-gray-500">{buEmps.length} คน</p>
+                </div>
+                <button onClick={()=>setBuEmpPopup(null)} className="p-1.5 hover:bg-gray-100 rounded-lg">
+                  <X className="w-5 h-5 text-gray-500"/>
+                </button>
+              </div>
+              <div className="overflow-auto flex-1">
+                <table className="w-full text-sm">
+                  <thead className="sticky top-0 bg-gray-50">
+                    <tr>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500 w-10">#</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">รหัส</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">ชื่อ-นามสกุล</th>
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-gray-500">ตำแหน่ง</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500">เงินเดือน</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-gray-500">ต้นทุนรวม/เดือน</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {buEmps.map((emp, i) => {
+                      const costRec = fCostEmp.find(r => r.hr_employee_id === emp.id)
+                      const salary = Number(emp.base_salary)||0
+                      const totalCostEmp = costRec ? Number(costRec.total_cost)||0 : salary
+                      return (
+                        <tr key={emp.id} className="hover:bg-[#f0fce8]/40">
+                          <td className="px-4 py-2 text-xs text-gray-400">{i+1}</td>
+                          <td className="px-4 py-2 font-mono text-xs text-gray-500">{emp.employee_code}</td>
+                          <td className="px-4 py-2 font-medium text-gray-900">
+                            {emp.prefix_th}{emp.first_name_th} {emp.last_name_th}
+                          </td>
+                          <td className="px-4 py-2 text-xs text-gray-500">{emp.position_th||'-'}</td>
+                          <td className="px-4 py-2 text-right font-mono text-gray-700">{salary>0?'฿'+fmt(salary):'-'}</td>
+                          <td className="px-4 py-2 text-right font-mono font-semibold text-[#5A9020]">{totalCostEmp>0?'฿'+fmt(Math.round(totalCostEmp)):'-'}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <div className="px-6 py-3 border-t border-gray-100 flex justify-between text-xs text-gray-500">
+                <span>รวม {buEmps.length} คน</span>
+                <span>เงินเดือนรวม: ฿{fmt(buEmps.reduce((s,e)=>s+(Number(e.base_salary)||0),0))}</span>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
   </div>
 }
