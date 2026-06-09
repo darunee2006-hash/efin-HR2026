@@ -1,0 +1,428 @@
+import { useState, useEffect, useMemo } from 'react'
+import { supabase } from '../lib/supabase'
+import { useCompanyFilter } from '../lib/CompanyFilterContext'
+import {
+  Users, TrendingUp, TrendingDown, DollarSign, AlertTriangle,
+  Star, Target, Briefcase, RefreshCw, Download, ChevronRight,
+  Building2, Shield, Zap, Clock, BarChart3, PieChart,
+} from 'lucide-react'
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart as RechartsPie, Pie, Cell, LineChart, Line, Legend,
+} from 'recharts'
+
+const G = { primary:'#00875A', dark:'#006644', light:'#E3FCEF', accent:'#FF8B00', danger:'#DE350B', info:'#0052CC', warn:'#FF991F' }
+const BU_COLORS = ['#00875A','#0052CC','#FF8B00','#6554C0','#00B8D9','#36B37E','#FF5630','#8777D9']
+const fmt = n => (n??0).toLocaleString('th-TH')
+const fmtM = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(0)+'K' : fmt(Math.round(n))
+
+const MONTHS_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']
+
+function KPI({ icon: Icon, label, value, unit, sub, color, change, changeUp, onClick, badge }) {
+  return (
+    <div onClick={onClick} className={`bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition cursor-pointer relative`}>
+      {badge && <span className="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{background:G.light,color:G.primary}}>{badge}</span>}
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background: color+'22'}}>
+          <Icon className="w-5 h-5" style={{color}}/>
+        </div>
+        <span className="text-sm text-gray-500 font-medium">{label}</span>
+      </div>
+      <div className="text-3xl font-bold text-gray-900 mb-1">{value}<span className="text-base font-normal text-gray-400 ml-1">{unit}</span></div>
+      {sub && <div className="text-xs text-gray-400">{sub}</div>}
+      {change !== undefined && (
+        <div className={`flex items-center gap-1 mt-2 text-xs font-medium ${changeUp ? 'text-green-600' : 'text-red-500'}`}>
+          {changeUp ? <TrendingUp className="w-3 h-3"/> : <TrendingDown className="w-3 h-3"/>}
+          {change}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function SectionHeader({ icon: Icon, title, subtitle, color }) {
+  return (
+    <div className="flex items-center gap-3 mb-4">
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background: (color||G.primary)+'22'}}>
+        <Icon className="w-5 h-5" style={{color: color||G.primary}}/>
+      </div>
+      <div>
+        <h3 className="font-bold text-gray-900 text-base">{title}</h3>
+        {subtitle && <p className="text-xs text-gray-400">{subtitle}</p>}
+      </div>
+    </div>
+  )
+}
+
+export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }) {
+  const { filterByCompany } = useCompanyFilter()
+  const [loading, setLoading] = useState(true)
+  const [employees, setEmployees] = useState([])
+  const [costData, setCostData] = useState([])
+  const [filterMonth, setFilterMonth] = useState('all')
+  const [lastUpdated, setLastUpdated] = useState(null)
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true)
+      const [empRes, costRes] = await Promise.all([
+        supabase.from('hr_employees')
+          .select('id,employee_code,first_name_th,last_name_th,bu,department_name_th,position_th,level,hire_date,resignation_date,employment_type,company_entity,status,base_salary,pvd_employee_rate,pvd_method,sso_deduct'),
+        supabase.from('hr_cost_employee')
+          .select('period_month,hr_employee_id,salary,provident_fund,social_security,total_cost,work_hours,cost_per_hour')
+          .order('period_month', { ascending: false }),
+      ])
+      setEmployees(empRes.data || [])
+      setCostData(costRes.data || [])
+      setLastUpdated(new Date())
+      setLoading(false)
+    }
+    load()
+  }, [])
+
+  const activeEmps = useMemo(() => employees.filter(e => e.status === 'active'), [employees])
+  const resignedThisYear = useMemo(() => {
+    const yr = new Date().getFullYear()
+    return employees.filter(e => e.resignation_date && new Date(e.resignation_date).getFullYear() === yr)
+  }, [employees])
+
+  const availableMonths = useMemo(() => [...new Set(costData.map(r => r.period_month))].sort().reverse(), [costData])
+  const filteredCost = useMemo(() => filterMonth === 'all' ? costData : costData.filter(r => r.period_month === filterMonth), [costData, filterMonth])
+
+  const totalCostMonth = useMemo(() => filteredCost.reduce((s,r) => s + (Number(r.total_cost)||0), 0), [filteredCost])
+  const totalSalaryMonth = useMemo(() => filteredCost.reduce((s,r) => s + (Number(r.salary)||0), 0), [filteredCost])
+
+  const turnoverRate = useMemo(() => {
+    const avgHead = activeEmps.length + resignedThisYear.length / 2 || 1
+    return ((resignedThisYear.length / avgHead) * 100).toFixed(1)
+  }, [activeEmps, resignedThisYear])
+
+  // BU breakdown
+  const buBreakdown = useMemo(() => {
+    const m = {}
+    activeEmps.forEach(e => {
+      const bu = e.bu || 'ไม่ระบุ'
+      if (!m[bu]) m[bu] = { bu, count: 0, cost: 0, salary: 0 }
+      m[bu].count++
+      m[bu].salary += Number(e.base_salary) || 0
+    })
+    filteredCost.forEach(r => {
+      const emp = employees.find(e => e.id === r.hr_employee_id)
+      if (!emp) return
+      const bu = emp.bu || 'ไม่ระบุ'
+      if (m[bu]) m[bu].cost += Number(r.total_cost) || 0
+    })
+    return Object.values(m).sort((a,b) => b.count - a.count)
+  }, [activeEmps, filteredCost, employees])
+
+  // Monthly cost trend
+  const monthlyTrend = useMemo(() => {
+    const m = {}
+    costData.forEach(r => {
+      if (!m[r.period_month]) m[r.period_month] = { month: r.period_month, cost: 0, headcount: new Set() }
+      m[r.period_month].cost += Number(r.total_cost) || 0
+      if (r.hr_employee_id) m[r.period_month].headcount.add(r.hr_employee_id)
+    })
+    return Object.values(m).sort((a,b) => a.month.localeCompare(b.month)).map(d => {
+      const [yr, mo] = d.month.split('-')
+      const thaiYr = parseInt(yr) + 543
+      return { ...d, label: MONTHS_TH[parseInt(mo)-1] + ' ' + thaiYr, count: d.headcount.size }
+    })
+  }, [costData])
+
+  // New hires this year
+  const newHiresThisYear = useMemo(() => {
+    const yr = new Date().getFullYear()
+    return activeEmps.filter(e => e.hire_date && new Date(e.hire_date).getFullYear() === yr)
+  }, [activeEmps])
+
+  // Cost per head
+  const costPerHead = useMemo(() => {
+    const empCount = new Set(filteredCost.map(r => r.hr_employee_id).filter(Boolean)).size
+    return empCount > 0 ? totalCostMonth / empCount : 0
+  }, [filteredCost, totalCostMonth])
+
+  // Board Alerts - auto-generated from data
+  const alerts = useMemo(() => {
+    const list = []
+    // High turnover BUs
+    const resBU = {}
+    resignedThisYear.forEach(e => { resBU[e.bu||'ไม่ระบุ'] = (resBU[e.bu||'ไม่ระบุ']||0)+1 })
+    Object.entries(resBU).sort((a,b)=>b[1]-a[1]).slice(0,2).forEach(([bu, n]) => {
+      if (n >= 2) list.push({ type:'danger', title:`ความเสี่ยงการลาออกใน ${bu}`, desc:`${n} คนลาออกในปีนี้`, icon: TrendingDown })
+    })
+    // High cost BUs
+    const topCostBU = [...buBreakdown].sort((a,b)=>b.cost-a.cost)[0]
+    if (topCostBU && topCostBU.cost > 0) list.push({ type:'info', title:`BU ต้นทุนสูงสุด: ${topCostBU.bu}`, desc:`฿${fmtM(topCostBU.cost)} / ${topCostBU.count} คน`, icon: DollarSign })
+    // Senior employees without succession (level G9+)
+    const seniorNoSuccessor = activeEmps.filter(e => {
+      const lvl = parseInt((e.level||'').replace('G','')) || 0
+      return lvl >= 9
+    })
+    if (seniorNoSuccessor.length > 0) list.push({ type:'warn', title:`ผู้บริหารระดับสูง ${seniorNoSuccessor.length} คน`, desc:'ยังไม่มีข้อมูล Succession Plan', icon: Shield })
+    return list.slice(0, 5)
+  }, [resignedThisYear, buBreakdown, activeEmps])
+
+  const monthLabel = iso => {
+    if (!iso) return '-'
+    const [yr, mo] = iso.split('-')
+    return MONTHS_TH[parseInt(mo)-1] + ' ' + (parseInt(yr)+543)
+  }
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-96">
+      <div className="text-center">
+        <div className="w-10 h-10 border-3 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-3"/>
+        <p className="text-sm text-gray-500">กำลังโหลดข้อมูลผู้บริหาร...</p>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="min-h-screen p-6" style={{background:'#F8FAFB'}}>
+
+      {/* Header */}
+      <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background:G.primary}}><BarChart3 className="w-4 h-4 text-white"/></div>
+            <h1 className="text-2xl font-bold text-gray-900">Executive HR Dashboard</h1>
+          </div>
+          <p className="text-sm text-gray-400">CEO & Board People Overview · ข้อมูล Real-time จาก Database</p>
+          {lastUpdated && <p className="text-xs text-gray-300 mt-0.5">Last updated: {lastUpdated.toLocaleTimeString('th-TH')}</p>}
+        </div>
+        <div className="flex items-center gap-3">
+          <select value={filterMonth} onChange={e=>setFilterMonth(e.target.value)}
+            className="text-sm border border-gray-200 rounded-xl px-3 py-2 bg-white shadow-sm">
+            <option value="all">ทุกเดือน</option>
+            {availableMonths.map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}
+          </select>
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white shadow-sm" style={{background:G.primary}}>
+            <Download className="w-4 h-4"/>Export Report
+          </button>
+        </div>
+      </div>
+
+      {/* KPI Cards - Row 1 */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <KPI icon={Users} label="พนักงานทั้งหมด" value={fmt(activeEmps.length)} unit="คน"
+          sub={`เข้าใหม่ปีนี้ ${newHiresThisYear.length} คน`}
+          color={G.primary} changeUp change={`+${newHiresThisYear.length} YTD`}
+          onClick={() => onNavigate && onNavigate('employees')} />
+        <KPI icon={TrendingDown} label="Turnover Rate YTD" value={turnoverRate} unit="%"
+          sub={`ลาออก ${resignedThisYear.length} คน ในปีนี้`}
+          color={parseFloat(turnoverRate) > 15 ? G.danger : G.warn}
+          changeUp={false} change={`${resignedThisYear.length} คน ลาออก`}
+          onClick={() => onNavigate && onNavigate('employees', {search:'ลาออก'})} />
+        <KPI icon={DollarSign} label="ต้นทุนพนักงานรวม" value={'฿'+fmtM(totalCostMonth)} unit=""
+          sub={filterMonth === 'all' ? `รวม ${availableMonths.length} เดือน` : monthLabel(filterMonth)}
+          color={G.info} badge="REAL"
+          onClick={() => onNavigate && onNavigate('costAnalysis')} />
+        <KPI icon={Users} label="ต้นทุน/หัว/เดือน" value={'฿'+fmtM(costPerHead)} unit=""
+          sub={`เงินเดือนเฉลี่ย ฿${fmtM(totalSalaryMonth / Math.max(1, new Set(filteredCost.map(r=>r.hr_employee_id).filter(Boolean)).size))}`}
+          color="#6554C0"
+          onClick={() => onNavigate && onNavigate('costAnalysis')} />
+      </div>
+
+      {/* KPI Cards - Row 2 (Placeholder for missing data) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {[
+          { icon: Star, label: 'Critical Talent', value: '-', unit: 'คน', sub: 'รอข้อมูล Talent Records', color: '#FF8B00', placeholder: true },
+          { icon: Target, label: 'Succession Coverage', value: '-%', unit: '', sub: 'รอข้อมูล Succession Plan', color: '#36B37E', placeholder: true },
+          { icon: Zap, label: 'Engagement Score', value: '-/10', unit: '', sub: 'รอผลสำรวจ Engagement', color: '#00B8D9', placeholder: true },
+          { icon: Briefcase, label: 'ตำแหน่งว่าง', value: '-', unit: 'ตำแหน่ง', sub: 'รอข้อมูล Recruitment', color: '#6554C0', placeholder: true },
+        ].map((kpi, i) => (
+          <div key={i} className="bg-white rounded-2xl p-5 border border-dashed border-gray-200 relative opacity-70">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-gray-100">
+                <kpi.icon className="w-4 h-4 text-gray-400"/>
+              </div>
+              <span className="text-sm text-gray-400">{kpi.label}</span>
+            </div>
+            <div className="text-2xl font-bold text-gray-300 mb-1">{kpi.value}</div>
+            <div className="text-xs text-gray-300">{kpi.sub}</div>
+            <div className="absolute bottom-3 right-3">
+              <span className="text-[10px] px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full font-medium">ต้องการข้อมูล</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        {/* BU Headcount Bar */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <SectionHeader icon={Building2} title="Headcount by BU" subtitle={`${activeEmps.length} คน ใน ${buBreakdown.length} BU`} />
+          <ResponsiveContainer width="100%" height={220}>
+            <BarChart data={buBreakdown.slice(0,8)} margin={{top:5,right:10,left:-10,bottom:40}}>
+              <XAxis dataKey="bu" tick={{fontSize:10}} angle={-30} textAnchor="end" interval={0}/>
+              <YAxis tick={{fontSize:10}}/>
+              <Tooltip formatter={(v,n) => [fmt(v), n==='count'?'จำนวนคน':'ต้นทุน']}/>
+              <Bar dataKey="count" name="count" radius={[4,4,0,0]}>
+                {buBreakdown.slice(0,8).map((_, i) => <Cell key={i} fill={BU_COLORS[i % BU_COLORS.length]}/>)}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Cost Donut */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <SectionHeader icon={PieChart} title="ต้นทุน by BU" subtitle={`฿${fmtM(totalCostMonth)} รวม`} />
+          <div className="flex flex-col items-center">
+            <ResponsiveContainer width="100%" height={160}>
+              <RechartsPie>
+                <Pie data={buBreakdown.filter(d=>d.cost>0).slice(0,6)} cx="50%" cy="50%"
+                  innerRadius={45} outerRadius={70} dataKey="cost" strokeWidth={2} stroke="#fff">
+                  {buBreakdown.slice(0,6).map((_,i) => <Cell key={i} fill={BU_COLORS[i % BU_COLORS.length]}/>)}
+                </Pie>
+                <Tooltip formatter={v => '฿'+fmtM(v)}/>
+              </RechartsPie>
+            </ResponsiveContainer>
+            <div className="w-full space-y-1 mt-2">
+              {buBreakdown.filter(d=>d.cost>0).slice(0,5).map((d,i) => (
+                <div key={i} className="flex justify-between text-xs">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-sm" style={{background:BU_COLORS[i%BU_COLORS.length]}}/>
+                    <span className="text-gray-600 truncate max-w-[100px]">{d.bu}</span>
+                  </span>
+                  <span className="font-medium text-gray-700">{totalCostMonth > 0 ? ((d.cost/totalCostMonth)*100).toFixed(0) : 0}%</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Monthly Trend + Alerts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+
+        {/* Monthly Cost Trend */}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <SectionHeader icon={TrendingUp} title="Monthly Cost Trend" subtitle="ต้นทุนรวมรายเดือน (฿)" />
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={monthlyTrend} margin={{top:5,right:10,left:-10,bottom:5}}>
+              <XAxis dataKey="label" tick={{fontSize:10}}/>
+              <YAxis tick={{fontSize:10}} tickFormatter={v => '฿'+fmtM(v)}/>
+              <Tooltip formatter={v => '฿'+fmtM(v)}/>
+              <Line type="monotone" dataKey="cost" stroke={G.primary} strokeWidth={2.5} dot={{fill:G.primary,r:4}} name="ต้นทุนรวม"/>
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Board Alert Center */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <SectionHeader icon={AlertTriangle} title="Board Alert Center" subtitle={`${alerts.length} รายการต้องติดตาม`} color={G.danger}/>
+          <div className="space-y-3">
+            {alerts.map((a, i) => (
+              <div key={i} className="flex items-start gap-3 p-3 rounded-xl border" style={{
+                background: a.type==='danger'?'#FFF5F5':a.type==='warn'?'#FFFBE6':'#EBF4FF',
+                borderColor: a.type==='danger'?'#FFBDAD':a.type==='warn'?'#FFE58F':'#BAE3FF'
+              }}>
+                <a.icon className="w-4 h-4 mt-0.5 flex-shrink-0" style={{
+                  color: a.type==='danger'?G.danger:a.type==='warn'?G.warn:G.info
+                }}/>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-gray-800 leading-tight">{a.title}</p>
+                  <p className="text-[11px] text-gray-500 mt-0.5">{a.desc}</p>
+                </div>
+              </div>
+            ))}
+            {alerts.length === 0 && <p className="text-sm text-gray-400 text-center py-4">ไม่มี Alert ในขณะนี้</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* Top BU Cost Table + Strategic Recommendations */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* Top Departments by Cost */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <SectionHeader icon={DollarSign} title="Top BU by People Cost" subtitle={`฿${fmtM(totalCostMonth)} รวม`} color={G.info}/>
+          <table className="w-full text-sm">
+            <thead><tr className="border-b border-gray-100">
+              <th className="text-left pb-2 text-xs text-gray-400 font-medium">BU</th>
+              <th className="text-right pb-2 text-xs text-gray-400 font-medium">คน</th>
+              <th className="text-right pb-2 text-xs text-gray-400 font-medium">ต้นทุน</th>
+              <th className="text-right pb-2 text-xs text-gray-400 font-medium">สัดส่วน</th>
+            </tr></thead>
+            <tbody>
+              {buBreakdown.slice(0,8).map((d,i) => {
+                const pct = totalCostMonth > 0 ? (d.cost/totalCostMonth*100) : (d.salary / (activeEmps.reduce((s,e)=>s+(Number(e.base_salary)||0),0) || 1) * 100)
+                const barW = Math.max(pct, 2)
+                return (
+                  <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 cursor-pointer"
+                    onClick={() => onNavigate && onNavigate('staffList', {bu: d.bu})}>
+                    <td className="py-2">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{background:BU_COLORS[i%BU_COLORS.length]}}/>
+                        <span className="text-gray-700 font-medium text-xs truncate max-w-[120px]">{d.bu}</span>
+                      </div>
+                      <div className="mt-1 h-1 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full" style={{width:`${barW}%`,background:BU_COLORS[i%BU_COLORS.length]}}/>
+                      </div>
+                    </td>
+                    <td className="py-2 text-right text-xs font-medium text-gray-700">{fmt(d.count)}</td>
+                    <td className="py-2 text-right text-xs font-mono text-gray-700">{d.cost > 0 ? '฿'+fmtM(d.cost) : '฿'+fmtM(d.salary)}</td>
+                    <td className="py-2 text-right text-xs text-gray-400">{pct.toFixed(1)}%</td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Strategic Recommendations */}
+        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+          <SectionHeader icon={Zap} title="Strategic Recommendations" subtitle="สำหรับ CEO & Board" color={G.accent}/>
+          <div className="space-y-4">
+            {[
+              {
+                priority: 'HIGH',
+                title: 'บริหารจัดการต้นทุนบุคลากร Center',
+                detail: `BU Center มีต้นทุนสูงสุด ${buBreakdown.find(b=>b.bu==='Center') ? '฿'+fmtM(buBreakdown.find(b=>b.bu==='Center').cost||buBreakdown.find(b=>b.bu==='Center').salary) : '-'} ควรทบทวนการจัดสรรงาน`,
+                color: G.danger,
+              },
+              {
+                priority: 'MEDIUM',
+                title: 'วางแผน Succession สำหรับผู้บริหาร G9+',
+                detail: `มีผู้บริหาร ${activeEmps.filter(e=>(parseInt((e.level||'').replace('G',''))||0)>=9).length} คน ระดับ G9+ ที่ยังไม่มี Successor`,
+                color: G.warn,
+              },
+              {
+                priority: 'MEDIUM',
+                title: 'ติดตาม Turnover Rate',
+                detail: `อัตรา Turnover YTD อยู่ที่ ${turnoverRate}% (${resignedThisYear.length} คน) ควรสัมภาษณ์เหตุผลการลาออก`,
+                color: G.info,
+              },
+              {
+                priority: 'LOW',
+                title: 'เพิ่มข้อมูล Talent & Engagement',
+                detail: 'ยังขาดข้อมูล Performance/OKR, Talent 9-Box และ Engagement Survey เพื่อให้ Dashboard สมบูรณ์',
+                color: '#6554C0',
+              },
+            ].map((r, i) => (
+              <div key={i} className="flex gap-3 p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition">
+                <div className="flex-shrink-0">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{background: r.priority==='HIGH'?G.danger:r.priority==='MEDIUM'?G.warn:'#6554C0'}}>
+                    {r.priority}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-800">{r.title}</p>
+                  <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{r.detail}</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300 flex-shrink-0 mt-1"/>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-6 text-center text-xs text-gray-300">
+        Executive HR Dashboard · Online Asset Co., Ltd. · ข้อมูลจาก Supabase Database · {lastUpdated?.toLocaleString('th-TH')}
+      </div>
+    </div>
+  )
+}

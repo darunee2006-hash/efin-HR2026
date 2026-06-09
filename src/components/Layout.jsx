@@ -7,6 +7,7 @@ import { useCompanyFilter } from '../lib/CompanyFilterContext'
 // minRole: 'employee' = all, 'manager' = manager+admin, 'admin' = admin only
 const NAV = [
   { key: 'dashboard', icon: Home, minRole: 'employee' },
+  { key: 'executiveDashboard', icon: BarChart3, minRole: 'manager' },
   { key: 'employees', icon: Users, minRole: 'manager' },
   { key: 'staffList', icon: List, minRole: 'supervisor' },
   { key: 'orgChart', icon: Network, minRole: 'manager' },
@@ -39,6 +40,7 @@ const ROLE_LEVEL = { employee: 0, supervisor: 1, manager: 2, admin: 3, superuser
 
 // Labels for pages not in translations
 const extraLabels = {
+  executiveDashboard: { th: 'Executive Dashboard', en: 'Executive Dashboard' },
   orgChart: { th: 'โครงสร้างองค์กร', en: 'Org Chart' },
   recruitment: { th: 'สรรหา', en: 'Recruitment' },
   training: { th: 'ฝึกอบรม', en: 'Training' },

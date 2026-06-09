@@ -28,11 +28,13 @@ import MyDocuments from './pages/MyDocuments'
 import CompanyManagement from './pages/CompanyManagement'
 import HolidayManagement from './pages/HolidayManagement'
 import StaffList from './pages/StaffList'
+import ExecutiveDashboard from './pages/ExecutiveDashboard'
 
 // Pages by role level
 const ROLE_PAGES = {
   admin: {
     dashboard: Dashboard,
+    executiveDashboard: ExecutiveDashboard,
     employees: Employees,
     staffList: StaffList,
     orgChart: OrgChart,
@@ -59,6 +61,7 @@ const ROLE_PAGES = {
   },
   manager: {
     dashboard: Dashboard,
+    executiveDashboard: ExecutiveDashboard,
     employees: Employees,
     staffList: StaffList,
     orgChart: OrgChart,
