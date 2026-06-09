@@ -11,8 +11,8 @@ import {
   PieChart as RechartsPie, Pie, Cell, LineChart, Line, Legend,
 } from 'recharts'
 
-const G = { primary:'#00875A', dark:'#006644', light:'#E3FCEF', accent:'#FF8B00', danger:'#DE350B', info:'#0052CC', warn:'#FF991F' }
-const BU_COLORS = ['#00875A','#0052CC','#FF8B00','#6554C0','#00B8D9','#36B37E','#FF5630','#8777D9']
+const G = { primary:'#7DC242', dark:'#5A9020', darker:'#4E7F1A', light:'#E8F5D0', light2:'#C5E888', mid:'#8FCC4A', accent:'#F5A623', danger:'#DE350B', info:'#0052CC', warn:'#FF991F' }
+const BU_COLORS = ['#7DC242','#5A9020','#8FCC4A','#C5E888','#F5A623','#B8DC80','#D8EDE3','#4E7F1A']
 const fmt = n => (n??0).toLocaleString('th-TH')
 const fmtM = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(0)+'K' : fmt(Math.round(n))
 
@@ -172,20 +172,20 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
   if (loading) return (
     <div className="flex items-center justify-center h-96">
       <div className="text-center">
-        <div className="w-10 h-10 border-3 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-3"/>
+        <div className="w-10 h-10 border-3 border-green-200 border-t-[#7DC242] rounded-full animate-spin mx-auto mb-3"/>
         <p className="text-sm text-gray-500">กำลังโหลดข้อมูลผู้บริหาร...</p>
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen p-6" style={{background:'#F8FAFB'}}>
+    <div className="min-h-screen p-6" style={{background:'#F4F7F5'}}>
 
       {/* Header */}
       <div className="flex items-start justify-between mb-6 flex-wrap gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background:G.primary}}><BarChart3 className="w-4 h-4 text-white"/></div>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background:G.primary,borderRadius:8}}><BarChart3 className="w-4 h-4 text-white"/></div>
             <h1 className="text-2xl font-bold text-gray-900">Executive HR Dashboard</h1>
           </div>
           <p className="text-sm text-gray-400">CEO & Board People Overview · ข้อมูล Real-time จาก Database</p>
@@ -197,7 +197,7 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
             <option value="all">ทุกเดือน</option>
             {availableMonths.map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}
           </select>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white shadow-sm" style={{background:G.primary}}>
+          <button className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-white" style={{background:G.primary}}>
             <Download className="w-4 h-4"/>Export Report
           </button>
         </div>
@@ -297,7 +297,7 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
               <XAxis dataKey="label" tick={{fontSize:10}}/>
               <YAxis tick={{fontSize:10}} tickFormatter={v => '฿'+fmtM(v)}/>
               <Tooltip formatter={v => '฿'+fmtM(v)}/>
-              <Line type="monotone" dataKey="cost" stroke={G.primary} strokeWidth={2.5} dot={{fill:G.primary,r:4}} name="ต้นทุนรวม"/>
+              <Line type="monotone" dataKey="cost" stroke="#7DC242" strokeWidth={2.5} dot={{fill:G.primary,r:4}} name="ต้นทุนรวม"/>
             </LineChart>
           </ResponsiveContainer>
         </div>
