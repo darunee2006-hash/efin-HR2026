@@ -802,9 +802,9 @@ export default function UserManagement({ lang = 'th' }) {
                       )
 
                       return (
-                        <tr key={u.id} className="hover:bg-[#F0FBF5] transition-colors group">
+                        <tr key={u.id} className="hover:bg-[#F0FBF5] transition-colors group cursor-pointer" onClick={()=>setEditUser(u)}>
                           {/* Sticky: Name */}
-                          <td className="sticky left-0 z-10 py-2 px-3 border-b border-r border-gray-100 group-hover:bg-[#F0FBF5]"
+                          <td className="sticky left-0 z-10 py-2 px-3 border-b border-r border-gray-100 group-hover:bg-[#F0FBF5]" title="คลิกเพื่อแก้ไข"
                             style={{background:rowBg, minWidth:180}}>
                             <div className="flex items-center gap-2">
                               <Av name={fullName} size={28}/>
@@ -871,12 +871,12 @@ export default function UserManagement({ lang = 'th' }) {
                           <td className="sticky right-0 z-10 py-2 px-2 border-b border-l border-gray-100 group-hover:bg-[#F0FBF5]"
                             style={{background:rowBg}}>
                             <div className="flex items-center gap-1">
-                              <button onClick={()=>setEditUser(u)}
+                              <button onClick={(e)=>{e.stopPropagation();setEditUser(u)}}
                                 className="p-1.5 rounded hover:bg-[#E6F9F0] text-gray-400 hover:text-[#007A3D]" title="แก้ไข">
                                 <Edit3 className="w-3.5 h-3.5"/>
                               </button>
                               {myRole==='superuser' && (
-                                <button onClick={()=>handleDelete(u.id)} disabled={deleting===u.id}
+                                <button onClick={(e)=>{e.stopPropagation();handleDelete(u.id)}} disabled={deleting===u.id}
                                   className="p-1.5 rounded hover:bg-red-50 text-gray-400 hover:text-red-500" title="ลบ">
                                   <Trash2 className="w-3.5 h-3.5"/>
                                 </button>
