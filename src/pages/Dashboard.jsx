@@ -168,6 +168,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const [loading, setLoading]           = useState(true)
   const [drillDown, setDrillDown]       = useState(null)
   const [allEmployees, setAllEmployees] = useState([])
+  const [empResigned, setEmpResigned]   = useState(0)
 
   useEffect(() => { fetchAll() }, [])
 
@@ -176,7 +177,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     const today = new Date()
     const thisMonthStart = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`
 
-    const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes] = await Promise.all([
+    const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes, resignedRes] = await Promise.all([
       supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active'),
       supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active').gte('hire_date', thisMonthStart),
       supabase.from('hr_recruitment').select('id', { count:'exact', head:true }).eq('status','open'),
@@ -189,10 +190,12 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       supabase.from('hr_announcements').select('*').eq('is_active', true).order('created_at', { ascending:false }).limit(3),
       supabase.from('hr_training').select('*').gte('start_date', today.toISOString().split('T')[0]).order('start_date').limit(3),
       supabase.from('hr_employees').select('bu, company_entity').eq('status','active'),
+      supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','resigned').gte('resignation_date', `${today.getFullYear()}-01-01`),
     ])
 
     setEmpTotal(empRes.count || 0)
     setEmpNew(newEmpRes.count || 0)
+    setEmpResigned(resignedRes.count || 0)
     setOpenPositions(openRes.count || 0)
     setLeaveCount(leaveRes.count || 0)
     setRecentLeave(recentLeaveRes.data || [])
@@ -231,8 +234,8 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
 
     const { data: empAll } = await supabase
       .from('hr_employees')
-      .select('employee_code,prefix_th,first_name_th,last_name_th,nickname,position_th,department_name_th,bu,level,hire_date,company_entity')
-      .eq('status','active')
+      .select('employee_code,prefix_th,first_name_th,last_name_th,nickname,position_th,department_name_th,bu,level,hire_date,resignation_date,status,company_entity')
+      .in('status',['active','resigned'])
       .order('first_name_th')
     setAllEmployees(empAll || [])
     setLoading(false)
@@ -272,6 +275,15 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const openDrill = (type) => {
     if (type === 'total') setDrillDown({ title: `พนักงานทั้งหมด (${allEmployees.length} คน)`, rows: allEmployees, columns: empCols, navPage: 'employees' })
     else if (type === 'new') setDrillDown({ title: `พนักงานใหม่เดือนนี้ (${newEmps.length} คน)`, rows: newEmps, columns: empCols, navPage: 'onboarding' })
+    else if (type === 'resigned') {
+      const resignedEmps = allEmployees.filter(e => e.status === 'resigned' && e.resignation_date && new Date(e.resignation_date).getFullYear() === new Date().getFullYear())
+      setDrillDown({ title: `พนักงานลาออกปี ${new Date().getFullYear()+543} (${resignedEmps.length} คน)`, rows: resignedEmps, columns: [
+        { key:'code', label:'รหัส', get: r => r.employee_code },
+        { key:'name', label:'ชื่อ-นามสกุล', get: r => `${r.first_name_th||''} ${r.last_name_th||''}`.trim() },
+        { key:'bu', label:'BU', get: r => r.bu || '—' },
+        { key:'date', label:'วันที่ลาออก', get: r => r.resignation_date ? new Date(r.resignation_date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '—' },
+      ], navPage: 'employees' })
+    }
     else if (type === 'leave') setDrillDown({
       title: `คำขอลา รออนุมัติ (${recentLeave.length} รายการ)`,
       rows: recentLeave,
@@ -319,7 +331,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       </div>
 
       {/* ── KPI Cards ── */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:11, marginBottom:16 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:11, marginBottom:16 }}>
         <div onClick={() => openDrill('total')} style={{ cursor:'pointer' }}>
           <StatCard icon={Users}      iconStyle={{background:G.light,  color:G.primary}} label={lang==='th'?'พนักงานทั้งหมด':'Total Employees'}  value={fmt(empTotal)}  unit={lang==='th'?'คน':'ppl'} change="4.3% จากเดือนที่แล้ว" changeUp />
         </div>
