@@ -67,7 +67,7 @@ const THAI_LABELS = {
   times: 'ครั้ง',
 };
 
-export default function Welfare({ lang = 'th' }) {
+export default function Welfare({ lang = 'th' , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const labels = THAI_LABELS;
   const [employees, setEmployees] = useState([]);

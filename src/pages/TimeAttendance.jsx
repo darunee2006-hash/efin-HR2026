@@ -21,7 +21,7 @@ function parseNotes(notes) {
 
 const monthLabels = { '2026-01': 'ม.ค. 69', '2026-02': 'ก.พ. 69', '2026-03': 'มี.ค. 69' }
 
-export default function TimeAttendance({ lang }) {
+export default function TimeAttendance({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter()
   const [loading, setLoading] = useState(true)
   const [employees, setEmployees] = useState([])

@@ -720,7 +720,7 @@ function ProbationTab({ lang }) {
   )
 }
 
-export default function Performance({ lang }) {
+export default function Performance({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter()
   const [loading, setLoading] = useState(true)
   const [employees, setEmployees] = useState([])

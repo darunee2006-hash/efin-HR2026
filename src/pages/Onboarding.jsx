@@ -150,7 +150,7 @@ const formatDate = (dateStr) => {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
-export default function Onboarding({ lang = 'en' }) {
+export default function Onboarding({ lang = 'en' , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const [onboardings, setOnboardings] = useState([]);
   const [employees, setEmployees] = useState({});

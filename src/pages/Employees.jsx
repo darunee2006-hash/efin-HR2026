@@ -23,13 +23,26 @@ import { fmt, fmtDate, insertRow, updateRow, deleteRow, bulkInsert } from '../li
 import Papa from 'papaparse';
 import * as XLSX from 'xlsx';
 
-export default function Employees({ lang }) {
+export default function Employees({ lang, navContext = {}, onNavigate }) {
   const { canViewSalary } = useAuth();
   const { filterByCompany } = useCompanyFilter();
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(navContext?.employeeCode || navContext?.search || '');
+  // Auto-apply navContext filter when navigating from another page
+  // Uses employee_code as primary key
+  React.useEffect(() => {
+    if (navContext?.employeeCode) {
+      setSearchTerm(navContext.employeeCode)
+    } else if (navContext?.bu) {
+      setSearchTerm(navContext.bu)
+    } else if (navContext?.department) {
+      setSearchTerm(navContext.department)
+    } else if (navContext?.search) {
+      setSearchTerm(navContext.search)
+    }
+  }, [navContext?.employeeCode, navContext?.bu, navContext?.department, navContext?.search])
   const [filterDept, setFilterDept] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterType, setFilterType] = useState('all');

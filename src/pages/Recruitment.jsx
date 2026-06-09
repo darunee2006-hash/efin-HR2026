@@ -36,7 +36,7 @@ const statusColors = {
   draft: 'bg-gray-100 text-gray-500',
 };
 
-export default function Recruitment({ lang }) {
+export default function Recruitment({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany, filterByEmployeeCompany } = useCompanyFilter();
   const [showImport, setShowImport] = useState(false);
   const [recruitments, setRecruitments] = useState([]);

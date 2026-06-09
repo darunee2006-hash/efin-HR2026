@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Plus, Check, X, Calendar, Clock } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { useCompanyFilter } from '../lib/CompanyFilterContext'
@@ -10,7 +10,7 @@ import { ImportModal, ImportExportButtons, exportToExcel } from '../components/I
 
 const CHART_COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#f97316', '#06b6d4']
 
-export default function Leave({ lang }) {
+export default function Leave({ lang, navContext = {}, onNavigate }) {
   const { filterByCompany, filterByEmployeeCompany } = useCompanyFilter()
   const [loading, setLoading] = useState(true)
   const [leaveRequests, setLeaveRequests] = useState([])
@@ -32,6 +32,10 @@ export default function Leave({ lang }) {
   })
 
   // Fetch all data
+  React.useEffect(() => {
+    if (navContext?.employeeCode) setSearchTerm && setSearchTerm(navContext.employeeCode)
+  }, [navContext])
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)

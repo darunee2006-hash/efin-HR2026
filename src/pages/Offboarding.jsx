@@ -385,7 +385,7 @@ const DetailPanel = ({ offboarding, employee, lang, onClose }) => {
   );
 };
 
-export default function Offboarding({ lang = 'en' }) {
+export default function Offboarding({ lang = 'en' , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const t = translations[lang];
   const [offboardings, setOffboardings] = useState([]);

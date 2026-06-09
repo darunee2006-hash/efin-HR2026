@@ -108,6 +108,13 @@ const ROLE_PAGES = {
 
 function AppContent() {
   const [page, setPage] = useState('dashboard')
+  const [navContext, setNavContext] = useState({})  // cross-page filter params
+
+  // Navigate to page with optional context (e.g., filter by employee, BU, etc.)
+  const navigate = (targetPage, ctx = {}) => {
+    setNavContext(ctx)
+    setPage(targetPage)
+  }
   const [lang, setLang] = useState('th')
   const [refreshKey, setRefreshKey] = useState(0)
   const { user, profile, loading, role } = useAuth()
@@ -139,7 +146,7 @@ function AppContent() {
   return (
     <Layout page={currentPage} setPage={setPage} lang={lang} setLang={setLang} onRefresh={() => setRefreshKey(k => k + 1)}>
       <ErrorBoundary key={`${currentPage}-${refreshKey}`}>
-        <PageComponent lang={lang} onNavigate={setPage} />
+        <PageComponent lang={lang} onNavigate={navigate} navContext={navContext} />
       </ErrorBoundary>
     </Layout>
   )

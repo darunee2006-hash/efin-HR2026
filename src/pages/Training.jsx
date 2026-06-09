@@ -191,7 +191,7 @@ function TrainingModal({ open, onClose, onSaved, lang }) {
 }
 
 // ─── Main Component ──────────────────────────────────────────
-export default function Training({ lang = 'th' }) {
+export default function Training({ lang = 'th' , onNavigate, navContext = {} }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterCategory, setFilterCategory] = useState('all');

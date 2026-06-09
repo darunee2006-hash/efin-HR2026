@@ -12,12 +12,17 @@ const COMPANIES = [
   { key: 'ATESS POWER TECHNOLOGY (THAILAND) CO., LTD.', label: 'ATESS POWER TECHNOLOGY (THAILAND) CO., LTD.', en: 'ATESS POWER TECHNOLOGY (THAILAND) CO., LTD.' },
 ]
 
-export default function StaffList({ lang }) {
+export default function StaffList({ lang, navContext = {}, onNavigate }) {
   const { canViewSalary } = useAuth();
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCompany, setSelectedCompany] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+const [_navApplied, _setNavApplied] = React.useState(false)
+  React.useEffect(() => {
+    if (navContext?.bu && !_navApplied) { setFilterBU && setFilterBU(navContext.bu); _setNavApplied(true) }
+    if (navContext?.company) { setFilterCompany && setFilterCompany(navContext.company) }
+  }, [navContext])
   const [filterBU, setFilterBU] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
 

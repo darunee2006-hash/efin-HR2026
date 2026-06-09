@@ -10,7 +10,7 @@ import { useCompanyFilter } from '../lib/CompanyFilterContext';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
 
-export default function Reports({ lang }) {
+export default function Reports({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('headcount');

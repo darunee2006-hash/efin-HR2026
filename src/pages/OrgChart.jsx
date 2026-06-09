@@ -37,7 +37,7 @@ function LevelBadge({ level }) {
 }
 
 /* ─── Employee Card ─────────────────────────────────── */
-function EmpCard({ emp, lang, compact }) {
+function EmpCard({ emp, lang, compact, onNavigate }) {
   const name = lang === 'th'
     ? `${emp.first_name_th || ''} ${emp.last_name_th || ''}`.trim()
     : `${emp.first_name_en || emp.first_name_th || ''} ${emp.last_name_en || emp.last_name_th || ''}`.trim();
@@ -49,7 +49,9 @@ function EmpCard({ emp, lang, compact }) {
 
   if (compact) {
     return (
-      <div className={`flex items-center gap-2 px-2 py-1.5 rounded border-l-3 ${lv.border} bg-white hover:bg-gray-50 transition`}>
+      <div className={`flex items-center gap-2 px-2 py-1.5 rounded border-l-3 ${lv.border} bg-white hover:bg-gray-50 transition`}
+        onClick={() => onNavigate && onNavigate('employees', {employeeCode: emp.employee_code})}
+        style={{cursor: onNavigate ? 'pointer' : 'default'}}>
         <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
           <User className="w-3 h-3 text-gray-500" />
         </div>
@@ -63,7 +65,9 @@ function EmpCard({ emp, lang, compact }) {
   }
 
   return (
-    <div className={`rounded-lg border-2 ${lv.border} bg-white shadow-sm hover:shadow-md transition p-3 ${isExec ? 'ring-2 ring-amber-200' : ''}`}>
+    <div className={`rounded-lg border-2 ${lv.border} bg-white shadow-sm hover:shadow-md transition p-3 ${isExec ? 'ring-2 ring-amber-200' : ''}`}
+      onClick={() => onNavigate && onNavigate('employees', {employeeCode: emp.employee_code})}
+      style={{cursor: onNavigate ? 'pointer' : 'default'}}>
       <div className="flex items-start gap-3">
         <div className={`w-10 h-10 rounded-full ${isExec ? 'bg-amber-100' : 'bg-gray-100'} flex items-center justify-center flex-shrink-0`}>
           <User className={`w-5 h-5 ${isExec ? 'text-amber-600' : 'text-gray-500'}`} />
@@ -191,7 +195,7 @@ function OrgDetailPanel({ deptName, emps, lang, color, onClose, groupBy = 'level
                   <div className="flex-1 h-px bg-gray-100" />
                 </div>
                 <div className="space-y-1.5 pl-2">
-                  {groupEmps.map(emp => <EmpCard key={emp.id} emp={emp} lang={lang} compact />)}
+                  {groupEmps.map(emp => <EmpCard key={emp.id} emp={emp} lang={lang} compact onNavigate={onNavigate} />)}
                 </div>
               </div>
             );
@@ -207,7 +211,7 @@ function OrgDetailPanel({ deptName, emps, lang, color, onClose, groupBy = 'level
                 <div className="flex-1 h-px bg-gray-100" />
               </div>
               <div className="space-y-1.5 pl-2">
-                {groupEmps.map(emp => <EmpCard key={emp.id} emp={emp} lang={lang} compact />)}
+                {groupEmps.map(emp => <EmpCard key={emp.id} emp={emp} lang={lang} compact onNavigate={onNavigate} />)}
               </div>
             </div>
           );
@@ -311,7 +315,7 @@ function DeptListItem({ deptName, data, color, lang }) {
                   <div className="flex-1 h-px bg-gray-100" />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1.5 pl-2">
-                  {lvlEmps.map(emp => <EmpCard key={emp.id} emp={emp} lang={lang} compact />)}
+                  {lvlEmps.map(emp => <EmpCard key={emp.id} emp={emp} lang={lang} compact onNavigate={onNavigate} />)}
                 </div>
               </div>
             );
@@ -528,7 +532,7 @@ function CompanyOrgView({ employees, deptMap, lang, company }) {
 }
 
 /* ─── Main Component ────────────────────────────────── */
-export default function OrgChart({ lang }) {
+export default function OrgChart({ lang, onNavigate }) {
   const { filterByCompany } = useCompanyFilter();
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);

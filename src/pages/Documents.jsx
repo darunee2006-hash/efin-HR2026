@@ -20,7 +20,7 @@ import {
 import { supabase } from '../lib/supabase';
 import { useCompanyFilter } from '../lib/CompanyFilterContext';
 
-export default function Documents({ lang = 'th' }) {
+export default function Documents({ lang = 'th' , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const [documents, setDocuments] = useState([]);
   const [employees, setEmployees] = useState([]);

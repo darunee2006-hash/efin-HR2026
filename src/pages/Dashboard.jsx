@@ -380,7 +380,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
             </div>
             <div style={{ flex:1 }}>
               {buData.map((d, i) => (
-                <div key={i} onClick={() => openDrill(`bu:${d.name}`)}
+                <div key={i} onClick={(e) => { e.stopPropagation(); if(nav) nav('staffList',{bu:d.name}); else openDrill(`bu:${d.name}`) }}
                   style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:'#6B9E84', marginBottom:5, cursor:'pointer', padding:'2px 4px', borderRadius:4, transition:'background .15s' }}
                   onMouseEnter={e=>e.currentTarget.style.background='#E6F9F0'}
                   onMouseLeave={e=>e.currentTarget.style.background='transparent'}>

@@ -60,7 +60,7 @@ const TEXT = {
   },
 };
 
-export default function Announcements({ lang = 'en' }) {
+export default function Announcements({ lang = 'en' , onNavigate, navContext = {} }) {
   const { filterByCompany, filterByEmployeeCompany } = useCompanyFilter();
   const t = TEXT[lang] || TEXT.en;
   const { user, role } = useAuth();

@@ -144,7 +144,7 @@ async function fetchAll(table, select='*', orderCol) {
   return all
 }
 
-export default function CostAnalysis(){
+export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
   const {isSuperUser}=useAuth()
   const {selectedCompany,filterByCompany,filterVersion}=useCompanyFilter()
   const [loading,setLoading]=useState(true)
@@ -1916,7 +1916,12 @@ export default function CostAnalysis(){
                         <tr key={emp.id} className="hover:bg-[#f0fce8]/40">
                           <td className="px-4 py-2 text-xs text-gray-400">{i+1}</td>
                           <td className="px-4 py-2 font-mono text-xs text-gray-500">{emp.employee_code}</td>
-                          <td className="px-4 py-2 font-medium text-gray-900">{emp.prefix_th}{emp.first_name_th} {emp.last_name_th}</td>
+                          <td className="px-4 py-2 font-medium text-gray-900">
+                            <span onClick={()=>onNavigate&&onNavigate('employees',{employeeCode:emp.employee_code})}
+                              className="cursor-pointer hover:text-[#7DC242] hover:underline underline-offset-2">
+                              {emp.prefix_th}{emp.first_name_th} {emp.last_name_th}
+                            </span>
+                          </td>
                           <td className="px-4 py-2 text-xs text-gray-500">{emp.position_th||'-'}</td>
                           <td className="px-4 py-2 text-right font-mono text-gray-700">{hrs > 0 ? fmt(hrs) : '-'}</td>
                           <td className="px-4 py-2 text-right font-mono font-semibold text-[#5A9020]">{prodCost > 0 ? '฿'+fmt(Math.round(prodCost)) : '-'}</td>

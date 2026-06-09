@@ -805,7 +805,15 @@ export default function UserManagement({ lang = 'th' }) {
                               </div>
                             </div>
                           </td>
-                          <TD mono>{emp?.employee_code||'-'}</TD>
+                          <td className="py-2 px-3 text-gray-700 border-b border-gray-50 font-mono"
+                            style={{background:rowBg}}>
+                            {emp?.employee_code ? (
+                              <span onClick={()=>nav&&nav('employees',{employeeCode:emp.employee_code})}
+                                className="cursor-pointer text-[#7DC242] hover:underline underline-offset-2">
+                                {emp.employee_code}
+                              </span>
+                            ) : '-'}
+                          </td>
                           <TD>{emp?.nickname||'-'}</TD>
                           <TD>{nameEn||'-'}</TD>
                           <TD>{genderLabel}</TD>

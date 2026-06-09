@@ -70,7 +70,7 @@ function getPvdTierLabel(yearsOfService, lang) {
 }
 
 
-export default function Payroll({ lang }) {
+export default function Payroll({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const [activeTab, setActiveTab] = useState('individual');
   const [payrollData, setPayrollData] = useState([]);
