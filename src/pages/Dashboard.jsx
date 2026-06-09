@@ -169,6 +169,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const [drillDown, setDrillDown]       = useState(null)
   const [allEmployees, setAllEmployees] = useState([])
   const [empResigned, setEmpResigned]   = useState(0)
+  const [companyCounts, setCompanyCounts] = useState({})
 
   useEffect(() => { fetchAll() }, [])
 
@@ -177,7 +178,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     const today = new Date()
     const thisMonthStart = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`
 
-    const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes, resignedRes] = await Promise.all([
+    const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes, resignedRes, companyRes] = await Promise.all([
       supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active'),
       supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active').gte('hire_date', `${today.getFullYear()}-01-01`),
       supabase.from('hr_recruitment').select('id', { count:'exact', head:true }).eq('status','open'),
@@ -191,11 +192,15 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       supabase.from('hr_training').select('*').gte('start_date', today.toISOString().split('T')[0]).order('start_date').limit(3),
       supabase.from('hr_employees').select('bu, company_entity').eq('status','active'),
       supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','resigned').gte('resignation_date', `${today.getFullYear()}-01-01`),
+      supabase.from('hr_employees').select('company_entity').eq('status','active'),
     ])
 
     setEmpTotal(empRes.count || 0)
     setEmpNew(newEmpRes.count || 0)
     setEmpResigned(resignedRes.count || 0)
+    const cCounts = {}
+    ;(companyRes.data||[]).forEach(e => { const c = e.company_entity||'อื่นๆ'; cCounts[c] = (cCounts[c]||0)+1 })
+    setCompanyCounts(cCounts)
     setOpenPositions(openRes.count || 0)
     setLeaveCount(leaveRes.count || 0)
     setRecentLeave(recentLeaveRes.data || [])
@@ -299,8 +304,16 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     else if (type === 'open') setDrillDown({ title: 'ตำแหน่งงานว่าง', rows: [], columns: [], navPage: 'recruitment' })
     else if (type.startsWith('bu:')) {
       const buName = type.slice(3)
-      const buEmps = allEmployees.filter(e => e.bu === buName)
-      setDrillDown({ title: `${buName} (${buEmps.length} คน)`, rows: buEmps, columns: empCols, navPage: 'staffList' })
+      // Check if it's a company code (ONL, EFINX, ATESS, SMT)
+      const companyCodes = ['ONL','EFINX','ATESS','SMT']
+      const companyNames = { ONL:'Online Asset', EFINX:'EFIN Xpert', ATESS:'ATESS', SMT:'Smart Medtech' }
+      if (companyCodes.includes(buName)) {
+        const compEmps = allEmployees.filter(e => e.company_entity === buName && e.status === 'active')
+        setDrillDown({ title: `${companyNames[buName]} (${compEmps.length} คน)`, rows: compEmps, columns: empCols, navPage: 'staffList' })
+      } else {
+        const buEmps = allEmployees.filter(e => e.bu === buName)
+        setDrillDown({ title: `${buName} (${buEmps.length} คน)`, rows: buEmps, columns: empCols, navPage: 'staffList' })
+      }
     }
     else if (type.startsWith('announce')) setDrillDown({ title: 'ประกาศภายใน', rows: announcements, columns: [
       { key:'title', label:'หัวข้อ', get: a => a.title_th || a.title_en || '—' },
@@ -347,6 +360,27 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
         <div onClick={() => openDrill('attendance')} style={{ cursor:'pointer' }}>
           <StatCard icon={TrendingUp} iconStyle={{background:'#E0F7F4',color:'#009688'}} label={lang==='th'?'อัตราการเข้างาน':'Attendance Rate'}   value="96.2" unit="%" change="1.8% จากเดือนที่แล้ว" changeUp />
         </div>
+      </div>
+
+      {/* ── Company Breakdown ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, marginBottom:16 }}>
+        {[
+          { code:'ONL',   label:'Online Asset',   color:G.primary,   bg:G.light   },
+          { code:'EFINX', label:'EFIN Xpert',     color:'#1565C0',   bg:'#E3F2FD' },
+          { code:'ATESS', label:'ATESS',           color:'#C62828',   bg:'#FEECEC' },
+          { code:'SMT',   label:'Smart Medtech',  color:'#6A1B9A',   bg:'#F3E5F5' },
+        ].map(c => (
+          <div key={c.code} onClick={() => openDrill(`bu:${c.code}`)}
+            style={{ background:'#fff', border:`1px solid ${c.bg}`, borderLeft:`4px solid ${c.color}`, borderRadius:10, padding:'10px 14px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between', transition:'box-shadow .15s' }}
+            onMouseEnter={e=>e.currentTarget.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'}
+            onMouseLeave={e=>e.currentTarget.style.boxShadow='none'}>
+            <div>
+              <div style={{ fontSize:11, color:'#888', marginBottom:2 }}>{c.label}</div>
+              <div style={{ fontSize:20, fontWeight:500, color:'#1a2e1a' }}>{fmt(companyCounts[c.code]||0)}</div>
+            </div>
+            <div style={{ fontSize:10, color:c.color, background:c.bg, padding:'2px 8px', borderRadius:20, fontWeight:500 }}>คน</div>
+          </div>
+        ))}
       </div>
 
       {/* ── Mid Grid ── */}
