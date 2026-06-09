@@ -13,7 +13,7 @@ const EMPTY = {
   is_active: true, notes: '',
 };
 
-export default function CompanyManagement({ lang }) {
+export default function CompanyManagement({ lang , onNavigate, navContext = {} }) {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

@@ -27,7 +27,7 @@ import { fmt, fmtDate, insertRow, updateRow, deleteRow } from '../lib/hooks';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { exportToExcel, ImportModal, ImportExportButtons } from '../components/ImportExport';
 
-export default function Assets({ lang }) {
+export default function Assets({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const [assets, setAssets] = useState([]);
   const [employees, setEmployees] = useState([]);

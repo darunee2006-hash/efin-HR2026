@@ -46,7 +46,7 @@ const STATUS_LABELS = {
   cancelled: { th: 'ยกเลิก', en: 'Cancelled', color: 'bg-gray-100 text-gray-500' },
 }
 
-export default function Expenses({ lang }) {
+export default function Expenses({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter()
   const { user, profile } = useAuth()
   const [loading, setLoading] = useState(true)

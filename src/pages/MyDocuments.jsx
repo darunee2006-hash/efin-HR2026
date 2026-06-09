@@ -328,7 +328,7 @@ function AdminSignaturePanel({ settings, onUpdate, lang }) {
 // ============================================================
 // Main Page
 // ============================================================
-export default function MyDocuments({ lang }) {
+export default function MyDocuments({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany, filterByEmployeeCompany } = useCompanyFilter()
   const { user, profile, role } = useAuth()
   const [employee, setEmployee] = useState(null)

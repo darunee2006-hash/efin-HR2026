@@ -10,7 +10,7 @@ const TYPES = [
 
 const EMPTY = { date: '', name_th: '', name_en: '', type: 'public', year: new Date().getFullYear(), is_active: true };
 
-export default function HolidayManagement({ lang }) {
+export default function HolidayManagement({ lang , onNavigate, navContext = {} }) {
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

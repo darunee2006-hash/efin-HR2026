@@ -210,7 +210,7 @@ const getStatusBadgeColor = (status) => {
   }
 };
 
-export default function EmployeeRelations({ lang = 'en' }) {
+export default function EmployeeRelations({ lang = 'en' , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
   const t = translations[lang];
   const [cases, setCases] = useState([]);
