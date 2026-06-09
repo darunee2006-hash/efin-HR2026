@@ -438,7 +438,7 @@ export default function JDManagement({ lang, onNavigate, navContext = {} }) {
   const load = async () => {
     setLoading(true)
     const [jdRes, empRes] = await Promise.all([
-      supabase.from('hr_job_descriptions').select('*, hr_employees(id,employee_code,prefix_th,first_name_th,last_name_th,position_th,bu,level,company_entity)').eq('hr_employees.company_entity','ONL').order('created_at',{ascending:false}),
+      supabase.from('hr_job_descriptions').select('*, hr_employees!inner(id,employee_code,prefix_th,first_name_th,last_name_th,position_th,position_en,bu,level,department_name_th,company_entity)').order('created_at',{ascending:false}),
       supabase.from('hr_employees').select('id,employee_code,prefix_th,first_name_th,last_name_th,position_th,position_en,bu,level,department_name_th,company_entity').eq('status','active').eq('company_entity','ONL').order('first_name_th'),
     ])
     setJdList(jdRes.data||[])
