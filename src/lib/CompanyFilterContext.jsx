@@ -5,7 +5,7 @@ const CompanyFilterContext = createContext({})
 
 export function CompanyFilterProvider({ children }) {
   const [companies, setCompanies] = useState([])
-  const [selectedCompany, setSelectedCompany] = useState('all')
+  const [selectedCompany, setSelectedCompany] = useState('ONL')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
