@@ -861,7 +861,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
     ws[XLSX.utils.encode_cell({r:1,c:0})]={v:'dept_code',t:'s'}
     ws[XLSX.utils.encode_cell({r:1,c:1})]={v:'รหัสพนักงาน',t:'s'}
     ws[XLSX.utils.encode_cell({r:1,c:2})]={v:'ชื่อพนักงาน',t:'s'}
-    ws[XLSX.utils.encode_cell({r:1,c:3})]={v:'แผนก',t:'s'}
+    ws[XLSX.utils.encode_cell({r:1,c:3})]={v:'ฝ่าย',t:'s'}
     ws[XLSX.utils.encode_cell({r:1,c:4})]={v:'Total',t:'s'}
     for(let ci=0;ci<sortedProducts.length;ci++){
       ws[XLSX.utils.encode_cell({r:1,c:FIXED_COLS+ci})]={v:sortedProducts[ci].code,t:'s'}
@@ -1233,7 +1233,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
             <th className="px-3 py-2 text-left font-medium text-gray-600">รหัส</th>
             <th className="px-3 py-2 text-left font-medium text-gray-600">ชื่อ-นามสกุล</th>
             <th className="px-3 py-2 text-left font-medium text-gray-600">ตำแหน่ง</th>
-            <th className="px-3 py-2 text-left font-medium text-gray-600">แผนก</th>
+            <th className="px-3 py-2 text-left font-medium text-gray-600">ฝ่าย</th>
             <th className="px-3 py-2 text-left font-medium text-gray-600">บริษัท</th>
             <th className="px-3 py-2 text-left font-medium text-gray-600">BU</th>
             <th className="px-3 py-2 text-left font-medium text-gray-600">ประเภท</th>
@@ -1378,7 +1378,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gray-50"><tr>
-                <th className="px-4 py-2 text-left font-medium text-gray-600">แผนก</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">ฝ่าย</th>
                 <th className="px-4 py-2 text-left font-medium text-gray-600">บริษัท</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">คน</th>
                 <th className="px-4 py-2 text-right font-medium text-gray-600">เงินเดือน</th>
@@ -1788,7 +1788,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
             { label: 'ชื่อ-สกุล', key: 'name', render: r=>`${r.prefix_th||''}${r.first_name_th||''} ${r.last_name_th||''}` },
             { label: 'บริษัท', key: 'company_entity', render: r=>r.company_entity||'-' },
             { label: 'BU', key: 'bu', render: r=>r.bu||'-' },
-            { label: 'แผนก', key: 'department', render: r=>r.department },
+            { label: 'ฝ่าย', key: 'department', render: r=>r.department },
             { label: 'จำนวนเดือน', key: 'months', render: r=>r.months, sortKey: r=>r.months, align:'right' },
             { label: 'ชม.ทำงาน', key: 'hours', render: r=>fmt(Math.round(r.hours)), sortKey: r=>r.hours, align:'right' },
             { label: 'ต้นทุนรวม', key: 'totalCost', render: r=>'฿'+fmt(Math.round(r.totalCost)), sortKey: r=>r.totalCost, align:'right' },
@@ -1812,7 +1812,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
           })
           popupData = Object.values(byDept).map(d=>({...d,count:d.people.size,costPerHr:d.hours>0?d.cost/d.hours:0})).sort((a,b)=>b.costPerHr-a.costPerHr)
           popupCols = [
-            { label: 'แผนก', key: 'department', render: r=>r.department },
+            { label: 'ฝ่าย', key: 'department', render: r=>r.department },
             { label: 'จำนวนคน', key: 'count', render: r=>fmt(r.count), sortKey: r=>r.count, align:'right' },
             { label: 'ต้นทุนรวม', key: 'cost', render: r=>'฿'+fmt(Math.round(r.cost)), sortKey: r=>r.cost, align:'right' },
             { label: 'ชม.ทำงาน', key: 'hours', render: r=>fmt(Math.round(r.hours)), sortKey: r=>r.hours, align:'right' },

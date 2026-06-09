@@ -228,7 +228,7 @@ export default function Payroll({ lang , onNavigate, navContext = {} }) {
     { header: T(lang, 'รหัสพนักงาน', 'Employee Code'), accessor: 'employee_code', width: 15 },
     { header: T(lang, 'ชื่อ-นามสกุล', 'Name'), accessor: (row) => lang === 'th' ? row.employee_name_th : row.employee_name_en, width: 20 },
     { header: T(lang, 'ตำแหน่ง', 'Position'), accessor: 'position', width: 18 },
-    { header: T(lang, 'แผนก', 'Department'), accessor: 'department_name', width: 18 },
+    { header: T(lang, 'ฝ่าย', 'Department'), accessor: 'department_name', width: 18 },
     { header: T(lang, 'อายุงาน (ปี)', 'Years'), accessor: (row) => Math.floor(row.years_of_service || 0), width: 10 },
     { header: T(lang, 'เงินเดือน', 'Salary'), accessor: 'salary', width: 14 },
     { header: T(lang, 'ประกันสังคม', 'SSO'), accessor: 'sso', width: 12 },
@@ -436,7 +436,7 @@ export default function Payroll({ lang , onNavigate, navContext = {} }) {
         </div>
 
         <div className="flex-1 min-w-32">
-          <label className="text-xs text-gray-600 font-medium mb-1 block">{T(lang, 'แผนก', 'Department')}</label>
+          <label className="text-xs text-gray-600 font-medium mb-1 block">{T(lang, 'ฝ่าย', 'Department')}</label>
           <select
             value={filterDept}
             onChange={(e) => setFilterDept(e.target.value)}
@@ -613,7 +613,7 @@ export default function Payroll({ lang , onNavigate, navContext = {} }) {
         {/* Right Panel (~35%) */}
         <DetailPanel>
           {/* Department Distribution Chart */}
-          <Section title={T(lang, 'การกระจายเงินเดือนตามแผนก', 'Salary by Department')}>
+          <Section title={T(lang, 'การกระจายเงินเดือนตามฝ่าย', 'Salary by Department')}>
             {deptBreakdown.length > 0 ? (
               <ResponsiveContainer width="100%" height={Math.max(200, deptBreakdown.sort((a, b) => b.value - a.value).slice(0, 10).length * 32 + 20)}>
                 <BarChart

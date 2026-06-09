@@ -28,7 +28,7 @@ export async function notifyLeaveRequest({ employee, leaveType, fromDate, toDate
   return sendEmail({
     toEmail: HR_EMAIL, toName: 'ทีม HR',
     subject: `[HR] คำขอลา: ${employee.first_name} ${employee.last_name} — ${leaveType}`,
-    message: `พนักงาน ${employee.first_name} ${employee.last_name} (${employee.employee_code})\nตำแหน่ง: ${employee.position || '—'}\nแผนก: ${employee.department || '—'}\n\nขอลา: ${leaveType}\nวันที่: ${fromDate} ถึง ${toDate} (${days} วัน)\nเหตุผล: ${reason || '—'}`,
+    message: `พนักงาน ${employee.first_name} ${employee.last_name} (${employee.employee_code})\nตำแหน่ง: ${employee.position || '—'}\nฝ่าย: ${employee.department || '—'}\n\nขอลา: ${leaveType}\nวันที่: ${fromDate} ถึง ${toDate} (${days} วัน)\nเหตุผล: ${reason || '—'}`,
     actionUrl: `${APP_URL}/leave`,
   })
 }
@@ -47,7 +47,7 @@ export async function notifyNewEmployee({ employee, startDate, managerEmail }) {
   const promises = [sendEmail({
     toEmail: HR_EMAIL, toName: 'ทีม HR',
     subject: `[HR] พนักงานใหม่เริ่มงาน: ${employee.first_name} ${employee.last_name}`,
-    message: `พนักงานใหม่เริ่มงานวันที่ ${startDate}\n\nชื่อ: ${employee.first_name} ${employee.last_name}\nรหัส: ${employee.employee_code || '—'}\nตำแหน่ง: ${employee.position || '—'}\nแผนก: ${employee.department || '—'}`,
+    message: `พนักงานใหม่เริ่มงานวันที่ ${startDate}\n\nชื่อ: ${employee.first_name} ${employee.last_name}\nรหัส: ${employee.employee_code || '—'}\nตำแหน่ง: ${employee.position || '—'}\nฝ่าย: ${employee.department || '—'}`,
     actionUrl: `${APP_URL}/onboarding`,
   })]
   if (managerEmail) promises.push(sendEmail({

@@ -116,7 +116,7 @@ function generateDocument(type, employee, settings, lang) {
           <td style="padding:8px; border:1px solid #ddd;">${empPosition}</td>
         </tr>
         <tr>
-          <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">แผนก</td>
+          <td style="padding:8px; border:1px solid #ddd; font-weight:bold;">ฝ่าย</td>
           <td style="padding:8px; border:1px solid #ddd;">${empDept}</td>
         </tr>
       </table>

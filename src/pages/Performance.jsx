@@ -165,7 +165,7 @@ function AddProbationModal({ open, onClose, onSaved }) {
                 placeholder="เช่น นักกฎหมาย, UX Designer" className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-200 focus:outline-none" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">แผนก / BU</label>
+              <label className="block text-xs font-semibold text-gray-700 mb-1">ฝ่าย / BU</label>
               <input type="text" value={form.department} onChange={e => setForm(p => ({ ...p, department: e.target.value }))}
                 placeholder="เช่น IT, Legal, Marketing" className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-amber-200 focus:outline-none" />
             </div>
@@ -402,7 +402,7 @@ function ProbationTab({ lang }) {
         <div className="relative flex-1 min-w-[200px]">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input type="text" value={searchText} onChange={e => setSearchText(e.target.value)}
-            placeholder="ค้นหาชื่อ, ตำแหน่ง, รหัส, แผนก..." className="w-full text-sm border border-gray-200 rounded-lg pl-9 pr-3 py-2 focus:ring-2 focus:ring-amber-200 focus:outline-none" />
+            placeholder="ค้นหาชื่อ, ตำแหน่ง, รหัส, ฝ่าย..." className="w-full text-sm border border-gray-200 rounded-lg pl-9 pr-3 py-2 focus:ring-2 focus:ring-amber-200 focus:outline-none" />
         </div>
         {canEdit && (
           <button onClick={() => setShowAddModal(true)}
@@ -767,7 +767,7 @@ export default function Performance({ lang , onNavigate, navContext = {} }) {
   const performanceColumns = [
     { header: lang === 'th' ? 'รหัสพนักงาน' : 'Employee Code', headerEn: 'Employee Code', accessor: 'employee_code', dbField: 'employee_code', width: 12, example: 'EMP001' },
     { header: lang === 'th' ? 'ชื่อ-นามสกุล' : 'Full Name', headerEn: 'Full Name', accessor: 'full_name', dbField: 'full_name', width: 20, example: 'สมชาย ใจดี' },
-    { header: lang === 'th' ? 'แผนก' : 'Department', headerEn: 'Department', accessor: 'department', width: 16, example: 'Sales' },
+    { header: lang === 'th' ? 'ฝ่าย' : 'Department', headerEn: 'Department', accessor: 'department', width: 16, example: 'Sales' },
     { header: lang === 'th' ? 'ตำแหน่ง' : 'Position', headerEn: 'Position', accessor: 'position', dbField: 'position', width: 16, example: 'Senior Manager' },
     { header: lang === 'th' ? 'คะแนนหัวหน้า' : 'Boss Score', headerEn: 'Boss Score', accessor: 'boss_score', dbField: 'boss_score', width: 12, example: '4.50', transform: (val) => parseFloat(val) },
     { header: lang === 'th' ? 'คะแนนตนเอง' : 'Self Score', headerEn: 'Self Score', accessor: 'self_score', dbField: 'self_score', width: 12, example: '4.28', transform: (val) => parseFloat(val) },
@@ -942,7 +942,7 @@ export default function Performance({ lang , onNavigate, navContext = {} }) {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-2">{lang === 'th' ? 'แผนก' : 'Department'}</label>
+                    <label className="block text-xs font-semibold text-gray-700 mb-2">{lang === 'th' ? 'ฝ่าย' : 'Department'}</label>
                     <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)} className="w-full text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#7DC242]">
                       {departments.map(d => (<option key={d.key} value={d.key}>{d.label}</option>))}
                     </select>
@@ -964,7 +964,7 @@ export default function Performance({ lang , onNavigate, navContext = {} }) {
                     <tr>
                       <th className="px-4 py-2 text-left font-semibold text-gray-700 text-xs">{lang === 'th' ? 'ลำดับ' : 'No.'}</th>
                       <th className="px-4 py-2 text-left font-semibold text-gray-700 text-xs">{lang === 'th' ? 'ชื่อ-นามสกุล' : 'Name'}</th>
-                      <th className="px-4 py-2 text-left font-semibold text-gray-700 text-xs">{lang === 'th' ? 'แผนก' : 'Department'}</th>
+                      <th className="px-4 py-2 text-left font-semibold text-gray-700 text-xs">{lang === 'th' ? 'ฝ่าย' : 'Department'}</th>
                       <th className="px-4 py-2 text-center font-semibold text-gray-700 text-xs">{lang === 'th' ? 'คะแนนหัวหน้า' : 'Boss Score'}</th>
                       <th className="px-4 py-2 text-center font-semibold text-gray-700 text-xs">{lang === 'th' ? 'คะแนนตนเอง' : 'Self Score'}</th>
                       <th className="px-4 py-2 text-center font-semibold text-gray-700 text-xs">{lang === 'th' ? 'คะแนนเฉลี่ย' : 'Avg Score'}</th>

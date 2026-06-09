@@ -94,7 +94,7 @@ const LABELS = {
     email: 'อีเมล',
     phone: 'โทรศัพท์',
     position: 'ตำแหน่ง',
-    department: 'แผนก',
+    department: 'ฝ่าย',
     startDateLabel: 'วันเริ่มงาน',
     hireDate: 'วันจ้าง',
     checklist: 'รายการติดตาม',

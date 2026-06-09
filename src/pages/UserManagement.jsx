@@ -379,7 +379,7 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
             <div className="grid grid-cols-2 gap-3">
               <FInput label="บริษัท" value={empForm.company_entity} onChange={sf('company_entity')} half options={['ONL','EFINX','ATESS','SMT']}/>
               <FInput label="BU/หน่วยงานหลัก" value={empForm.bu} onChange={sf('bu')} half/>
-              <FInput label="แผนก" value={empForm.department_name_th} onChange={sf('department_name_th')} half/>
+              <FInput label="ฝ่าย" value={empForm.department_name_th} onChange={sf('department_name_th')} half/>
               <FInput label="Department (EN)" value={empForm.department_name_en} onChange={sf('department_name_en')} half/>
               <FInput label="ตำแหน่ง (TH)" value={empForm.position_th} onChange={sf('position_th')} half/>
               <FInput label="Position (EN)" value={empForm.position_en} onChange={sf('position_en')} half/>
@@ -763,7 +763,7 @@ export default function UserManagement({ lang = 'th' }) {
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>บริษัท</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>BU</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>ฝ่ายงาน</th>
-                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:200}}>แผนก</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:200}}>ฝ่าย</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>ตำแหน่ง</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:60}}>ระดับ</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>ประเภทจ้าง</th>

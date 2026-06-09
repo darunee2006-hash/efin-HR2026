@@ -391,7 +391,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
         </Card>
 
         {/* Donut chart — BU breakdown */}
-        <Card title={lang==='th'?'สัดส่วนพนักงานตามแผนก':'Employees by BU'} action={lang==='th'?'ดูโครงสร้าง':'OrgChart'} onAction={() => nav('orgChart')}>
+        <Card title={lang==='th'?'สัดส่วนพนักงานตามฝ่าย':'Employees by BU'} action={lang==='th'?'ดูโครงสร้าง':'OrgChart'} onAction={() => nav('orgChart')}>
           <div style={{ display:'flex', gap:12, alignItems:'center' }}>
             <div style={{ position:'relative', width:110, height:110, flexShrink:0 }}>
               <PieChart width={110} height={110}>

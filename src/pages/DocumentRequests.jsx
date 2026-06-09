@@ -126,7 +126,7 @@ function generateEmploymentCert(emp, options) {
     `${emp.first_name_th || emp.full_name || emp.first_name} ${emp.last_name_th || emp.last_name || ''}`,
     `รหัสพนักงาน: ${emp.employee_code || '—'}`,
     `ตำแหน่ง: ${emp.position || emp.job_title || '—'}`,
-    `ฝ่าย/แผนก: ${emp.department || '—'}`,
+    `ฝ่าย/ฝ่าย: ${emp.department || '—'}`,
     `เริ่มงานวันที่: ${startDate}`,
     `ปัจจุบันยังคงเป็นพนักงานประจำของบริษัท และมีความประพฤติดีตลอดมา`,
   ]
@@ -157,7 +157,7 @@ function generateLeaveForm(emp, options) {
   const fields = [
     ['วันที่:', todayThai(), 'เลขที่:', docNo],
     ['ชื่อพนักงาน:', `${emp.first_name || ''} ${emp.last_name || ''}`, 'รหัส:', emp.employee_code || '—'],
-    ['ตำแหน่ง:', emp.position || emp.job_title || '—', 'แผนก:', emp.department || '—'],
+    ['ตำแหน่ง:', emp.position || emp.job_title || '—', 'ฝ่าย:', emp.department || '—'],
     ['BU:', emp.bu || '—', 'บริษัท:', emp.company || '—'],
   ]
   fields.forEach(([l1, v1, l2, v2]) => {
@@ -212,7 +212,7 @@ function generateWarningLetter(emp, options) {
   doc.setFont('helvetica', 'bold'); doc.text('เรียน:', 20, y)
   doc.setFont('helvetica', 'normal')
   doc.text(`${emp.first_name || ''} ${emp.last_name || ''} (รหัส: ${emp.employee_code || '—'})`, 40, y); y += 8
-  doc.text(`ตำแหน่ง: ${emp.position || emp.job_title || '—'}  |  แผนก: ${emp.department || '—'}`, 40, y); y += 15
+  doc.text(`ตำแหน่ง: ${emp.position || emp.job_title || '—'}  |  ฝ่าย: ${emp.department || '—'}`, 40, y); y += 15
   const reasonText = options.reason || 'ได้กระทำการอันมิบังควร ขัดต่อระเบียบข้อบังคับของบริษัท'
   const bodyLines = doc.splitTextToSize(`     บริษัทฯ ได้รับทราบว่าท่านได้ ${reasonText} ซึ่งถือว่าเป็นการกระทำผิดวินัยของบริษัท บริษัทฯ จึงออกหนังสือเตือนฉบับนี้ เพื่อให้ท่านรับทราบและปรับปรุงพฤติกรรมดังกล่าว`, 170)
   doc.setFont('helvetica', 'normal'); doc.text(bodyLines, 20, y); y += bodyLines.length * 7 + 10

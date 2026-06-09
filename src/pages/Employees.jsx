@@ -72,7 +72,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
     { key: 'employment_type', label: 'ประเภทพนักงาน', default: true },
     { key: 'company_entity', label: 'บริษัท', default: true },
     { key: 'bu', label: 'BU', default: true },
-    { key: 'department', label: 'แผนก', default: true },
+    { key: 'department', label: 'ฝ่าย', default: true },
     { key: 'position', label: 'ตำแหน่ง', default: true },
     { key: 'cost_center', label: 'Cost Center', default: false },
     { key: 'level', label: 'ระดับ', default: false },
@@ -393,7 +393,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
       'วันเกิด': emp.date_of_birth || '',
       'โทรศัพท์': emp.phone || '',
       'อีเมล': emp.email || '',
-      'แผนก': deptMap[emp.department_id] || emp.department_id || '',
+      'ฝ่าย': deptMap[emp.department_id] || emp.department_id || '',
       'ตำแหน่ง': emp.position_th || '',
       'ระดับ': LEVEL_LABEL[emp.level] || emp.level || '',
       'บริษัทที่สังกัด': emp.company_entity || '',
@@ -414,7 +414,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
   const handleDownloadTemplate = () => {
     const wb = XLSX.utils.book_new();
 
-    const headers = ['รหัสพนักงาน', 'ชื่อ (ไทย)', 'นามสกุล (ไทย)', 'ชื่อ (English)', 'นามสกุล (English)', 'ตำแหน่ง', 'ระดับ (Job Grade)', 'เพศ', 'แผนก', 'บริษัทที่สังกัด', 'ประเภทพนักงาน', 'วันเริ่มงาน (YYYY-MM-DD)'];
+    const headers = ['รหัสพนักงาน', 'ชื่อ (ไทย)', 'นามสกุล (ไทย)', 'ชื่อ (English)', 'นามสกุล (English)', 'ตำแหน่ง', 'ระดับ (Job Grade)', 'เพศ', 'ฝ่าย', 'บริษัทที่สังกัด', 'ประเภทพนักงาน', 'วันเริ่มงาน (YYYY-MM-DD)'];
     const example = ['EMP001', 'สมชาย', 'ใจดี', 'Somchai', 'Jaidee', 'Software Developer', 'Staff', 'ชาย', 'ฝ่ายนวัตกรรมและเทคโนโลยีสารสนเทศ', 'บริษัท ออนไลน์แอสเซ็ท จำกัด', 'พนักงานประจำ', '2026-05-01'];
     const wsData = [headers, example];
     const ws = XLSX.utils.aoa_to_sheet(wsData);
@@ -422,7 +422,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
     XLSX.utils.book_append_sheet(wb, ws, 'นำเข้าพนักงาน');
 
     const refData = [
-      ['ระดับ (Job Grade)', 'เพศ', 'แผนก', 'บริษัท', 'ประเภทพนักงาน'],
+      ['ระดับ (Job Grade)', 'เพศ', 'ฝ่าย', 'บริษัท', 'ประเภทพนักงาน'],
       ['C-Level', 'ชาย', 'ฝ่ายบัญชีและการเงิน', 'บริษัท ออนไลน์แอสเซ็ท จำกัด', 'พนักงานประจำ'],
       ['Director', 'หญิง', 'ฝ่ายบริหารองค์กรและทรัพยากรบุคคล', 'บริษัท สมาร์ท เมดเทค จำกัด', 'พนักงานสัญญาจ้าง'],
       ['Manager', '', 'ฝ่ายกลยุทธ์และพัฒนาธุรกิจ', 'บริษัท เอเทสส์ (ประเทศไทย) จำกัด', 'พนักงานทดลองงาน'],
@@ -467,7 +467,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
       if (row['ตำแหน่ง']) mapped.position_th = row['ตำแหน่ง'];
       if (row['ระดับ (Job Grade)']) mapped.level = LEVEL_MAP_TH[row['ระดับ (Job Grade)']] || 'junior';
       if (row['เพศ']) mapped.gender = GENDER_MAP_TH[row['เพศ']] || row['เพศ'];
-      if (row['แผนก']) mapped.department_id = deptLookup[row['แผนก']] || null;
+      if (row['ฝ่าย']) mapped.department_id = deptLookup[row['ฝ่าย']] || null;
       if (row['บริษัทที่สังกัด']) mapped.company_entity = row['บริษัทที่สังกัด'];
       if (row['ประเภทพนักงาน']) mapped.employment_type = EMPTYPE_MAP_TH[row['ประเภทพนักงาน']] || 'permanent';
       if (row['วันเริ่มงาน (YYYY-MM-DD)']) mapped.hire_date = row['วันเริ่มงาน (YYYY-MM-DD)'];
@@ -562,7 +562,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
       <div className="grid grid-cols-4 gap-3">
         <KPICard icon={Users} iconBg="bg-[#E6F9F0]" iconColor="text-[#7DC242]" label="จำนวนพนักงานทั้งหมด" value={totalEmployees} />
         <KPICard icon={UserCheck} iconBg="bg-green-100" iconColor="text-green-600" label="พนักงานประจำ" value={fullTimeCount} />
-        <KPICard icon={Building} iconBg="bg-purple-100" iconColor="text-purple-600" label="แผนก/ฝ่าย" value={deptCount} />
+        <KPICard icon={Building} iconBg="bg-purple-100" iconColor="text-purple-600" label="ฝ่าย" value={deptCount} />
         <KPICard icon={UserPlus} iconBg="bg-orange-100" iconColor="text-orange-600" label="พนักงานใหม่เดือนนี้" value={newHireCount} />
       </div>
 
@@ -668,7 +668,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
               onChange={(e) => setFilterDept(e.target.value)}
               className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]"
             >
-              <option value="all">แผนก/ฝ่าย ทั้งหมด</option>
+              <option value="all">ฝ่าย ทั้งหมด</option>
               {departments.map((dept) => (
                 <option key={dept.id} value={dept.id}>
                   {lang === 'th' ? dept.name_th : dept.name_en}
@@ -837,7 +837,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
                     <InfoRow label="รหัสพนักงาน" value={emp.employee_code} />
                     <InfoRow label="บริษัท" value={emp.company_entity} />
                     <InfoRow label="BU" value={emp.bu} />
-                    <InfoRow label="แผนก" value={deptName} />
+                    <InfoRow label="ฝ่าย" value={deptName} />
                     <InfoRow label="ตำแหน่ง (ไทย)" value={emp.position_th} />
                     <InfoRow label="ตำแหน่ง (EN)" value={emp.position_en} />
                     <InfoRow label="ระดับ" value={emp.level} />
@@ -1023,7 +1023,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">แผนก *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ฝ่าย *</label>
                   <select
                     name="department_id"
                     value={formData.department_id}

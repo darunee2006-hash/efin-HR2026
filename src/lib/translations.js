@@ -29,7 +29,7 @@ export const T = {
   // Employee fields
   empCode: { th: 'รหัสพนักงาน', en: 'Employee Code' },
   name: { th: 'ชื่อ-นามสกุล', en: 'Full Name' },
-  department: { th: 'แผนก', en: 'Department' },
+  department: { th: 'ฝ่าย', en: 'Department' },
   position: { th: 'ตำแหน่ง', en: 'Position' },
   level: { th: 'ระดับ', en: 'Level' },
   hireDate: { th: 'วันเริ่มงาน', en: 'Hire Date' },

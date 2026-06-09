@@ -106,7 +106,7 @@ const [_navApplied, _setNavApplied] = React.useState(false)
       'บริษัท': e.company_entity,
       'BU': e.bu,
       'ฝ่ายงาน': e.department_name_th || '',
-      'แผนก/ส่วน': e.team_section,
+      'ฝ่าย': e.team_section,
       'สถานะ': e.status,
       'ประเภท': e.employment_type,
       'วันเริ่มงาน': e.hire_date,

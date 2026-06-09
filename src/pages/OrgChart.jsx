@@ -545,7 +545,7 @@ export default function OrgChart({ lang, onNavigate }) {
   const t = {
     title: lang === 'th' ? 'โครงสร้างองค์กร' : 'Organization Chart',
     empCount: lang === 'th' ? 'จำนวนพนักงาน' : 'Total Employees',
-    deptCount: lang === 'th' ? 'แผนก/ฝ่าย' : 'Departments',
+    deptCount: lang === 'th' ? 'ฝ่าย' : 'Departments',
     levelCount: lang === 'th' ? 'ระดับตำแหน่ง' : 'Job Grades',
     buCount: lang === 'th' ? 'Business Unit' : 'Business Units',
     cLevel: lang === 'th' ? 'บอร์ดบริหาร' : 'Executive Board',
@@ -557,7 +557,7 @@ export default function OrgChart({ lang, onNavigate }) {
     buView: lang === 'th' ? 'โครงสร้าง BU' : 'BU Structure',
     selectDept: lang === 'th' ? 'เลือกแผนกเพื่อดูรายละเอียดพนักงาน' : 'Select a department to view employees',
     selectBU: lang === 'th' ? 'เลือก BU เพื่อดูรายละเอียดพนักงาน' : 'Select a BU to view employees',
-    allDepts: lang === 'th' ? 'แผนกทั้งหมด' : 'All Departments',
+    allDepts: lang === 'th' ? 'ฝ่ายทั้งหมด' : 'All Departments',
     allBUs: lang === 'th' ? 'Business Unit ทั้งหมด' : 'All Business Units',
   };
 

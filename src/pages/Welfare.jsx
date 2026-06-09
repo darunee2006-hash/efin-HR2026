@@ -55,7 +55,7 @@ const THAI_LABELS = {
   search: 'ค้นหาพนักงาน',
   welfareType: 'ประเภทสวัสดิการ',
   employeeName: 'ชื่อ-นามสกุล',
-  department: 'แผนก',
+  department: 'ฝ่าย',
   amount: 'จำนวนเงิน',
   date: 'วันที่',
   status: 'สถานะ',
@@ -153,7 +153,7 @@ export default function Welfare({ lang = 'th' , onNavigate, navContext = {} }) {
     const columns = [
       { header: 'ชื่อ-นามสกุล', accessor: (row) => `${row.employee.first_name_th} ${row.employee.last_name_th}${row.employee.nickname ? ' (' + row.employee.nickname + ')' : ''}` },
       { header: 'รหัสพนักงาน', accessor: 'employee.employee_code' },
-      { header: 'แผนก', accessor: 'employee.department_th' },
+      { header: 'ฝ่าย', accessor: 'employee.department_th' },
       { header: 'ประเภทสวัสดิการ', accessor: 'category' },
       { header: 'จำนวนเงิน', accessor: 'amount' },
       { header: 'วันที่', accessor: 'date' },

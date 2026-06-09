@@ -28,7 +28,7 @@ export default function Reports({ lang , onNavigate, navContext = {} }) {
       title: 'รายงาน',
       filter: 'ตัวกรอง',
       type: 'ประเภท',
-      department: 'แผนก',
+      department: 'ฝ่าย',
       period: 'ช่วงเวลา',
       export: 'ส่งออก',
       employees: 'พนักงานปัจจุบัน',
@@ -37,7 +37,7 @@ export default function Reports({ lang , onNavigate, navContext = {} }) {
       training: 'ชม.ฝึกอบรม',
       openPositions: 'ตำแหน่งเปิดรับ',
       headcountTrend: 'สถิติจำนวนพนักงาน (Headcount Trend)',
-      departmentStructure: 'โครงสร้างตามแผนก',
+      departmentStructure: 'โครงสร้างตามฝ่าย',
       peopleCostChart: 'ค่าใช้จ่ายบุคลากร People Cost (ล้านบาท)',
       gradeDistribution: 'สถิติจำนวนพนักงานตามระดับ (Job Grade)',
       popularReports: 'สรุปรายงาน',
@@ -224,7 +224,7 @@ export default function Reports({ lang , onNavigate, navContext = {} }) {
     { id: 2, label: lang === 'th' ? 'เข้าใหม่ปีนี้' : 'New Hires (YTD)', value: kpis.newHiresThisYear, type: 'Headcount' },
     { id: 3, label: lang === 'th' ? 'ลาออกปีนี้' : 'Resigned (YTD)', value: kpis.resignedThisYear, type: 'Turnover' },
     { id: 4, label: lang === 'th' ? 'ตำแหน่งเปิดรับ' : 'Open Positions', value: kpis.openPositions, type: 'Recruitment' },
-    { id: 5, label: lang === 'th' ? 'แผนกทั้งหมด' : 'Total Departments', value: computedDepartmentDist.filter(d => d.name !== 'N/A').length, type: 'Structure' },
+    { id: 5, label: lang === 'th' ? 'ฝ่ายทั้งหมด' : 'Total Departments', value: computedDepartmentDist.filter(d => d.name !== 'N/A').length, type: 'Structure' },
   ], [kpis, lang, computedDepartmentDist]);
 
   const handleExportExcel = () => {
@@ -271,7 +271,7 @@ export default function Reports({ lang , onNavigate, navContext = {} }) {
             <label className="block text-xs font-medium text-gray-600 mb-2">{labels.department}</label>
             <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7DC242]">
-              <option value="all">{lang === 'th' ? 'ทุกแผนก' : 'All Departments'}</option>
+              <option value="all">{lang === 'th' ? 'ทุกฝ่าย' : 'All Departments'}</option>
               {departments.map(d => <option key={d.id} value={d.id}>{lang === 'th' ? (d.name_th || d.name_en || d.code) : (d.name_en || d.name_th || d.code)}</option>)}
             </select>
           </div>
