@@ -179,7 +179,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
 
     const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes, resignedRes] = await Promise.all([
       supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active'),
-      supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active').gte('hire_date', thisMonthStart),
+      supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active').gte('hire_date', `${today.getFullYear()}-01-01`),
       supabase.from('hr_recruitment').select('id', { count:'exact', head:true }).eq('status','open'),
       supabase.from('hr_leave_requests').select('id', { count:'exact', head:true }).eq('status','pending'),
       supabase.from('hr_leave_requests').select(`
