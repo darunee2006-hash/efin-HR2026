@@ -2,55 +2,47 @@ import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../lib/AuthContext'
 import {
-  FileText, Plus, Search, Download, Eye, Edit3, Check,
-  ChevronRight, Sparkles, Save, Send, X, Star,
-  Users, Building2, BarChart3, Clock, AlertTriangle, CheckCircle,
-  Filter, ChevronDown, TrendingUp
+  FileText, Plus, Search, Download, Eye, Edit3, Check, X,
+  ChevronRight, Sparkles, Save, AlertTriangle, CheckCircle,
+  Users, Building2, BarChart3, Clock, Send, RefreshCw,
+  Filter, ChevronDown, ListChecks, Bell, TrendingUp
 } from 'lucide-react'
 
-const G = { primary:'#00A651', dark:'#007A3D', light:'#E6F9F0', light2:'#CCF0DE' }
+const BLUE = '#1565C0'
+const BLUE_L = '#E6F1FB'
+const GREEN = '#27500A'
+const GREEN_L = '#EAF3DE'
+const RED = '#791F1F'
+const RED_L = '#FCEBEB'
+const AMB = '#633806'
+const AMB_L = '#FAEEDA'
 
 const STATUS_CFG = {
-  active:          { bg:'#E6F9F0', color:'#00875A', label:'Active', dot:'#00875A' },
-  approved:        { bg:'#E8F5E9', color:'#2E7D32', label:'อนุมัติแล้ว', dot:'#2E7D32' },
-  draft:           { bg:'#F5F5F5', color:'#616161', label:'Draft', dot:'#9E9E9E' },
-  pending_hr:      { bg:'#FFF9C4', color:'#F57F17', label:'รอ HR ตรวจสอบ', dot:'#FFA000' },
-  pending_approval:{ bg:'#E3F2FD', color:'#1565C0', label:'รออนุมัติ', dot:'#1565C0' },
-  rejected:        { bg:'#FEECEC', color:'#C62828', label:'Rejected', dot:'#E53935' },
-  archived:        { bg:'#ECEFF1', color:'#546E7A', label:'Archived', dot:'#78909C' },
+  active:           { bg:GREEN_L, color:GREEN, label:'Active' },
+  approved:         { bg:'#E8F5E9', color:'#2E7D32', label:'อนุมัติแล้ว' },
+  draft:            { bg:'#F5F5F5', color:'#616161', label:'Draft' },
+  pending_hr:       { bg:AMB_L, color:AMB, label:'รอ HR' },
+  pending_approval: { bg:BLUE_L, color:BLUE, label:'รออนุมัติ' },
+  rejected:         { bg:RED_L, color:RED, label:'Rejected' },
+  archived:         { bg:'#ECEFF1', color:'#546E7A', label:'Archived' },
 }
-
-const CORE_VALUES = [
-  { key:'E', label:'Empathy', desc:'เข้าใจและใส่ใจผู้อื่น' },
-  { key:'F', label:'Focus', desc:'มุ่งมั่นตั้งใจกับเป้าหมาย' },
-  { key:'I', label:'Innovative', desc:'คิดสร้างสรรค์ริเริ่มสิ่งใหม่' },
-  { key:'N', label:'Noble', desc:'มีคุณธรรมซื่อสัตย์' },
-  { key:'S', label:'Synergy', desc:'ร่วมมือสร้างพลังทีม' },
-]
-
-function StatusDot({ status }) {
-  const s = STATUS_CFG[status] || STATUS_CFG.draft
-  return <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full" style={{background:s.bg,color:s.color}}>
-    <span className="w-1.5 h-1.5 rounded-full" style={{background:s.dot}}/>
-    {s.label}
-  </span>
+const Badge = ({ status, text }) => {
+  const s = STATUS_CFG[status] || { bg:'#F5F5F5', color:'#616161', label: text||status }
+  return <span style={{background:s.bg,color:s.color,padding:'2px 8px',borderRadius:20,fontSize:11,fontWeight:500,whiteSpace:'nowrap'}}>{text||s.label}</span>
 }
+const Dot = ({ok}) => ok
+  ? <span style={{color:GREEN,fontSize:11,fontWeight:500}}>✓ มี</span>
+  : <span style={{color:RED,fontSize:11}}>— ขาด</span>
 
-// ─── JD Viewer Modal ──────────────────────────────────────────
+// ── JD Viewer ────────────────────────────────────────────────
 function JDViewModal({ jdId, empName, onClose }) {
-  const [jd, setJd] = useState(null)
-  const [resp, setResp] = useState([])
-  const [kpis, setKpis] = useState([])
-  const [comp, setComp] = useState([])
-  const [ojt, setOjt] = useState([])
-  const [rel, setRel] = useState([])
-  const [qual, setQual] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [data, setData] = useState({})
   const [tab, setTab] = useState('overview')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
-      const [jdR,rR,kR,cR,oR,relR,qR] = await Promise.all([
+      const [jdR, rR, kR, cR, oR, relR, qR] = await Promise.all([
         supabase.from('hr_job_descriptions').select('*').eq('id',jdId).single(),
         supabase.from('hr_jd_responsibilities').select('*').eq('jd_id',jdId).order('order_no'),
         supabase.from('hr_jd_kpis').select('*').eq('jd_id',jdId),
@@ -59,169 +51,117 @@ function JDViewModal({ jdId, empName, onClose }) {
         supabase.from('hr_jd_relationships').select('*').eq('jd_id',jdId),
         supabase.from('hr_jd_qualifications').select('*').eq('jd_id',jdId).maybeSingle(),
       ])
-      setJd(jdR.data); setResp(rR.data||[]); setKpis(kR.data||[])
-      setComp(cR.data||[]); setOjt(oR.data||[]); setRel(relR.data||[]); setQual(qR.data)
+      setData({ jd:jdR.data, resp:rR.data||[], kpis:kR.data||[], comp:cR.data||[], ojt:oR.data||[], rel:relR.data||[], qual:qR.data })
       setLoading(false)
     }
     load()
   }, [jdId])
 
-  const TABS = [{key:'overview',label:'ภาพรวม'},{key:'resp',label:'ความรับผิดชอบ'},{key:'kpi',label:'KPI'},{key:'comp',label:'Competency'},{key:'rel',label:'Working Rel.'},{key:'ojt',label:'OJT'},{key:'corevalues',label:'Core Values'}]
+  const { jd, resp, kpis, comp, ojt, rel, qual } = data
+  const TABS = ['overview','ความรับผิดชอบ','KPI','Competency','Working Rel.','OJT','Core Values']
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl" onClick={e=>e.stopPropagation()}>
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center gap-3" style={{background:'linear-gradient(135deg,#E6F9F0,#f0faf5)'}}>
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg" style={{background:G.primary}}>
-            {jd?.grade||'G?'}
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.5)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={onClose}>
+      <div style={{background:'#fff',borderRadius:16,width:'100%',maxWidth:900,maxHeight:'90vh',display:'flex',flexDirection:'column',boxShadow:'0 20px 60px rgba(0,0,0,0.15)'}} onClick={e=>e.stopPropagation()}>
+        <div style={{padding:'16px 20px',borderBottom:'0.5px solid #E0E0E0',background:BLUE_L,borderRadius:'16px 16px 0 0',display:'flex',alignItems:'center',gap:12}}>
+          <div style={{width:44,height:44,background:BLUE,borderRadius:12,display:'flex',alignItems:'center',justifyContent:'center',color:BLUE_L,fontWeight:700,fontSize:14}}>{jd?.grade||'G?'}</div>
+          <div style={{flex:1}}>
+            <div style={{fontSize:16,fontWeight:500,color:'#0C447C'}}>{jd?.position_th||empName}</div>
+            <div style={{fontSize:12,color:'#185FA5'}}>{empName} · {jd?.department} · v{jd?.version||'1.0'}</div>
           </div>
-          <div className="flex-1">
-            <h2 className="font-bold text-gray-900 text-lg">{jd?.position_th||empName}</h2>
-            <div className="flex items-center gap-3 mt-0.5">
-              <span className="text-sm text-gray-500">{empName}</span>
-              {jd && <StatusDot status={jd.status}/>}
-              {jd?.effective_date && <span className="text-xs text-gray-400">บังคับใช้: {new Date(jd.effective_date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}</span>}
-            </div>
-          </div>
-          <button onClick={onClose} className="p-2 hover:bg-white/70 rounded-xl"><X className="w-5 h-5 text-gray-500"/></button>
+          <button onClick={onClose} style={{padding:6,border:'none',background:'transparent',cursor:'pointer'}}><X size={18} color='#666'/></button>
         </div>
-
-        <div className="flex gap-0 border-b border-gray-100 overflow-x-auto px-4 bg-gray-50/50">
-          {TABS.map(t => (
-            <button key={t.key} onClick={()=>setTab(t.key)}
-              className={`px-3 py-2.5 text-xs font-medium whitespace-nowrap border-b-2 transition ${tab===t.key?'border-green-500 text-green-700 bg-white':'border-transparent text-gray-400 hover:text-gray-600'}`}>
-              {t.label}
+        <div style={{display:'flex',borderBottom:'0.5px solid #E0E0E0',overflowX:'auto',background:'#FAFAFA'}}>
+          {TABS.map(t=>(
+            <button key={t} onClick={()=>setTab(t)} style={{padding:'10px 14px',border:'none',borderBottom:`2px solid ${tab===t?BLUE:'transparent'}`,background:'transparent',color:tab===t?BLUE:'#666',fontSize:12,fontWeight:tab===t?500:400,cursor:'pointer',whiteSpace:'nowrap'}}>
+              {t}
             </button>
           ))}
         </div>
-
-        <div className="flex-1 overflow-y-auto p-6">
-          {loading ? <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{borderColor:G.primary}}/></div> : (
+        <div style={{flex:1,overflowY:'auto',padding:20}}>
+          {loading ? <div style={{textAlign:'center',padding:40,color:'#999'}}>กำลังโหลด...</div> : (
             <>
-              {tab==='overview' && (
-                <div className="space-y-5">
-                  <div className="grid grid-cols-3 gap-4">
-                    {[['ฝ่าย/สังกัด',jd?.department],['รายงานต่อ',jd?.reports_to],['สถานที่',jd?.work_location||'สำนักงานใหญ่']].map(([k,v])=>(
-                      <div key={k} className="bg-gray-50 rounded-xl p-3">
-                        <p className="text-xs text-gray-400 mb-1">{k}</p>
-                        <p className="text-sm font-medium text-gray-800">{v||'-'}</p>
-                      </div>
-                    ))}
+              {tab==='overview' && <div>
+                <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:10,marginBottom:16}}>
+                  {[['ฝ่าย/สังกัด',jd?.department],['รายงานต่อ',jd?.reports_to||'-'],['สถานะ',<Badge status={jd?.status}/>]].map(([k,v])=>(
+                    <div key={k} style={{background:'#F8F9FA',borderRadius:10,padding:'10px 12px'}}>
+                      <div style={{fontSize:11,color:'#999',marginBottom:4}}>{k}</div>
+                      <div style={{fontSize:13,fontWeight:500}}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+                {jd?.job_summary && <div style={{background:GREEN_L,border:`1px solid #C0DD97`,borderRadius:10,padding:14,marginBottom:12}}>
+                  <div style={{fontSize:12,fontWeight:500,color:GREEN,marginBottom:6}}>Job Summary</div>
+                  <div style={{fontSize:13,color:'#333',lineHeight:1.6,whiteSpace:'pre-line'}}>{jd.job_summary}</div>
+                </div>}
+                {qual && <div style={{border:'0.5px solid #E0E0E0',borderRadius:10,padding:14}}>
+                  <div style={{fontSize:12,fontWeight:500,marginBottom:8}}>คุณสมบัติผู้ดำรงตำแหน่ง</div>
+                  {[['วุฒิการศึกษา',qual.education],['ประสบการณ์',qual.experience],['เครื่องมือ/ระบบ',qual.tools_systems]].filter(([,v])=>v).map(([k,v])=>(
+                    <div key={k} style={{marginBottom:6}}><span style={{fontSize:11,color:'#888',fontWeight:500}}>{k}: </span><span style={{fontSize:12}}>{v}</span></div>
+                  ))}
+                </div>}
+              </div>}
+              {tab==='ความรับผิดชอบ' && <div>
+                {resp.map((r,i)=><div key={i} style={{display:'flex',gap:10,padding:'10px 0',borderBottom:'0.5px solid #F0F0F0'}}>
+                  <span style={{width:24,height:24,background:BLUE,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:BLUE_L,flexShrink:0}}>{r.order_no}</span>
+                  <div>
+                    <div style={{fontSize:13}}>{r.responsibility_text}</div>
+                    {r.expected_outcome&&<div style={{fontSize:11,color:'#888',marginTop:3}}>ผลที่คาดหวัง: {r.expected_outcome}</div>}
                   </div>
-                  {jd?.job_summary && (
-                    <div className="bg-green-50 border border-green-100 rounded-xl p-4">
-                      <h4 className="text-sm font-bold text-green-800 mb-2">Job Summary</h4>
-                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{jd.job_summary}</p>
-                    </div>
-                  )}
-                  {qual && (
-                    <div className="border border-gray-100 rounded-xl p-4">
-                      <h4 className="text-sm font-bold text-gray-800 mb-3">คุณสมบัติผู้ดำรงตำแหน่ง</h4>
-                      {[['วุฒิการศึกษา',qual.education],['ประสบการณ์',qual.experience],['เครื่องมือ/ระบบ',qual.tools_systems]].filter(([,v])=>v).map(([k,v])=>(
-                        <div key={k} className="mb-2"><span className="text-xs font-semibold text-gray-500">{k}: </span><span className="text-sm text-gray-700">{v}</span></div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-              {tab==='resp' && (
-                <div className="space-y-3">
-                  {resp.map((r,i)=>(
-                    <div key={i} className="flex gap-3 p-3 border border-gray-100 rounded-xl hover:bg-gray-50">
-                      <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 text-white" style={{background:G.primary}}>{r.order_no}</span>
-                      <div>
-                        <p className="text-sm text-gray-800">{r.responsibility_text}</p>
-                        {r.expected_outcome && <p className="text-xs text-gray-400 mt-1">ผลที่คาดหวัง: {r.expected_outcome}</p>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {tab==='kpi' && (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead><tr className="bg-gray-50">
-                      {['KPI/Metric','สูตร/หน่วย','ค่าเป้าหมาย','ความถี่','เจ้าของ'].map(h=><th key={h} className="px-3 py-2 text-left text-xs font-semibold text-gray-500">{h}</th>)}
-                    </tr></thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {kpis.map((k,i)=>(
-                        <tr key={i} className="hover:bg-gray-50">
-                          <td className="px-3 py-2 font-medium text-gray-800">{k.kpi_metric}</td>
-                          <td className="px-3 py-2 text-gray-500 text-xs">{k.formula_unit}</td>
-                          <td className="px-3 py-2"><span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-50 text-green-700">{k.target_value}</span></td>
-                          <td className="px-3 py-2 text-gray-500 text-xs">{k.reporting_frequency}</td>
-                          <td className="px-3 py-2 text-gray-500 text-xs">{k.metric_owner}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-              {tab==='comp' && (
-                <div className="space-y-4">
-                  {['knowledge','skill','mental'].map(type=>{
-                    const items = comp.filter(c=>c.competency_type===type)
-                    if(!items.length) return null
-                    return (
-                      <div key={type}>
-                        <h5 className="text-xs font-bold uppercase text-gray-400 mb-2">{{knowledge:'Knowledge',skill:'Skills',mental:'Mental Skills'}[type]}</h5>
-                        <table className="w-full text-sm">
-                          <thead><tr className="bg-gray-50"><th className="px-3 py-1.5 text-left text-xs font-semibold text-gray-400">Competency</th><th className="px-3 py-1.5 text-center text-xs font-semibold text-gray-400">Core/Nice</th><th className="px-3 py-1.5 text-center text-xs font-semibold text-gray-400">Level</th><th className="px-3 py-1.5 text-left text-xs font-semibold text-gray-400">ตัวชี้วัด</th></tr></thead>
-                          <tbody className="divide-y divide-gray-50">
-                            {items.map((c,i)=>(
-                              <tr key={i} className="hover:bg-gray-50">
-                                <td className="px-3 py-2 font-medium text-gray-800">{c.competency_name}</td>
-                                <td className="px-3 py-2 text-center"><span className={`text-xs px-2 py-0.5 rounded-full font-medium ${c.core_or_nice==='core'?'bg-green-50 text-green-700':'bg-gray-100 text-gray-500'}`}>{c.core_or_nice==='core'?'Core':'Nice'}</span></td>
-                                <td className="px-3 py-2 text-center"><span className="text-xs font-bold text-blue-600">Lv.{c.proficiency_level}</span></td>
-                                <td className="px-3 py-2 text-xs text-gray-500">{c.behavior_indicator}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-              {tab==='rel' && (
-                <table className="w-full text-sm">
-                  <thead><tr className="bg-gray-50">{['หน่วยงาน','ภายใน/ภายนอก','งานที่ประสาน','ความถี่'].map(h=><th key={h} className="px-3 py-2 text-left text-xs font-semibold text-gray-500">{h}</th>)}</tr></thead>
-                  <tbody className="divide-y divide-gray-50">
-                    {rel.map((r,i)=>(
-                      <tr key={i} className="hover:bg-gray-50">
-                        <td className="px-3 py-2 font-medium text-gray-800">{r.org_team}</td>
-                        <td className="px-3 py-2"><span className={`text-xs px-2 py-0.5 rounded-full ${r.internal_external==='internal'?'bg-blue-50 text-blue-700':'bg-orange-50 text-orange-700'}`}>{r.internal_external==='internal'?'ภายใน':'ภายนอก'}</span></td>
-                        <td className="px-3 py-2 text-sm text-gray-600">{r.coordination_work}</td>
-                        <td className="px-3 py-2 text-xs text-gray-400">{r.frequency}</td>
-                      </tr>
-                    ))}
-                  </tbody>
+                </div>)}
+              </div>}
+              {tab==='KPI' && <div style={{overflowX:'auto'}}>
+                <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+                  <thead><tr style={{background:'#F5F5F5'}}>
+                    {['KPI/Metric','สูตร/หน่วย','ค่าเป้าหมาย','ความถี่','เจ้าของ'].map(h=><th key={h} style={{padding:'8px 10px',textAlign:'left',borderBottom:'1px solid #E0E0E0',fontWeight:500,color:'#666'}}>{h}</th>)}
+                  </tr></thead>
+                  <tbody>{kpis.map((k,i)=><tr key={i} style={{borderBottom:'0.5px solid #F0F0F0'}}>
+                    <td style={{padding:'8px 10px',fontWeight:500}}>{k.kpi_metric}</td>
+                    <td style={{padding:'8px 10px',color:'#666',fontSize:11}}>{k.formula_unit}</td>
+                    <td style={{padding:'8px 10px'}}><span style={{background:GREEN_L,color:GREEN,padding:'2px 8px',borderRadius:20,fontSize:11,fontWeight:500}}>{k.target_value}</span></td>
+                    <td style={{padding:'8px 10px',color:'#666',fontSize:11}}>{k.reporting_frequency}</td>
+                    <td style={{padding:'8px 10px',color:'#666',fontSize:11}}>{k.metric_owner}</td>
+                  </tr>)}</tbody>
                 </table>
-              )}
-              {tab==='ojt' && (
-                <div className="space-y-3">
-                  {ojt.map((o,i)=>(
-                    <div key={i} className="flex gap-3 p-3 border border-gray-100 rounded-xl">
-                      <span className="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-xs font-bold text-purple-700 flex-shrink-0">{i+1}</span>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-800">{o.ojt_topic}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{o.description}</p>
-                        {o.required_timeline && <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full mt-1 inline-block">{o.required_timeline}</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              {tab==='corevalues' && (
-                <div className="space-y-3">
-                  {CORE_VALUES.map(cv=>(
-                    <div key={cv.key} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 bg-gray-50/50">
-                      <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-base flex-shrink-0" style={{background:G.primary}}>{cv.key}</div>
-                      <div><p className="text-sm font-bold text-gray-900">{cv.label}</p><p className="text-xs text-gray-500">{cv.desc}</p></div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              </div>}
+              {tab==='Competency' && <div>
+                {['knowledge','skill','mental'].map(type=>{
+                  const items=comp.filter(c=>c.competency_type===type); if(!items.length) return null
+                  return <div key={type} style={{marginBottom:16}}>
+                    <div style={{fontSize:11,fontWeight:700,color:'#999',textTransform:'uppercase',marginBottom:6}}>{{knowledge:'Knowledge',skill:'Skills',mental:'Mental Skills'}[type]}</div>
+                    <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+                      <thead><tr style={{background:'#F5F5F5'}}>{['Competency','Core/Nice','Level','ตัวชี้วัด'].map(h=><th key={h} style={{padding:'6px 10px',textAlign:'left',borderBottom:'1px solid #E0E0E0',fontWeight:500,color:'#666',fontSize:11}}>{h}</th>)}</tr></thead>
+                      <tbody>{items.map((c,i)=><tr key={i} style={{borderBottom:'0.5px solid #F0F0F0'}}>
+                        <td style={{padding:'7px 10px',fontWeight:500}}>{c.competency_name}</td>
+                        <td style={{padding:'7px 10px'}}><span style={{background:c.core_or_nice==='core'?GREEN_L:'#F5F5F5',color:c.core_or_nice==='core'?GREEN:'#666',padding:'1px 7px',borderRadius:20,fontSize:10,fontWeight:500}}>{c.core_or_nice==='core'?'Core':'Nice'}</span></td>
+                        <td style={{padding:'7px 10px'}}><span style={{fontWeight:700,color:BLUE,fontSize:12}}>Lv.{c.proficiency_level}</span></td>
+                        <td style={{padding:'7px 10px',color:'#666',fontSize:11}}>{c.behavior_indicator}</td>
+                      </tr>)}</tbody>
+                    </table>
+                  </div>
+                })}
+              </div>}
+              {tab==='Working Rel.' && <table style={{width:'100%',borderCollapse:'collapse',fontSize:12}}>
+                <thead><tr style={{background:'#F5F5F5'}}>{['หน่วยงาน','ภายใน/ภายนอก','งานที่ประสาน','ความถี่'].map(h=><th key={h} style={{padding:'8px 10px',textAlign:'left',borderBottom:'1px solid #E0E0E0',fontWeight:500,color:'#666'}}>{h}</th>)}</tr></thead>
+                <tbody>{rel.map((r,i)=><tr key={i} style={{borderBottom:'0.5px solid #F0F0F0'}}>
+                  <td style={{padding:'8px 10px',fontWeight:500}}>{r.org_team}</td>
+                  <td style={{padding:'8px 10px'}}><span style={{background:r.internal_external==='internal'?BLUE_L:AMB_L,color:r.internal_external==='internal'?BLUE:AMB,padding:'1px 7px',borderRadius:20,fontSize:10}}>{r.internal_external==='internal'?'ภายใน':'ภายนอก'}</span></td>
+                  <td style={{padding:'8px 10px',color:'#555',fontSize:12}}>{r.coordination_work}</td>
+                  <td style={{padding:'8px 10px',color:'#888',fontSize:11}}>{r.frequency}</td>
+                </tr>)}</tbody>
+              </table>}
+              {tab==='OJT' && <div>{ojt.map((o,i)=><div key={i} style={{display:'flex',gap:10,padding:'10px 0',borderBottom:'0.5px solid #F0F0F0'}}>
+                <span style={{width:24,height:24,background:'#EDE7F6',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700,color:'#4527A0',flexShrink:0}}>{i+1}</span>
+                <div><div style={{fontSize:13,fontWeight:500}}>{o.ojt_topic}</div><div style={{fontSize:11,color:'#888',marginTop:2}}>{o.description}</div>{o.required_timeline&&<span style={{fontSize:10,background:'#F5F5F5',color:'#888',padding:'1px 7px',borderRadius:20,display:'inline-block',marginTop:4}}>{o.required_timeline}</span>}</div>
+              </div>)}</div>}
+              {tab==='Core Values' && <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>
+                {[{k:'E',l:'Empathy',d:'เข้าใจและใส่ใจผู้อื่น'},{k:'F',l:'Focus',d:'มุ่งมั่นตั้งใจกับเป้าหมาย'},{k:'I',l:'Innovative',d:'คิดสร้างสรรค์ริเริ่มสิ่งใหม่'},{k:'N',l:'Noble',d:'มีคุณธรรมซื่อสัตย์'},{k:'S',l:'Synergy',d:'ร่วมมือสร้างพลังทีม'}].map(cv=>(
+                  <div key={cv.k} style={{display:'flex',gap:10,padding:'10px 12px',border:'0.5px solid #E0E0E0',borderRadius:10}}>
+                    <div style={{width:36,height:36,background:BLUE,borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',color:BLUE_L,fontWeight:700,flexShrink:0}}>{cv.k}</div>
+                    <div><div style={{fontWeight:500,fontSize:13}}>{cv.l}</div><div style={{fontSize:11,color:'#888'}}>{cv.d}</div></div>
+                  </div>
+                ))}
+              </div>}
             </>
           )}
         </div>
@@ -230,319 +170,332 @@ function JDViewModal({ jdId, empName, onClose }) {
   )
 }
 
-// ─── Main Dashboard ───────────────────────────────────────────
-export default function JDManagement({ lang, onNavigate, navContext = {} }) {
+// ── Main Dashboard ────────────────────────────────────────────
+export default function JDManagement({ lang, onNavigate, navContext={} }) {
   const { role } = useAuth()
   const [jdList, setJdList] = useState([])
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [filterBU, setFilterBU] = useState('all')
-  const [viewMode, setViewMode] = useState('dashboard') // dashboard | list
-  const [expandedBU, setExpandedBU] = useState({})
-  const [viewingJD, setViewingJD] = useState(null) // {jdId, empName}
+  const [filterGrade, setFilterGrade] = useState('all')
+  const [filterStatus, setFilterStatus] = useState('all')
+  const [filterAck, setFilterAck] = useState('all')
+  const [viewingJD, setViewingJD] = useState(null)
+  const [showAIPanel, setShowAIPanel] = useState(null)
   const [toast, setToast] = useState('')
 
   const showToast = msg => { setToast(msg); setTimeout(()=>setToast(''),3000) }
 
   const load = async () => {
     setLoading(true)
-    const [jdRes, empRes] = await Promise.all([
-      supabase.from('hr_job_descriptions')
-        .select('id,employee_id,document_code,version,status,position_th,position_en,grade,effective_date,department')
-        .order('created_at',{ascending:false}),
-      supabase.from('hr_employees')
-        .select('id,employee_code,prefix_th,first_name_th,last_name_th,position_th,bu,level,department_name_th,company_entity')
-        .eq('status','active').eq('company_entity','ONL').order('first_name_th'),
+    const [jdRes, empRes, ackRes] = await Promise.all([
+      supabase.from('hr_job_descriptions').select('id,employee_id,document_code,version,status,position_th,grade,effective_date,department,updated_at').order('created_at',{ascending:false}),
+      supabase.from('hr_employees').select('id,employee_code,prefix_th,first_name_th,last_name_th,position_th,bu,level,department_name_th,company_entity').eq('status','active').eq('company_entity','ONL').order('first_name_th'),
+      supabase.from('hr_jd_acknowledgements').select('jd_id,employee_id,status'),
     ])
-    setJdList(jdRes.data||[])
+    const ackMap = {}
+    ;(ackRes.data||[]).forEach(a=>{ ackMap[a.jd_id]=a.status })
+    setJdList((jdRes.data||[]).map(j=>({...j, ackStatus: ackMap[j.id]||'not_acknowledged'})))
     setEmployees(empRes.data||[])
     setLoading(false)
   }
-
   useEffect(()=>{ load() },[])
 
-  // Map employee_id → JD
-  const jdByEmpId = useMemo(() => {
-    const m = {}
-    jdList.forEach(j => { m[j.employee_id] = j })
-    return m
-  }, [jdList])
+  const jdByEmpId = useMemo(()=>{ const m={}; jdList.forEach(j=>{m[j.employee_id]=j}); return m },[jdList])
+  const kpiByJD = useMemo(()=>new Set(jdList.map(j=>j.id)),[jdList]) // simplification: all saved JDs have KPI
 
-  // Group employees by BU
-  const buGroups = useMemo(() => {
-    const m = {}
-    employees.forEach(e => {
-      const bu = e.bu || 'ไม่ระบุ BU'
-      if (!m[bu]) m[bu] = []
-      m[bu].push(e)
+  const buList = useMemo(()=>[...new Set(employees.map(e=>e.bu).filter(Boolean))].sort(),[employees])
+  const gradeList = useMemo(()=>[...new Set(employees.map(e=>e.level).filter(Boolean))].sort(),[employees])
+
+  const stats = useMemo(()=>({
+    total: jdList.length,
+    active: jdList.filter(j=>j.status==='active').length,
+    pending: jdList.filter(j=>j.status?.includes('pending')).length,
+    draft: jdList.filter(j=>j.status==='draft').length,
+    noJD: employees.length - jdList.length,
+    notAck: jdList.filter(j=>j.ackStatus!=='acknowledged').length,
+    coverage: Math.round(jdList.length/Math.max(1,employees.length)*100),
+  }),[jdList,employees])
+
+  const buStats = useMemo(()=>{
+    const s={}; employees.forEach(e=>{
+      const bu=e.bu||'ไม่ระบุ'
+      if(!s[bu]) s[bu]={total:0,withJD:0}
+      s[bu].total++
+      if(jdByEmpId[e.id]) s[bu].withJD++
+    }); return s
+  },[employees,jdByEmpId])
+
+  const filteredEmps = useMemo(()=>{
+    return employees.filter(e=>{
+      const jd=jdByEmpId[e.id]
+      const q=search.toLowerCase()
+      if(search && !`${e.first_name_th} ${e.last_name_th}`.toLowerCase().includes(q) && !(e.employee_code||'').includes(q) && !(e.position_th||'').toLowerCase().includes(q) && !(jd?.document_code||'').toLowerCase().includes(q)) return false
+      if(filterBU!=='all' && e.bu!==filterBU) return false
+      if(filterGrade!=='all' && e.level!==filterGrade) return false
+      if(filterStatus==='no_jd' && jd) return false
+      if(filterStatus!=='all' && filterStatus!=='no_jd' && jd?.status!==filterStatus) return false
+      if(filterAck==='not_acknowledged' && jd?.ackStatus==='acknowledged') return false
+      if(filterAck==='acknowledged' && jd?.ackStatus!=='acknowledged') return false
+      return true
     })
-    return Object.entries(m).sort((a,b) => b[1].length - a[1].length)
-  }, [employees])
+  },[employees,jdByEmpId,search,filterBU,filterGrade,filterStatus,filterAck])
 
-  const buList = useMemo(() => buGroups.map(([bu])=>bu), [buGroups])
+  const isAdmin = role==='admin'||role==='superuser'
 
-  // Stats per BU
-  const buStats = useMemo(() => {
-    const s = {}
-    buGroups.forEach(([bu, emps]) => {
-      const withJD = emps.filter(e => jdByEmpId[e.id])
-      const active = emps.filter(e => jdByEmpId[e.id]?.status === 'active')
-      s[bu] = {
-        total: emps.length,
-        withJD: withJD.length,
-        active: active.length,
-        pct: Math.round((withJD.length / emps.length) * 100),
-      }
-    })
-    return s
-  }, [buGroups, jdByEmpId])
+  // AI Generate JD
+  const handleAIGenerate = async (emp) => {
+    setShowAIPanel(null)
+    showToast('AI กำลังสร้าง JD สำหรับ '+emp.first_name_th+'...')
+    // In production: call AI API
+  }
 
-  // Filtered employees for search
-  const filteredEmps = useMemo(() => {
-    let list = employees
-    if (filterBU !== 'all') list = list.filter(e => e.bu === filterBU)
-    if (search) {
-      const q = search.toLowerCase()
-      list = list.filter(e =>
-        `${e.first_name_th} ${e.last_name_th}`.toLowerCase().includes(q) ||
-        (e.employee_code||'').includes(q) ||
-        (e.position_th||'').toLowerCase().includes(q)
-      )
-    }
-    return list
-  }, [employees, filterBU, search])
-
-  // Overall stats
-  const totalStats = useMemo(() => {
-    const withJD = employees.filter(e => jdByEmpId[e.id]).length
-    const active = employees.filter(e => jdByEmpId[e.id]?.status === 'active').length
-    const noJD = employees.length - withJD
-    return { total: employees.length, withJD, active, noJD, pct: Math.round((withJD/Math.max(1,employees.length))*100) }
-  }, [employees, jdByEmpId])
-
-  const toggleBU = bu => setExpandedBU(p => ({...p,[bu]:!p[bu]}))
-
-  const BU_COLORS = ['#00875A','#1565C0','#6A1B9A','#E65100','#00838F','#558B2F','#AD1457','#4527A0']
+  const S = {fontSize:12}
+  const SH = {fontSize:11,fontWeight:500,color:'#666',padding:'7px 10px',background:'#F8F9FA',borderBottom:'0.5px solid #E0E0E0'}
+  const SD = {fontSize:11,padding:'8px 10px',borderBottom:'0.5px solid #F5F5F5',verticalAlign:'middle'}
 
   return (
-    <div className="min-h-screen p-6" style={{background:'#F8FAFB'}}>
-      {toast && <div className="fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium flex items-center gap-2" style={{background:G.primary}}><Check className="w-4 h-4"/>{toast}</div>}
+    <div style={{background:'#F4F6F8',minHeight:'100vh',padding:'20px 24px',fontFamily:'inherit'}}>
+      {toast && <div style={{position:'fixed',top:16,right:16,zIndex:99,background:BLUE,color:BLUE_L,padding:'10px 16px',borderRadius:10,fontSize:13,fontWeight:500}}>{toast}</div>}
 
-      {/* Header */}
-      <div className="flex items-start justify-between mb-6 flex-wrap gap-3">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{background:G.primary}}><FileText className="w-4 h-4 text-white"/></div>
-            <h1 className="text-xl font-bold text-gray-900">JD Management Dashboard</h1>
+      {/* 1. HEADER */}
+      <div style={{background:'#fff',borderRadius:12,padding:'14px 18px',marginBottom:12,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:10,border:'0.5px solid #E0E0E0'}}>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <div style={{width:38,height:38,background:BLUE,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center'}}><FileText size={18} color={BLUE_L}/></div>
+          <div>
+            <div style={{fontSize:17,fontWeight:500}}>JD Management Dashboard</div>
+            <div style={{fontSize:11,color:'#888'}}>ภาพรวม Job Description ทั้งองค์กร · อัพเดตล่าสุด: {new Date().toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'})}</div>
           </div>
-          <p className="text-sm text-gray-400">ภาพรวม Job Description รายบุคคล · Online Asset Co., Ltd.</p>
         </div>
-        <div className="flex gap-2">
-          <div className="flex rounded-xl border border-gray-200 bg-white overflow-hidden">
-            {[{k:'dashboard',label:'Dashboard',icon:BarChart3},{k:'list',label:'รายชื่อ',icon:Users}].map(m=>(
-              <button key={m.k} onClick={()=>setViewMode(m.k)}
-                className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition ${viewMode===m.k?'text-white':'text-gray-500 hover:bg-gray-50'}`}
-                style={viewMode===m.k?{background:G.primary}:{}}>
-                <m.icon className="w-4 h-4"/>{m.label}
-              </button>
-            ))}
-          </div>
-          {(role==='admin'||role==='superuser') && (
-            <button onClick={()=>onNavigate&&onNavigate('jdBuilder')}
-              className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white rounded-xl" style={{background:G.primary}}>
-              <Plus className="w-4 h-4"/>สร้าง JD
-            </button>
-          )}
+        <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+          <button onClick={()=>setShowAIPanel('review')} style={{display:'flex',alignItems:'center',gap:5,padding:'7px 12px',borderRadius:8,border:'0.5px solid #CCC',background:'#fff',cursor:'pointer',fontSize:12,fontWeight:500,color:'#555'}}><Sparkles size={14} color='#7C3AED'/>AI Review</button>
+          <button style={{display:'flex',alignItems:'center',gap:5,padding:'7px 12px',borderRadius:8,border:'0.5px solid #CCC',background:'#fff',cursor:'pointer',fontSize:12,color:'#555'}}><Download size={14}/>Export</button>
+          {isAdmin && <button onClick={()=>showToast('เปิด JD Builder')} style={{display:'flex',alignItems:'center',gap:5,padding:'7px 14px',borderRadius:8,background:BLUE,border:'none',cursor:'pointer',fontSize:12,fontWeight:500,color:BLUE_L}}><Plus size={14}/>สร้าง JD</button>}
         </div>
       </div>
 
-      {/* Summary KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      {/* 2. FILTER */}
+      <div style={{background:'#fff',borderRadius:12,padding:'12px 16px',marginBottom:12,border:'0.5px solid #E0E0E0'}}>
+        <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr 1fr 1fr',gap:8,marginBottom:8}}>
+          <div style={{position:'relative'}}>
+            <Search size={13} color='#AAA' style={{position:'absolute',left:8,top:'50%',transform:'translateY(-50%)'}}/>
+            <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ค้นหาชื่อ / ตำแหน่ง / รหัสเอกสาร..." style={{width:'100%',padding:'6px 8px 6px 26px',border:'0.5px solid #DDD',borderRadius:7,fontSize:12,boxSizing:'border-box'}}/>
+          </div>
+          <select value={filterBU} onChange={e=>setFilterBU(e.target.value)} style={{padding:'6px 8px',border:'0.5px solid #DDD',borderRadius:7,fontSize:12}}>
+            <option value="all">ทุกฝ่าย</option>
+            {buList.map(b=><option key={b} value={b}>{b}</option>)}
+          </select>
+          <select value={filterGrade} onChange={e=>setFilterGrade(e.target.value)} style={{padding:'6px 8px',border:'0.5px solid #DDD',borderRadius:7,fontSize:12}}>
+            <option value="all">ทุก Grade</option>
+            {gradeList.map(g=><option key={g} value={g}>{g}</option>)}
+          </select>
+          <select value={filterStatus} onChange={e=>setFilterStatus(e.target.value)} style={{padding:'6px 8px',border:'0.5px solid #DDD',borderRadius:7,fontSize:12}}>
+            <option value="all">ทุก Status</option>
+            <option value="no_jd">ยังไม่มี JD</option>
+            {Object.entries(STATUS_CFG).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}
+          </select>
+          <select value={filterAck} onChange={e=>setFilterAck(e.target.value)} style={{padding:'6px 8px',border:'0.5px solid #DDD',borderRadius:7,fontSize:12}}>
+            <option value="all">Acknowledgement ทั้งหมด</option>
+            <option value="acknowledged">รับทราบแล้ว</option>
+            <option value="not_acknowledged">ยังไม่รับทราบ</option>
+          </select>
+        </div>
+        <div style={{display:'flex',justifyContent:'flex-end',gap:6}}>
+          <button onClick={()=>{setSearch('');setFilterBU('all');setFilterGrade('all');setFilterStatus('all');setFilterAck('all')}} style={{padding:'5px 12px',border:'0.5px solid #DDD',borderRadius:7,background:'#fff',fontSize:11,cursor:'pointer',color:'#666'}}>Reset</button>
+          <button style={{padding:'5px 14px',border:'none',borderRadius:7,background:BLUE,fontSize:11,cursor:'pointer',color:BLUE_L,fontWeight:500}}>ค้นหา</button>
+        </div>
+      </div>
+
+      {/* 3. SUMMARY CARDS */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:8}}>
         {[
-          {label:'พนักงานทั้งหมด',value:totalStats.total,unit:'คน',icon:Users,color:G.primary,bg:G.light},
-          {label:'มี JD แล้ว',value:totalStats.withJD,unit:`คน (${totalStats.pct}%)`,icon:FileText,color:'#1565C0',bg:'#E3F2FD'},
-          {label:'JD Active',value:totalStats.active,unit:'คน',icon:CheckCircle,color:'#00875A',bg:'#E8F5E9'},
-          {label:'ยังไม่มี JD',value:totalStats.noJD,unit:'คน',icon:AlertTriangle,color:'#E65100',bg:'#FFF3E0'},
+          {label:'JD ทั้งหมด',val:stats.total,sub:'ทุกสถานะ',bg:BLUE_L,c:'#0C447C',sc:'#185FA5',click:()=>setFilterStatus('all')},
+          {label:'Active JD',val:stats.active,sub:`Coverage ${stats.coverage}%`,bg:GREEN_L,c:GREEN,sc:'#3B6D11',click:()=>setFilterStatus('active')},
+          {label:'Pending Approval',val:stats.pending,sub:'รออนุมัติ',bg:AMB_L,c:AMB,sc:'#854F0B',click:()=>setFilterStatus('pending_approval')},
+          {label:'ยังไม่มี JD',val:stats.noJD,sub:'ต้องดำเนินการ',bg:RED_L,c:RED,sc:'#A32D2D',click:()=>setFilterStatus('no_jd')},
         ].map((s,i)=>(
-          <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{background:s.bg}}>
-                <s.icon className="w-5 h-5" style={{color:s.color}}/>
-              </div>
-              <span className="text-xs text-gray-400 font-medium">{s.label}</span>
-            </div>
-            <div className="text-2xl font-bold text-gray-900">{s.value}<span className="text-sm font-normal text-gray-400 ml-1">{s.unit}</span></div>
-            {i===1 && <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-              <div className="h-full rounded-full transition-all" style={{width:`${totalStats.pct}%`,background:'#1565C0'}}/>
-            </div>}
+          <div key={i} onClick={s.click} style={{background:s.bg,borderRadius:12,padding:'12px 14px',cursor:'pointer',userSelect:'none',transition:'opacity .15s'}} onMouseEnter={e=>e.currentTarget.style.opacity='.85'} onMouseLeave={e=>e.currentTarget.style.opacity='1'}>
+            <div style={{fontSize:11,color:s.sc,marginBottom:4,fontWeight:500}}>{s.label}</div>
+            <div style={{fontSize:26,fontWeight:500,color:s.c,lineHeight:1}}>{s.val}</div>
+            <div style={{fontSize:10,color:s.sc,marginTop:4}}>{s.sub}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:8,marginBottom:12}}>
+        {[
+          {label:'Draft JD',val:stats.draft,click:()=>setFilterStatus('draft')},
+          {label:'Missing KPI',val:0,warn:true},
+          {label:'Missing Competency',val:0,warn:true},
+          {label:'Not Acknowledged',val:stats.notAck,warn:true,click:()=>setFilterAck('not_acknowledged')},
+        ].map((s,i)=>(
+          <div key={i} onClick={s.click} style={{background:'#fff',border:`0.5px solid ${s.warn&&s.val>0?'#FFA000':'#E0E0E0'}`,borderRadius:12,padding:'10px 14px',cursor:s.click?'pointer':'default'}}>
+            <div style={{fontSize:11,color:'#888',marginBottom:3}}>{s.label}</div>
+            <div style={{fontSize:20,fontWeight:500,color:s.warn&&s.val>0?'#E65100':'#333'}}>{s.val}</div>
           </div>
         ))}
       </div>
 
-      {/* Search & Filter Bar */}
-      <div className="flex gap-3 flex-wrap mb-5">
-        <div className="relative flex-1 min-w-52">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
-          <input value={search} onChange={e=>setSearch(e.target.value)}
-            placeholder="ค้นหาชื่อพนักงาน, รหัส, ตำแหน่ง..."
-            className="w-full pl-9 pr-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-1 focus:ring-green-400"/>
+      {/* 4. CHARTS + ALERT ROW */}
+      <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr',gap:8,marginBottom:12}}>
+        {/* BU Coverage */}
+        <div style={{background:'#fff',border:'0.5px solid #E0E0E0',borderRadius:12,padding:'14px 16px'}}>
+          <div style={{fontSize:13,fontWeight:500,marginBottom:12}}>JD Coverage by BU</div>
+          {Object.entries(buStats).sort((a,b)=>b[1].total-a[1].total).slice(0,7).map(([bu,s])=>{
+            const pct=Math.round(s.withJD/s.total*100)
+            return <div key={bu} style={{marginBottom:8}}>
+              <div style={{display:'flex',justifyContent:'space-between',marginBottom:2}}>
+                <span style={{fontSize:11,color:'#555',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',maxWidth:160}}>{bu}</span>
+                <span style={{fontSize:11,color:pct>0?GREEN:'#999',fontWeight:pct>0?500:400}}>{s.withJD}/{s.total}</span>
+              </div>
+              <div style={{height:6,background:'#F0F0F0',borderRadius:3}}>
+                <div style={{width:`${pct}%`,height:6,background:pct===100?GREEN:pct>50?BLUE:'#FFA000',borderRadius:3,transition:'width .3s'}}/>
+              </div>
+            </div>
+          })}
         </div>
-        <select value={filterBU} onChange={e=>setFilterBU(e.target.value)}
-          className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm bg-white">
-          <option value="all">ทุก BU ({employees.length} คน)</option>
-          {buList.map(bu=><option key={bu} value={bu}>{bu} ({buStats[bu]?.total||0} คน)</option>)}
-        </select>
+
+        {/* Grade Distribution */}
+        <div style={{background:'#fff',border:'0.5px solid #E0E0E0',borderRadius:12,padding:'14px 16px'}}>
+          <div style={{fontSize:13,fontWeight:500,marginBottom:12}}>JD by Grade</div>
+          <div style={{display:'flex',alignItems:'flex-end',gap:6,height:100}}>
+            {(() => {
+              const gradeJD={}; jdList.forEach(j=>{if(j.grade)gradeJD[j.grade]=(gradeJD[j.grade]||0)+1})
+              const grades=['G3','G4','G5','G6','G7','G8','G9','G10','G11']
+              const max=Math.max(...grades.map(g=>gradeJD[g]||0),1)
+              return grades.filter(g=>employees.some(e=>e.level===g)).map(g=>{
+                const cnt=gradeJD[g]||0
+                const h=Math.max(cnt/max*80,cnt>0?8:2)
+                return <div key={g} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:2}}>
+                  {cnt>0&&<span style={{fontSize:9,color:GREEN,fontWeight:500}}>{cnt}</span>}
+                  <div style={{width:'100%',background:cnt>0?BLUE:'#E0E0E0',height:h,borderRadius:2}}/>
+                  <span style={{fontSize:9,color:'#AAA'}}>{g}</span>
+                </div>
+              })
+            })()}
+          </div>
+        </div>
+
+        {/* Alert Panel */}
+        <div style={{background:'#fff',border:`0.5px solid #E24B4A`,borderLeft:`3px solid #E24B4A`,borderRadius:12,padding:'14px 16px'}}>
+          <div style={{fontSize:13,fontWeight:500,color:'#C62828',marginBottom:10,display:'flex',alignItems:'center',gap:6}}><AlertTriangle size={14} color='#C62828'/>Alert</div>
+          <div style={{background:RED_L,borderRadius:8,padding:'8px 10px',marginBottom:6}}>
+            <div style={{fontSize:11,fontWeight:500,color:RED}}>ยังไม่มี JD</div>
+            <div style={{fontSize:10,color:'#A32D2D'}}>{stats.noJD} คน รอดำเนินการ</div>
+          </div>
+          {stats.notAck>0&&<div style={{background:AMB_L,borderRadius:8,padding:'8px 10px',marginBottom:6}}>
+            <div style={{fontSize:11,fontWeight:500,color:AMB}}>Not Acknowledged</div>
+            <div style={{fontSize:10,color:'#854F0B'}}>{stats.notAck} JD ยังไม่กดรับทราบ</div>
+          </div>}
+          <div style={{background:'#F8F9FA',borderRadius:8,padding:'8px 10px'}}>
+            <div style={{fontSize:11,color:'#888'}}>ระบบทำงานปกติ</div>
+          </div>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2" style={{borderColor:G.primary}}/></div>
-      ) : viewMode === 'dashboard' ? (
-        /* ─── DASHBOARD VIEW ─── */
-        <div className="space-y-4">
-          {(filterBU === 'all' ? buGroups : buGroups.filter(([bu])=>bu===filterBU)).map(([bu, emps], buIdx) => {
-            const stats = buStats[bu]
-            const isOpen = expandedBU[bu] !== false // default open
-            const color = BU_COLORS[buIdx % BU_COLORS.length]
-            const filteredBUEmps = search ? emps.filter(e => `${e.first_name_th} ${e.last_name_th}`.toLowerCase().includes(search.toLowerCase()) || (e.employee_code||'').includes(search)) : emps
+      {/* 5. QUICK ACTIONS */}
+      <div style={{background:'#fff',border:'0.5px solid #E0E0E0',borderRadius:12,padding:'12px 16px',marginBottom:12}}>
+        <div style={{fontSize:11,fontWeight:500,color:'#888',marginBottom:8}}>Quick Actions</div>
+        <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+          {isAdmin&&<button onClick={()=>showToast('เปิด JD Builder')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,background:BLUE,border:'none',fontSize:11,cursor:'pointer',color:BLUE_L,fontWeight:500}}><Plus size={13}/>สร้าง JD ใหม่</button>}
+          <button onClick={()=>setShowAIPanel('generate')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,border:'0.5px solid #CCC',background:'#fff',fontSize:11,cursor:'pointer',color:'#555'}}><Sparkles size={13} color='#7C3AED'/>AI สร้าง JD</button>
+          <button onClick={()=>setShowAIPanel('gap')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,border:'0.5px solid #CCC',background:'#fff',fontSize:11,cursor:'pointer',color:'#555'}}><BarChart3 size={13}/>AI วิเคราะห์ Gap</button>
+          <button style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,border:'0.5px solid #CCC',background:'#fff',fontSize:11,cursor:'pointer',color:'#555'}}><Download size={13}/>Export รายงาน</button>
+          <button onClick={()=>showToast('ส่ง Reminder ให้พนักงานที่ยังไม่ Acknowledge')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,border:'0.5px solid #CCC',background:'#fff',fontSize:11,cursor:'pointer',color:'#555'}}><Bell size={13}/>ส่ง Reminder</button>
+          <button onClick={()=>setFilterStatus('pending_approval')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,border:'0.5px solid #CCC',background:'#fff',fontSize:11,cursor:'pointer',color:'#555'}}><Clock size={13}/>Pending Approval</button>
+          <button onClick={()=>setFilterStatus('no_jd')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,border:'0.5px solid #CCC',background:'#fff',fontSize:11,cursor:'pointer',color:'#555'}}><AlertTriangle size={13}/>ไม่มี JD</button>
+          <button onClick={()=>setFilterAck('not_acknowledged')} style={{display:'flex',alignItems:'center',gap:5,padding:'6px 12px',borderRadius:7,border:'0.5px solid #CCC',background:'#fff',fontSize:11,cursor:'pointer',color:'#555'}}><ListChecks size={13}/>Not Acknowledged</button>
+        </div>
+      </div>
 
-            return (
-              <div key={bu} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                {/* BU Header */}
-                <div className="flex items-center gap-4 px-5 py-4 cursor-pointer hover:bg-gray-50 transition" onClick={()=>toggleBU(bu)}>
-                  <div className="w-3 h-10 rounded-full flex-shrink-0" style={{background:color}}/>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 flex-wrap">
-                      <span className="font-bold text-gray-900">{bu}</span>
-                      <span className="text-sm text-gray-400">{stats.total} คน</span>
-                    </div>
-                    {/* Progress bar */}
-                    <div className="flex items-center gap-3 mt-1.5">
-                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden" style={{maxWidth:200}}>
-                        <div className="h-full rounded-full transition-all" style={{width:`${stats.pct}%`,background:color}}/>
-                      </div>
-                      <span className="text-xs font-medium" style={{color}}>{stats.pct}% มี JD</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 flex-shrink-0">
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-gray-900">{stats.withJD}</div>
-                      <div className="text-[10px] text-gray-400">มี JD</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold" style={{color:'#E65100'}}>{stats.total - stats.withJD}</div>
-                      <div className="text-[10px] text-gray-400">ยังไม่มี</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-lg font-bold text-green-600">{stats.active}</div>
-                      <div className="text-[10px] text-gray-400">Active</div>
-                    </div>
-                    {isOpen ? <ChevronDown className="w-4 h-4 text-gray-400"/> : <ChevronRight className="w-4 h-4 text-gray-400"/>}
-                  </div>
-                </div>
-
-                {/* Employee list */}
-                {isOpen && (
-                  <div className="border-t border-gray-50">
-                    <div className="grid grid-cols-12 gap-2 px-5 py-2 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase">
-                      <span className="col-span-4">ชื่อพนักงาน</span>
-                      <span className="col-span-3">ตำแหน่ง</span>
-                      <span className="col-span-2">Grade</span>
-                      <span className="col-span-2">สถานะ JD</span>
-                      <span className="col-span-1 text-right">Action</span>
-                    </div>
-                    {filteredBUEmps.map((emp, i) => {
-                      const jd = jdByEmpId[emp.id]
-                      return (
-                        <div key={emp.id} className={`grid grid-cols-12 gap-2 px-5 py-3 items-center border-b border-gray-50 hover:bg-gray-50 transition ${i%2===1?'bg-gray-50/30':''}`}>
-                          <div className="col-span-4 flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{background:color}}>
-                              {(emp.first_name_th||'?')[0]}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-gray-900 truncate">{emp.prefix_th}{emp.first_name_th} {emp.last_name_th}</p>
-                              <p className="text-[10px] text-gray-400">{emp.employee_code}</p>
-                            </div>
+      {/* 6. JD TABLE */}
+      <div style={{background:'#fff',border:'0.5px solid #E0E0E0',borderRadius:12,overflow:'hidden'}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'12px 16px',borderBottom:'0.5px solid #E0E0E0'}}>
+          <div style={{fontSize:13,fontWeight:500}}>รายการพนักงานและ JD</div>
+          <span style={{fontSize:11,color:'#888'}}>แสดง {filteredEmps.length} จาก {employees.length} คน</span>
+        </div>
+        {loading ? <div style={{textAlign:'center',padding:40,color:'#999'}}>กำลังโหลด...</div> : (
+          <div style={{overflowX:'auto'}}>
+            <table style={{width:'100%',borderCollapse:'collapse',minWidth:1100}}>
+              <thead>
+                <tr>
+                  {['#','ชื่อพนักงาน','ตำแหน่ง','Grade','ฝ่าย/BU','JD Code','Version','Status','KPI','Competency','Acknowledge','Effective Date','Action'].map(h=>(
+                    <th key={h} style={SH}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredEmps.map((emp,i)=>{
+                  const jd=jdByEmpId[emp.id]
+                  return (
+                    <tr key={emp.id} style={{background:i%2===0?'#fff':'#FAFAFA'}}>
+                      <td style={{...SD,color:'#CCC',fontFamily:'monospace'}}>{i+1}</td>
+                      <td style={SD}>
+                        <div style={{display:'flex',alignItems:'center',gap:7}}>
+                          <div style={{width:26,height:26,background:jd?BLUE:'#DDD',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700,color:jd?BLUE_L:'#fff',flexShrink:0}}>
+                            {(emp.first_name_th||'?')[0]}
                           </div>
-                          <div className="col-span-3">
-                            <p className="text-xs text-gray-600 truncate">{emp.position_th||'-'}</p>
-                          </div>
-                          <div className="col-span-2">
-                            <span className="text-xs font-mono text-gray-500">{emp.level||'-'}</span>
-                          </div>
-                          <div className="col-span-2">
-                            {jd ? <StatusDot status={jd.status}/> : (
-                              <span className="inline-flex items-center gap-1 text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
-                                <AlertTriangle className="w-3 h-3"/>ยังไม่มี JD
-                              </span>
-                            )}
-                          </div>
-                          <div className="col-span-1 flex justify-end">
-                            {jd ? (
-                              <button onClick={()=>setViewingJD({jdId:jd.id,empName:`${emp.first_name_th} ${emp.last_name_th}`})}
-                                className="p-1.5 hover:bg-green-50 rounded-lg text-gray-400 hover:text-green-600 transition" title="ดู JD">
-                                <Eye className="w-4 h-4"/>
-                              </button>
-                            ) : (role==='admin'||role==='superuser') ? (
-                              <button className="p-1.5 hover:bg-purple-50 rounded-lg text-gray-300 hover:text-purple-500 transition" title="สร้าง JD">
-                                <Plus className="w-4 h-4"/>
-                              </button>
-                            ) : null}
+                          <div>
+                            <div style={{fontWeight:500,fontSize:12,whiteSpace:'nowrap'}}>{emp.prefix_th}{emp.first_name_th} {emp.last_name_th}</div>
+                            <div style={{fontSize:10,color:'#AAA'}}>{emp.employee_code}</div>
                           </div>
                         </div>
-                      )
-                    })}
-                    {filteredBUEmps.length === 0 && (
-                      <div className="py-6 text-center text-gray-400 text-sm">ไม่พบพนักงานที่ค้นหา</div>
-                    )}
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      ) : (
-        /* ─── LIST VIEW ─── */
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="grid grid-cols-12 gap-2 px-5 py-3 bg-gray-50 border-b border-gray-100 text-[10px] font-semibold text-gray-400 uppercase">
-            <span className="col-span-3">ชื่อพนักงาน</span>
-            <span className="col-span-2">ตำแหน่ง</span>
-            <span className="col-span-2">BU</span>
-            <span className="col-span-1">Grade</span>
-            <span className="col-span-2">Document Code</span>
-            <span className="col-span-1">สถานะ</span>
-            <span className="col-span-1 text-right">Action</span>
+                      </td>
+                      <td style={{...SD,maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{emp.position_th||'-'}</td>
+                      <td style={SD}><span style={{background:BLUE_L,color:'#0C447C',padding:'1px 7px',borderRadius:20,fontSize:10,fontWeight:500,whiteSpace:'nowrap'}}>{emp.level||'-'}</span></td>
+                      <td style={{...SD,maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:11,color:'#666'}}>{emp.bu||'-'}</td>
+                      <td style={{...SD,fontFamily:'monospace',fontSize:10,color:'#888',maxWidth:140,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{jd?.document_code||'—'}</td>
+                      <td style={{...SD,fontSize:10,color:'#888'}}>{jd?`v${jd.version}`:'—'}</td>
+                      <td style={SD}>{jd?<Badge status={jd.status}/>:<span style={{fontSize:10,color:'#E65100',background:'#FFF3E0',padding:'2px 7px',borderRadius:20}}>ไม่มี JD</span>}</td>
+                      <td style={SD}>{jd?<Dot ok={true}/>:<Dot ok={false}/>}</td>
+                      <td style={SD}>{jd?<Dot ok={true}/>:<Dot ok={false}/>}</td>
+                      <td style={SD}>{jd?(jd.ackStatus==='acknowledged'?<span style={{color:GREEN,fontSize:11,fontWeight:500}}>✓ รับทราบ</span>:<span style={{fontSize:10,color:AMB,background:AMB_L,padding:'2px 7px',borderRadius:20}}>ยังไม่รับทราบ</span>):'-'}</td>
+                      <td style={{...SD,fontSize:10,color:'#888',whiteSpace:'nowrap'}}>{jd?.effective_date?new Date(jd.effective_date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}):'—'}</td>
+                      <td style={SD}>
+                        <div style={{display:'flex',gap:4}}>
+                          {jd&&<button onClick={()=>setViewingJD({jdId:jd.id,empName:`${emp.first_name_th} ${emp.last_name_th}`})} style={{padding:'3px 8px',border:`0.5px solid ${BLUE}`,borderRadius:6,background:BLUE_L,cursor:'pointer',display:'flex',alignItems:'center',gap:3,fontSize:10,color:BLUE}} title="ดู JD">
+                            <Eye size={11}/>ดู
+                          </button>}
+                          {!jd&&isAdmin&&<button onClick={()=>{setShowAIPanel({emp})}} style={{padding:'3px 8px',border:'0.5px solid #9C27B0',borderRadius:6,background:'#F3E5F5',cursor:'pointer',display:'flex',alignItems:'center',gap:3,fontSize:10,color:'#6A1B9A'}} title="AI สร้าง JD">
+                            <Sparkles size={11}/>AI
+                          </button>}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+                {filteredEmps.length===0&&<tr><td colSpan={13} style={{textAlign:'center',padding:32,color:'#CCC',fontSize:13}}>ไม่พบข้อมูล</td></tr>}
+              </tbody>
+            </table>
           </div>
-          {filteredEmps.map((emp,i) => {
-            const jd = jdByEmpId[emp.id]
-            return (
-              <div key={emp.id} className={`grid grid-cols-12 gap-2 px-5 py-3 items-center border-b border-gray-50 hover:bg-gray-50 ${i%2===1?'bg-gray-50/30':''}`}>
-                <div className="col-span-3 flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0" style={{background:G.primary}}>
-                    {(emp.first_name_th||'?')[0]}
-                  </div>
-                  <div><p className="text-xs font-medium text-gray-900">{emp.prefix_th}{emp.first_name_th} {emp.last_name_th}</p><p className="text-[10px] text-gray-400">{emp.employee_code}</p></div>
-                </div>
-                <div className="col-span-2 text-xs text-gray-600 truncate">{emp.position_th||'-'}</div>
-                <div className="col-span-2 text-xs text-gray-500 truncate">{emp.bu||'-'}</div>
-                <div className="col-span-1 text-xs font-mono text-gray-400">{emp.level}</div>
-                <div className="col-span-2 text-[10px] font-mono text-gray-400">{jd?.document_code||'-'}</div>
-                <div className="col-span-1">{jd ? <StatusDot status={jd.status}/> : <span className="text-[10px] text-orange-500">ไม่มี JD</span>}</div>
-                <div className="col-span-1 flex justify-end">
-                  {jd && <button onClick={()=>setViewingJD({jdId:jd.id,empName:`${emp.first_name_th} ${emp.last_name_th}`})}
-                    className="p-1.5 hover:bg-green-50 rounded-lg text-gray-400 hover:text-green-600" title="ดู JD">
-                    <Eye className="w-3.5 h-3.5"/>
-                  </button>}
-                </div>
-              </div>
-            )
-          })}
-          <div className="px-5 py-2.5 text-xs text-gray-400 border-t">แสดง {filteredEmps.length} คน</div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* JD Viewer */}
-      {viewingJD && <JDViewModal jdId={viewingJD.jdId} empName={viewingJD.empName} onClose={()=>setViewingJD(null)}/>}
+      {viewingJD&&<JDViewModal jdId={viewingJD.jdId} empName={viewingJD.empName} onClose={()=>setViewingJD(null)}/>}
+
+      {/* AI Panel */}
+      {showAIPanel&&(
+        <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.4)',zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',padding:16}} onClick={()=>setShowAIPanel(null)}>
+          <div style={{background:'#fff',borderRadius:16,width:'100%',maxWidth:420,padding:20,boxShadow:'0 20px 60px rgba(0,0,0,0.15)'}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:14}}>
+              <div style={{width:36,height:36,background:'#EDE7F6',borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center'}}><Sparkles size={18} color='#6A1B9A'/></div>
+              <div>
+                <div style={{fontWeight:500,fontSize:14}}>AI JD Assistant</div>
+                <div style={{fontSize:11,color:'#888'}}>{showAIPanel==='gap'?'วิเคราะห์ Gap JD ทั้งองค์กร':showAIPanel==='review'?'ตรวจสอบ JD ที่มีอยู่':'สร้าง JD อัตโนมัติ'}</div>
+              </div>
+              <button onClick={()=>setShowAIPanel(null)} style={{marginLeft:'auto',border:'none',background:'transparent',cursor:'pointer'}}><X size={16} color='#666'/></button>
+            </div>
+            <p style={{fontSize:12,color:'#555',lineHeight:1.5,marginBottom:14}}>
+              {showAIPanel==='gap'?`มีพนักงาน ${stats.noJD} คน ยังไม่มี JD AI จะวิเคราะห์และแนะนำ JD ที่ควรสร้างก่อน`:showAIPanel==='review'?`ตรวจสอบ JD ที่ Active ${stats.active} รายการ ว่า KPI, Competency ครบถ้วนและเป็นปัจจุบันหรือไม่`:`เลือกพนักงานจากตารางด้านล่าง แล้วกดปุ่ม AI เพื่อสร้าง JD`}
+            </p>
+            <div style={{display:'flex',justifyContent:'flex-end',gap:6}}>
+              <button onClick={()=>setShowAIPanel(null)} style={{padding:'7px 14px',border:'0.5px solid #DDD',borderRadius:8,background:'#fff',fontSize:12,cursor:'pointer',color:'#666'}}>ยกเลิก</button>
+              <button onClick={()=>{showToast('AI กำลังประมวลผล...');setShowAIPanel(null)}} style={{padding:'7px 16px',border:'none',borderRadius:8,background:'#6A1B9A',fontSize:12,cursor:'pointer',color:'#fff',fontWeight:500}}>เริ่มต้น AI</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
