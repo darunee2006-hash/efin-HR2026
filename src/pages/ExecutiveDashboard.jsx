@@ -226,26 +226,18 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
 
       {/* KPI Cards - Row 2 (Placeholder for missing data) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        {[
-          { icon: Star, label: 'Critical Talent', value: '-', unit: 'คน', sub: 'รอข้อมูล Talent Records', color: '#FF8B00', placeholder: true },
-          { icon: Target, label: 'Succession Coverage', value: '-%', unit: '', sub: 'รอข้อมูล Succession Plan', color: '#36B37E', placeholder: true },
-          { icon: Zap, label: 'Engagement Score', value: '-/10', unit: '', sub: 'รอผลสำรวจ Engagement', color: '#00B8D9', placeholder: true },
-          { icon: Briefcase, label: 'ตำแหน่งว่าง', value: '-', unit: 'ตำแหน่ง', sub: 'รอข้อมูล Recruitment', color: '#6554C0', placeholder: true },
-        ].map((kpi, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border border-dashed border-gray-200 relative opacity-70">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-gray-100">
-                <kpi.icon className="w-4 h-4 text-gray-400"/>
-              </div>
-              <span className="text-sm text-gray-400">{kpi.label}</span>
-            </div>
-            <div className="text-2xl font-bold text-gray-300 mb-1">{kpi.value}</div>
-            <div className="text-xs text-gray-300">{kpi.sub}</div>
-            <div className="absolute bottom-3 right-3">
-              <span className="text-[10px] px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full font-medium">ต้องการข้อมูล</span>
-            </div>
-          </div>
-        ))}
+        <KPI icon={Star} label="Critical Talent" value="0" unit="คน"
+          sub="ยังไม่มีข้อมูล Talent Records" color="#FF8B00"
+          onClick={() => onNavigate && onNavigate('employees')} />
+        <KPI icon={Target} label="Succession Coverage" value="0" unit="%"
+          sub="ยังไม่มีข้อมูล Succession Plan" color="#36B37E"
+          onClick={() => onNavigate && onNavigate('employees')} />
+        <KPI icon={Zap} label="Engagement Score" value="0" unit="/10"
+          sub="ยังไม่มีผลสำรวจ Engagement" color="#00B8D9"
+          onClick={() => onNavigate && onNavigate('employees')} />
+        <KPI icon={Briefcase} label="ตำแหน่งว่าง" value="0" unit="ตำแหน่ง"
+          sub="ยังไม่มีข้อมูล Recruitment" color="#6554C0"
+          onClick={() => onNavigate && onNavigate('recruitment')} />
       </div>
 
       {/* Charts Row */}
