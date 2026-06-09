@@ -154,7 +154,7 @@ function DrillDownPanel({ title, rows, columns, onClose, onNavigate, navPage, la
 export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const nav = onNavigate || setPage || (() => {})
   const { profile, role } = useAuth()
-  const { filterByCompany } = useCompanyFilter()
+  const { filterByCompany, applyCompanyFilter, filterVersion } = useCompanyFilter()
 
   const [empTotal, setEmpTotal]         = useState(0)
   const [empNew, setEmpNew]             = useState(0)
@@ -171,7 +171,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const [empResigned, setEmpResigned]   = useState(0)
   const [companyCounts, setCompanyCounts] = useState({})
 
-  useEffect(() => { fetchAll() }, [])
+  useEffect(() => { fetchAll() }, [filterVersion])
 
   const fetchAll = async () => {
     setLoading(true)
@@ -179,8 +179,8 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     const thisMonthStart = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`
 
     const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes, resignedRes, companyRes] = await Promise.all([
-      supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active'),
-      supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active').gte('hire_date', `${today.getFullYear()}-01-01`),
+      applyCompanyFilter(supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active')),
+      applyCompanyFilter(supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active').gte('hire_date', `${today.getFullYear()}-01-01`)),
       supabase.from('hr_recruitment').select('id', { count:'exact', head:true }).eq('status','open'),
       supabase.from('hr_leave_requests').select('id', { count:'exact', head:true }).eq('status','pending'),
       supabase.from('hr_leave_requests').select(`
@@ -190,9 +190,9 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       `).order('created_at', { ascending:false }).limit(4),
       supabase.from('hr_announcements').select('*').eq('is_active', true).order('created_at', { ascending:false }).limit(3),
       supabase.from('hr_training').select('*').gte('start_date', today.toISOString().split('T')[0]).order('start_date').limit(3),
-      supabase.from('hr_employees').select('bu, company_entity').eq('status','active'),
-      supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','resigned').gte('resignation_date', `${today.getFullYear()}-01-01`),
-      supabase.from('hr_employees').select('company_entity').eq('status','active'),
+      applyCompanyFilter(supabase.from('hr_employees').select('bu, company_entity').eq('status','active')),
+      applyCompanyFilter(supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','resigned').gte('resignation_date', `${today.getFullYear()}-01-01`)),
+      applyCompanyFilter(supabase.from('hr_employees').select('company_entity').eq('status','active')),
     ])
 
     setEmpTotal(empRes.count || 0)

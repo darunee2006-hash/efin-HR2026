@@ -38,14 +38,33 @@ export function CompanyFilterProvider({ children }) {
   const filterVersion = useMemo(() => `${selectedCompany}-${[...activeCodes].join(',')}`, [selectedCompany, activeCodes])
 
   // Helper: client-side filter for data already fetched
+  // Map employee_code prefix → company code
+  const getCompanyFromCode = (code) => {
+    if (!code) return null
+    const s = String(code)
+    if (s.startsWith('A')) return 'ATESS'
+    if (s.startsWith('S1') || s.startsWith('S5')) return 'SMT'
+    return null  // default: use company_entity field
+  }
+
   const filterByCompany = useCallback((items, companyField = 'company_entity') => {
     if (!items || items.length === 0) return items || []
     if (selectedCompany === 'all') {
-      // If no companies loaded yet, return all items (don't filter out everything)
       if (activeCodes.size === 0) return items
-      return items.filter(item => !item[companyField] || activeCodes.has(item[companyField]))
+      return items.filter(item => {
+        const codeCompany = getCompanyFromCode(item.employee_code)
+        const fieldCompany = item[companyField]
+        const effectiveCompany = codeCompany || fieldCompany
+        return !effectiveCompany || activeCodes.has(effectiveCompany)
+      })
     }
-    return items.filter(item => item[companyField] === selectedCompany)
+    return items.filter(item => {
+      const codeCompany = getCompanyFromCode(item.employee_code)
+      const fieldCompany = item[companyField]
+      // employee_code prefix takes priority
+      if (codeCompany) return codeCompany === selectedCompany
+      return fieldCompany === selectedCompany
+    })
   }, [selectedCompany, activeCodes])
 
   // Helper: filter related data by employee IDs from filtered employees
