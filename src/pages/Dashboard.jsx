@@ -282,7 +282,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     if (type === 'total') setDrillDown({ title: `พนักงานทั้งหมด (${allEmployees.length} คน)`, rows: allEmployees, columns: empCols, navPage: 'employees' })
     else if (type === 'new') setDrillDown({ title: `พนักงานใหม่เดือนนี้ (${newEmps.length} คน)`, rows: newEmps, columns: empCols, navPage: 'onboarding' })
     else if (type === 'resigned') {
-      const resignedEmps = allEmployees.filter(e => e.status === 'resigned' && e.resignation_date && new Date(e.resignation_date).getFullYear() === new Date().getFullYear())
+      const resignedEmps = filterByCompany(allEmployees.filter(e => e.status === 'resigned' && e.resignation_date && new Date(e.resignation_date).getFullYear() === new Date().getFullYear()), 'company_entity')
       setDrillDown({ title: `พนักงานลาออกปี ${new Date().getFullYear()+543} (${resignedEmps.length} คน)`, rows: resignedEmps, columns: [
         { key:'code', label:'รหัส', get: r => r.employee_code },
         { key:'name', label:'ชื่อ-นามสกุล', get: r => `${r.first_name_th||''} ${r.last_name_th||''}`.trim() },
@@ -312,7 +312,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
         const compEmps = allEmployees.filter(e => e.company_entity === buName && e.status === 'active')
         setDrillDown({ title: `${companyNames[buName]} (${compEmps.length} คน)`, rows: compEmps, columns: empCols, navPage: 'staffList' })
       } else {
-        const buEmps = allEmployees.filter(e => e.bu === buName)
+        const buEmps = filterByCompany(allEmployees.filter(e => e.bu === buName && e.status==='active'))
         setDrillDown({ title: `${buName} (${buEmps.length} คน)`, rows: buEmps, columns: empCols, navPage: 'staffList' })
       }
     }
@@ -361,27 +361,6 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
         <div onClick={() => openDrill('attendance')} style={{ cursor:'pointer' }}>
           <StatCard icon={TrendingUp} iconStyle={{background:'#E0F7F4',color:'#009688'}} label={lang==='th'?'อัตราการเข้างาน':'Attendance Rate'}   value="96.2" unit="%" change="1.8% จากเดือนที่แล้ว" changeUp />
         </div>
-      </div>
-
-      {/* ── Company Breakdown ── */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8, marginBottom:16 }}>
-        {[
-          { code:'ONL',   label:'Online Asset',   color:G.primary,   bg:G.light   },
-          { code:'EFINX', label:'EFIN Xpert',     color:'#1565C0',   bg:'#E3F2FD' },
-          { code:'ATESS', label:'ATESS',           color:'#C62828',   bg:'#FEECEC' },
-          { code:'SMT',   label:'Smart Medtech',  color:'#6A1B9A',   bg:'#F3E5F5' },
-        ].map(c => (
-          <div key={c.code} onClick={() => openDrill(`bu:${c.code}`)}
-            style={{ background:'#fff', border:`1px solid ${c.bg}`, borderLeft:`4px solid ${c.color}`, borderRadius:10, padding:'10px 14px', cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'space-between', transition:'box-shadow .15s' }}
-            onMouseEnter={e=>e.currentTarget.style.boxShadow='0 2px 8px rgba(0,0,0,0.08)'}
-            onMouseLeave={e=>e.currentTarget.style.boxShadow='none'}>
-            <div>
-              <div style={{ fontSize:11, color:'#888', marginBottom:2 }}>{c.label}</div>
-              <div style={{ fontSize:20, fontWeight:500, color:'#1a2e1a' }}>{fmt(companyCounts[c.code]||0)}</div>
-            </div>
-            <div style={{ fontSize:10, color:c.color, background:c.bg, padding:'2px 8px', borderRadius:20, fontWeight:500 }}>คน</div>
-          </div>
-        ))}
       </div>
 
       {/* ── Mid Grid ── */}
