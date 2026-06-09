@@ -252,6 +252,14 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
           pvd_prev_employer_amount: empForm.pvd_prev_employer_amount ? parseFloat(empForm.pvd_prev_employer_amount) : null,
           resignation_date: empForm.resignation_date || null,
           resignation_reason: empForm.resignation_reason || null,
+          // Auto-update status field based on employee_status
+          status: (() => {
+            const es = empForm.employee_status || ''
+            if (es === 'ลาออก' || es === 'เลิกจ้าง') return 'resigned'
+            if (es === 'ทดลองงาน') return 'probation'
+            if (empForm.resignation_date) return 'resigned'
+            return 'active'
+          })(),
         }
         const { error: ee } = await supabase.from('hr_employees').update(empData).eq('id', empId)
         if (ee) throw ee
