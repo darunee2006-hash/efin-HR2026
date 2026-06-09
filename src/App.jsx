@@ -29,12 +29,14 @@ import CompanyManagement from './pages/CompanyManagement'
 import HolidayManagement from './pages/HolidayManagement'
 import StaffList from './pages/StaffList'
 import ExecutiveDashboard from './pages/ExecutiveDashboard'
+import JDManagement from './pages/JDManagement'
 
 // Pages by role level
 const ROLE_PAGES = {
   admin: {
     dashboard: Dashboard,
     executiveDashboard: ExecutiveDashboard,
+    jdManagement: JDManagement,
     employees: Employees,
     staffList: StaffList,
     orgChart: OrgChart,
