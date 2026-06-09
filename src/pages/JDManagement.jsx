@@ -464,7 +464,7 @@ export default function JDManagement({ lang, onNavigate, navContext={} }) {
                     </tr>
                   )
                 })}
-                {filteredEmps.length===0&&<tr><td colSpan={13} style={{textAlign:'center',padding:32,color:'#CCC',fontSize:13}}>ไม่พบข้อมูล</td></tr>}
+                {filteredEmps.length===0&&<tr><td colSpan={14} style={{textAlign:'center',padding:32,color:'#CCC',fontSize:13}}>ไม่พบข้อมูล</td></tr>}
               </tbody>
             </table>
           </div>

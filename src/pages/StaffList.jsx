@@ -37,7 +37,7 @@ const [_navApplied, _setNavApplied] = React.useState(false)
     try {
       const { data, error } = await supabase
         .from('hr_employees')
-        .select('id, employee_code, prefix_th, first_name_th, last_name_th, prefix_en, first_name_en, last_name_en, position_th, company_entity, bu, team_section, status, employment_type, hire_date, gender, email, phone')
+        .select('id, employee_code, prefix_th, first_name_th, last_name_th, prefix_en, first_name_en, last_name_en, position_th, company_entity, bu, department_name_th, team_section, status, employment_type, hire_date, gender, email, phone')
         .order('company_entity')
         .order('bu')
         .order('first_name_th')
@@ -105,6 +105,7 @@ const [_navApplied, _setNavApplied] = React.useState(false)
       'ตำแหน่ง': e.position_th,
       'บริษัท': e.company_entity,
       'BU': e.bu,
+      'ฝ่ายงาน': e.department_name_th || '',
       'แผนก/ส่วน': e.team_section,
       'สถานะ': e.status,
       'ประเภท': e.employment_type,
@@ -266,7 +267,8 @@ const [_navApplied, _setNavApplied] = React.useState(false)
                         <th className="text-left py-2 px-3 font-medium">{th('รหัส', 'Code')}</th>
                         <th className="text-left py-2 px-3 font-medium">{th('ชื่อ-นามสกุล', 'Name')}</th>
                         <th className="text-left py-2 px-3 font-medium">{th('ตำแหน่ง', 'Position')}</th>
-                        <th className="text-left py-2 px-3 font-medium">{th('แผนก/ส่วน', 'Section')}</th>
+                        <th className="text-left py-2 px-3 font-medium">{th('BU', 'BU')}</th>
+                        <th className="text-left py-2 px-3 font-medium">{th('ฝ่ายงาน', 'Department')}</th>
                         <th className="text-left py-2 px-3 font-medium">{th('ประเภท', 'Type')}</th>
                         <th className="text-left py-2 px-3 font-medium">{th('สถานะ', 'Status')}</th>
                         <th className="text-left py-2 px-3 font-medium">{th('วันเริ่มงาน', 'Hire Date')}</th>
@@ -290,7 +292,8 @@ const [_navApplied, _setNavApplied] = React.useState(false)
                             </div>
                           </td>
                           <td className="py-2 px-3 text-gray-600">{e.position_th || '-'}</td>
-                          <td className="py-2 px-3 text-gray-500 text-xs max-w-[200px] truncate">{e.team_section || '-'}</td>
+                          <td className="py-2 px-3 text-xs font-medium" style={{color:'#5A9020'}}>{e.bu||'-'}</td>
+                          <td className="py-2 px-3 text-gray-500 text-xs max-w-[180px] truncate">{e.department_name_th ? e.department_name_th.replace(/^BU\s+[\w.]+[-–]\s*/,'').trim() : e.team_section||'-'}</td>
                           <td className="py-2 px-3">
                             <span className="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-600">
                               {e.employment_type === 'fulltime' ? th('เต็มเวลา', 'Full-time') : th('พาร์ทไทม์', 'Part-time')}

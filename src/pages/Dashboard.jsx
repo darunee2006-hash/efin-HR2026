@@ -270,6 +270,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     { key:'name', label:'ชื่อ-นามสกุล', get: r => `${r.first_name_th||''} ${r.last_name_th||''}${r.nickname?' ('+r.nickname+')':''}`.trim() },
     { key:'position_th', label:'ตำแหน่ง', get: r => r.position_th || '—' },
     { key:'bu', label:'BU', get: r => r.bu || '—' },
+    { key:'department', label:'ฝ่ายงาน', get: r => r.department_name_th ? r.department_name_th.replace(/^BU\s+[\w.]+[-–]\s*/,'').trim() : '—' },
     { key:'company_entity', label:'บริษัท', get: r => r.company_entity || '—' },
     { key:'hire_date', label:'วันเริ่มงาน', get: r => fmtHireDate(r.hire_date) },
   ]

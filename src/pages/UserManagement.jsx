@@ -747,7 +747,7 @@ export default function UserManagement({ lang = 'th' }) {
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="text-xs whitespace-nowrap" style={{minWidth:'2400px'}}>
+                <table className="text-xs whitespace-nowrap" style={{minWidth:'2600px'}}>
                   <thead>
                     <tr style={{background:'#F4F7F5',borderBottom:'1px solid #D8EDE3'}}>
                       {/* Sticky name col */}
@@ -762,6 +762,7 @@ export default function UserManagement({ lang = 'th' }) {
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:80}}>สมรส</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:70}}>บริษัท</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:100}}>BU</th>
+                      <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>ฝ่ายงาน</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:200}}>แผนก</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:160}}>ตำแหน่ง</th>
                       <th className="text-left py-3 px-3 font-semibold text-gray-500" style={{minWidth:60}}>ระดับ</th>
@@ -782,7 +783,7 @@ export default function UserManagement({ lang = 'th' }) {
                   </thead>
                   <tbody>
                     {filtered.length === 0 ? (
-                      <tr><td colSpan={27} className="text-center py-12 text-gray-400">ไม่พบข้อมูล</td></tr>
+                      <tr><td colSpan={28} className="text-center py-12 text-gray-400">ไม่พบข้อมูล</td></tr>
                     ) : filtered.map((u, ri) => {
                       const emp = u.hr_employees
                       const fullName = emp ? `${emp.prefix_th||''} ${emp.first_name_th||''} ${emp.last_name_th||''}`.trim() : (u.display_name || '-')
@@ -837,7 +838,7 @@ export default function UserManagement({ lang = 'th' }) {
                             ) : '-'}
                           </TD>
                           <TD>{emp?.bu||'-'}</TD>
-                          <TD><span className="truncate block max-w-[190px]">{emp?.department_name_th||'-'}</span></TD>
+                          <TD><span className="truncate block max-w-[160px] text-xs">{emp?.department_name_th ? emp.department_name_th.replace(/^BU\s+\w+[-–]\s*/,'') : '-'}</span></TD>
                           <TD><span className="truncate block max-w-[150px]">{emp?.position_th||'-'}</span></TD>
                           <TD>
                             {emp?.level ? (
