@@ -410,10 +410,10 @@ function JDBuilderModal({ jd, employee, onClose, onSaved }) {
             <button onClick={()=>handleSave('draft')} disabled={saving} className="flex items-center gap-1.5 px-4 py-2 text-sm border border-gray-200 rounded-xl text-gray-700 hover:bg-gray-50">
               <Save className="w-4 h-4"/>บันทึก Draft
             </button>
-            <button onClick={()=>handleSave('pending_hr')} disabled={saving}
+            <button onClick={()=>handleSave('active')} disabled={saving}
               className="flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-white rounded-xl disabled:opacity-50"
               style={{background:G.primary}}>
-              <Send className="w-4 h-4"/>{saving ? 'กำลังบันทึก...' : 'ส่งให้ HR ตรวจสอบ'}
+              <Check className="w-4 h-4"/>{saving ? 'กำลังบันทึก...' : 'บันทึกและใช้งานเลย'}
             </button>
           </div>
         </div>
