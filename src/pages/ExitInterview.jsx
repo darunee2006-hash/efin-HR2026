@@ -11,7 +11,7 @@ export default function ExitInterview({ lang, onNavigate }) {
   const [search, setSearch]         = useState('')
   const [filterMonth, setFilterMonth] = useState('all')
   const [filterDept, setFilterDept]   = useState('all')
-  const [filterYear, setFilterYear]   = useState('2026')
+  const [filterYear, setFilterYear]   = useState(String(new Date().getFullYear()+543))
   const [viewMode, setViewMode]       = useState('month')  // 'month' | 'year'
   const [selected, setSelected]     = useState(null)
 
@@ -66,8 +66,8 @@ export default function ExitInterview({ lang, onNavigate }) {
     // ใช้ filtered data ที่ผ่าน year/dept filter แล้ว (แต่ไม่ filter month)
     const baseData = data.filter(d => {
       if (filterYear !== 'all') {
-        const yr = d.last_working_date ? new Date(d.last_working_date).getFullYear()+543 : null
-        if (yr !== parseInt(filterYear)) return false
+        const yr = d.last_working_date ? String(new Date(d.last_working_date).getFullYear()+543) : null
+        if (yr !== filterYear) return false
       }
       if (filterDept !== 'all' && d.department !== filterDept) return false
       return true
