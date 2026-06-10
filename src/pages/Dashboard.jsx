@@ -290,7 +290,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     if (type === 'total') setDrillDown({ title: `พนักงานทั้งหมด (${allEmployees.length} คน)`, rows: allEmployees, columns: empCols, navPage: 'employees' })
     else if (type === 'new') setDrillDown({ title: `พนักงานใหม่เดือนนี้ (${newEmps.length} คน)`, rows: newEmps, columns: empCols, navPage: 'onboarding' })
     else if (type === 'resigned') {
-      const resignedEmps = filterByCompany(allEmployees.filter(e => e.status === 'resigned' && e.resignation_date && new Date(e.resignation_date).getFullYear() === new Date().getFullYear()), 'company_entity')
+      const resignedEmps = filterByCompany(allEmployees.filter(e => e.status === 'resigned' && e.resignation_date && new Date(e.resignation_date).getFullYear() === new Date().getFullYear()), 'company_entity').sort((a,b) => new Date(b.resignation_date) - new Date(a.resignation_date))
       setDrillDown({ title: `พนักงานลาออกปี ${new Date().getFullYear()+543} (${resignedEmps.length} คน)`, rows: resignedEmps, columns: [
         { key:'code', label:'รหัส', get: r => r.employee_code },
         { key:'name', label:'ชื่อ-นามสกุล', get: r => `${r.first_name_th||''} ${r.last_name_th||''}`.trim() },
