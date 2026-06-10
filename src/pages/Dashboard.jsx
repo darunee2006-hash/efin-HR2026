@@ -169,6 +169,8 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
   const [drillDown, setDrillDown]       = useState(null)
   const [allEmployees, setAllEmployees] = useState([])
   const [empResigned, setEmpResigned]   = useState(0)
+  const [empStartYear, setEmpStartYear] = useState(0)
+  const [empFormula, setEmpFormula]     = useState(0)
   const [companyCounts, setCompanyCounts] = useState({})
 
   useEffect(() => { fetchAll() }, [filterVersion])
@@ -178,7 +180,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
     const today = new Date()
     const thisMonthStart = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-01`
 
-    const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes, resignedRes, companyRes] = await Promise.all([
+    const [empRes, newEmpRes, openRes, leaveRes, recentLeaveRes, annRes, trainRes, buRes, resignedRes, companyRes, startYearRes] = await Promise.all([
       applyCompanyFilter(supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active')),
       applyCompanyFilter(supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','active').gte('hire_date', `${today.getFullYear()}-01-01`)),
       supabase.from('hr_recruitment').select('id', { count:'exact', head:true }).eq('status','open'),
@@ -193,11 +195,17 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       applyCompanyFilter(supabase.from('hr_employees').select('bu, company_entity').eq('status','active')),
       applyCompanyFilter(supabase.from('hr_employees').select('id', { count:'exact', head:true }).eq('status','resigned').gte('resignation_date', `${today.getFullYear()}-01-01`)),
       applyCompanyFilter(supabase.from('hr_employees').select('company_entity').eq('status','active')),
+      applyCompanyFilter(supabase.from('hr_employees').select('id', { count:'exact', head:true }).lt('hire_date',`${today.getFullYear()}-01-01`).eq('status','active')),
     ])
 
     setEmpTotal(empRes.count || 0)
     setEmpNew(newEmpRes.count || 0)
-    setEmpResigned(resignedRes.count || 0)
+    const resigned = resignedRes.count || 0
+    const newHires = newEmpRes.count || 0
+    const startYear = (startYearRes.count || 0)
+    setEmpResigned(resigned)
+    setEmpStartYear(startYear)
+    setEmpFormula(startYear + newHires - resigned)
     const cCounts = {}
     ;(companyRes.data||[]).forEach(e => { const c = e.company_entity||'อื่นๆ'; cCounts[c] = (cCounts[c]||0)+1 })
     setCompanyCounts(cCounts)
@@ -347,7 +355,8 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       {/* ── KPI Cards ── */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:11, marginBottom:16 }}>
         <div onClick={() => openDrill('total')} style={{ cursor:'pointer' }}>
-          <StatCard icon={Users}      iconStyle={{background:G.light,  color:G.primary}} label={lang==='th'?'พนักงานทั้งหมด':'Total Employees'}  value={fmt(empTotal)}  unit={lang==='th'?'คน':'ppl'} change="4.3% จากเดือนที่แล้ว" changeUp />
+          <StatCard icon={Users}      iconStyle={{background:G.light,  color:G.primary}} label={lang==='th'?'พนักงานทั้งหมด':'Total Employees'}  value={fmt(empFormula||empTotal)} unit={lang==='th'?'คน':'ppl'}
+          change={`ต้นปี ${fmt(empStartYear)} + ใหม่ ${fmt(empNew)} − ลาออก ${fmt(empResigned)}`} changeUp />
         </div>
         <div onClick={() => openDrill('new')} style={{ cursor:'pointer' }}>
           <StatCard icon={UserPlus}   iconStyle={{background:'#E0F7EE',color:'#00875A'}} label={lang==='th'?'พนักงานใหม่':'New Employees'}       value={fmt(empNew)}    unit={lang==='th'?'คน':'ppl'} change="12.5% จากเดือนที่แล้ว" changeUp />
