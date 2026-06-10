@@ -59,6 +59,9 @@ export default function ExitInterview({ lang, onNavigate }) {
 
   const byMonth = useMemo(() => {
     const ALL_MONTHS = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']
+    const currentMonth = new Date().getMonth() // 0-indexed
+    // แสดงตั้งแต่ม.ค.ถึงเดือนปัจจุบัน
+    const SHOW_MONTHS = ALL_MONTHS.slice(0, currentMonth + 1)
     const m = {}
     // ใช้ filtered data ที่ผ่าน year/dept filter แล้ว (แต่ไม่ filter month)
     const baseData = data.filter(d => {
@@ -71,7 +74,7 @@ export default function ExitInterview({ lang, onNavigate }) {
     })
     baseData.forEach(d => { if(d.month_label) m[d.month_label]=(m[d.month_label]||0)+1 })
     // แสดงทุกเดือนตั้งแต่ม.ค. รวมถึงเดือนที่ไม่มีข้อมูล (count=0)
-    return ALL_MONTHS.map(mo=>({month:mo, count:m[mo]||0}))
+    return SHOW_MONTHS.map(mo=>({month:mo, count:m[mo]||0}))
   }, [data, filterYear, filterDept])
 
   const byDept = useMemo(() => {
