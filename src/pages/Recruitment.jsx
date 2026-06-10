@@ -296,7 +296,14 @@ export default function Recruitment({ lang , onNavigate, navContext = {} }) {
                         >
                           <td className="px-3 py-2.5 text-gray-500">{idx + 1}</td>
                           <td className="px-3 py-2.5 text-gray-600 text-xs font-mono">{parsed['WAMS'] || '-'}</td>
-                          <td className="px-3 py-2.5 text-gray-900 font-medium">{r.position_title}</td>
+                          <td className="px-3 py-2.5">
+                            <button
+                              onClick={(e)=>{ e.stopPropagation(); onNavigate && onNavigate('jdManagement',{search:r.position_title}) }}
+                              className="text-left font-medium text-gray-900 hover:text-[#7DC242] hover:underline underline-offset-2 transition-colors"
+                              title="คลิกดู JD ของตำแหน่งนี้">
+                              {r.position_title}
+                            </button>
+                          </td>
                           <td className="px-3 py-2.5 text-gray-600 text-xs">{parsed['ฝ่าย'] || '-'}</td>
                           <td className="px-3 py-2.5 text-center text-gray-900 font-semibold">{r.headcount}</td>
                           <td className="px-3 py-2.5 text-gray-600 text-xs">{r.employment_type || '-'}</td>
