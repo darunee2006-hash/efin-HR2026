@@ -1,170 +1,245 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
-import { Users, TrendingDown, Building2, Search, ChevronRight, BarChart3, MessageSquare } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
+import { TrendingDown, Search, ChevronDown, ChevronRight, Users, Building2, Calendar, UserMinus } from 'lucide-react'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
-const G = { primary:'#7DC242', dark:'#5A9020', light:'#E8F5D0' }
-const COLORS = ['#E24B4A','#FF8B00','#1565C0','#7DC242','#6A1B9A','#00838F','#AD1457','#4527A0']
-const fmt = n => (n||0).toLocaleString('th-TH')
+const G = { primary:'#7DC242', dark:'#5A9020', light:'#E8F5D0', light2:'#C5E888' }
 
 export default function ExitInterview({ lang, onNavigate }) {
-  const [data, setData] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
+  const [data, setData]             = useState([])
+  const [loading, setLoading]       = useState(true)
+  const [search, setSearch]         = useState('')
   const [filterMonth, setFilterMonth] = useState('all')
-  const [filterDept, setFilterDept] = useState('all')
-  const [selected, setSelected] = useState(null)
+  const [filterDept, setFilterDept]   = useState('all')
+  const [filterYear, setFilterYear]   = useState('2026')
+  const [viewMode, setViewMode]       = useState('month')  // 'month' | 'year'
+  const [selected, setSelected]     = useState(null)
 
   useEffect(() => {
-    const load = async () => {
-      const { data: rows } = await supabase.from('hr_exit_interviews').select('*').order('last_working_date',{ascending:false})
-      setData(rows||[])
-      setLoading(false)
-    }
-    load()
+    supabase.from('hr_exit_interviews').select('*').order('last_working_date',{ascending:false})
+      .then(({data:rows}) => { setData(rows||[]); setLoading(false) })
   }, [])
 
-  const months = useMemo(() => [...new Set(data.map(d=>d.month_label).filter(Boolean))], [data])
-  const depts = useMemo(() => [...new Set(data.map(d=>d.department).filter(Boolean))].sort(), [data])
+  const months = useMemo(() => {
+    const order = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']
+    const found = new Set(data.map(d=>d.month_label).filter(Boolean))
+    return order.filter(m=>found.has(m))
+  }, [data])
+
+  const depts = useMemo(() =>
+    [...new Set(data.map(d=>d.department).filter(Boolean))].sort()
+  , [data])
+
+  const years = useMemo(() => {
+    const s = new Set(data.map(d => d.last_working_date ? new Date(d.last_working_date).getFullYear()+543 : null).filter(Boolean))
+    return [...s].sort().reverse()
+  }, [data])
 
   const filtered = useMemo(() => data.filter(d => {
+    // Year filter
+    if (filterYear !== 'all') {
+      const yr = d.last_working_date ? new Date(d.last_working_date).getFullYear()+543 : null
+      if (yr !== parseInt(filterYear)) return false
+    }
     if (filterMonth !== 'all' && d.month_label !== filterMonth) return false
     if (filterDept !== 'all' && d.department !== filterDept) return false
-    if (search && !`${d.full_name||''} ${d.position||''} ${d.department||''}`.toLowerCase().includes(search.toLowerCase())) return false
+    if (search) {
+      const q = search.toLowerCase()
+      if (!`${d.full_name||''} ${d.position||''} ${d.department||''}`.toLowerCase().includes(q)) return false
+    }
     return true
-  }), [data, filterMonth, filterDept, search])
+  }), [data, filterYear, filterMonth, filterDept, search])
 
-  // สถิติ
-  const byDept = useMemo(() => {
+  // Stats for current filtered set
+  const filteredByDept = useMemo(() => {
     const m = {}
     filtered.forEach(d => { const k=d.department||'ไม่ระบุ'; m[k]=(m[k]||0)+1 })
     return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([dept,count])=>({dept,count}))
   }, [filtered])
 
   const byMonth = useMemo(() => {
-    const order = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']
+    const order = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.']
     const m = {}
-    data.forEach(d => { const k=d.month_label||'?'; m[k]=(m[k]||0)+1 })
-    return order.filter(mo=>m[mo]).map(mo=>({month:mo,count:m[mo]}))
+    data.forEach(d => { if(d.month_label) m[d.month_label]=(m[d.month_label]||0)+1 })
+    return order.filter(mo=>m[mo]).map(mo=>({month:mo, count:m[mo]}))
   }, [data])
 
-  const MONTH_TH = {'ม.ค.':'ม.ค.','ก.พ.':'ก.พ.','มี.ค.':'มี.ค.','เม.ย.':'เม.ย.','พ.ค.':'พ.ค.','มิ.ย.':'มิ.ย.'}
+  const byDept = useMemo(() => {
+    const m = {}
+    data.forEach(d => { const k=d.department||'ไม่ระบุ'; m[k]=(m[k]||0)+1 })
+    return Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([dept,count])=>({dept,count}))
+  }, [data])
 
-  if (loading) return <div className="flex justify-center items-center h-64"><div className="animate-spin rounded-full h-10 w-10 border-b-2" style={{borderColor:G.primary}}/></div>
+  const topDept   = filteredByDept[0]?.dept?.replace('ฝ่าย','') || '-'
+  const topMonth  = [...byMonth].sort((a,b)=>b.count-a.count)[0]?.month || '-'
+
+  if (loading) return (
+    <div className="flex justify-center items-center h-64">
+      <div className="animate-spin rounded-full h-10 w-10 border-b-2" style={{borderColor:G.primary}}/>
+    </div>
+  )
 
   return (
-    <div className="space-y-5 p-6" style={{background:'#F4F7F5',minHeight:'100%'}}>
+    <div style={{background:'#F4F7F5',minHeight:'100%',padding:'20px 24px'}}>
+
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-          <TrendingDown className="w-6 h-6 text-red-500"/>Exit Interview 2569
-        </h1>
-        <p className="text-sm text-gray-400 mt-0.5">สรุปพนักงานลาออกและเหตุผล — รวม {data.length} คน</p>
+      <div style={{marginBottom:20}}>
+        <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:4}}>
+          <div style={{width:36,height:36,borderRadius:9,background:'#FEECEC',display:'flex',alignItems:'center',justifyContent:'center'}}>
+            <UserMinus style={{width:18,height:18,color:'#C62828'}}/>
+          </div>
+          <div>
+            <div style={{fontSize:18,fontWeight:500,color:'#1a2e1a'}}>Exit Interview 2569</div>
+            <div style={{fontSize:12,color:'#9AB09A'}}>สรุปพนักงานลาออกและเหตุผล · ปัจจุบัน {filtered.length} จาก {data.length} คน</div>
+          </div>
+        </div>
       </div>
 
-      {/* KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* KPI Cards */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:16}}>
         {[
-          {label:'ลาออกทั้งหมด',val:data.length,color:'#C62828',bg:'#FEECEC'},
-          {label:'ฝ่ายที่ลาออกมากสุด',val:byDept[0]?.dept?.replace('ฝ่าย','')?.slice(0,12)||'-',color:'#E65100',bg:'#FFF3E0'},
-          {label:'เดือนที่ลาออกมาก',val:byMonth.sort((a,b)=>b.count-a.count)[0]?.month||'-',color:'#1565C0',bg:'#E3F2FD'},
-          {label:'ลาออกล่าสุด',val:data[0]?.full_name?.split(' ').slice(0,2).join(' ')||'-',color:G.dark,bg:G.light},
+          { icon:UserMinus, label:'ลาออก (ที่เลือก)', val:`${filtered.length} คน`, bg:'#FEECEC', ic:'#C62828' },
+          { icon:Building2, label:'ฝ่ายที่ลาออกมากสุด', val:topDept.slice(0,14), bg:'#FFF3E0', ic:'#E65100' },
+          { icon:Calendar,  label:'เดือนที่มากสุด', val:topMonth, bg:G.light, ic:G.dark },
+          { icon:Users,     label:'ลาออกล่าสุด', val:(data[0]?.full_name||'-').split(' ').slice(0,3).join(' '), bg:'#EDE7F6', ic:'#6A1B9A' },
         ].map((s,i)=>(
-          <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-            <div className="text-xs text-gray-400 mb-2">{s.label}</div>
-            <div className="text-lg font-bold truncate" style={{color:s.color}}>{s.val}</div>
+          <div key={i} style={{background:'#fff',borderRadius:12,border:'0.5px solid #E8EDE8',padding:'14px 16px',display:'flex',alignItems:'center',gap:12}}>
+            <div style={{width:38,height:38,borderRadius:10,background:s.bg,display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+              <s.icon style={{width:18,height:18,color:s.ic}}/>
+            </div>
+            <div style={{minWidth:0}}>
+              <div style={{fontSize:11,color:'#9AB09A',marginBottom:2}}>{s.label}</div>
+              <div style={{fontSize:15,fontWeight:500,color:'#1a2e1a',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{s.val}</div>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-          <div className="text-sm font-semibold text-gray-700 mb-3">ลาออกรายเดือน</div>
-          <ResponsiveContainer width="100%" height={160}>
+      {/* Charts row */}
+      <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:16}}>
+        {/* Bar chart by month */}
+        <div style={{background:'#fff',borderRadius:12,border:'0.5px solid #E8EDE8',padding:'14px 16px'}}>
+          <div style={{fontSize:13,fontWeight:500,color:'#1a2e1a',marginBottom:12}}>ลาออกรายเดือน ปี 2569</div>
+          <ResponsiveContainer width="100%" height={150}>
             <BarChart data={byMonth} margin={{top:0,right:0,left:-20,bottom:0}}>
-              <XAxis dataKey="month" tick={{fontSize:11}}/>
-              <YAxis tick={{fontSize:11}}/>
-              <Tooltip/>
-              <Bar dataKey="count" name="คน" radius={[4,4,0,0]} fill="#E24B4A"/>
+              <XAxis dataKey="month" tick={{fontSize:11,fill:'#888'}}/>
+              <YAxis tick={{fontSize:11,fill:'#888'}} allowDecimals={false}/>
+              <Tooltip contentStyle={{fontSize:12}}/>
+              <Bar dataKey="count" name="คน" radius={[4,4,0,0]} fill="#DE350B"/>
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-          <div className="text-sm font-semibold text-gray-700 mb-3">ลาออกตามฝ่าย</div>
-          <div className="space-y-2">
-            {byDept.slice(0,6).map((d,i)=>(
-              <div key={i} className="flex items-center gap-2">
-                <span className="text-xs text-gray-600 truncate" style={{minWidth:130}}>{d.dept.replace('ฝ่าย','')}</span>
-                <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full rounded-full" style={{width:`${(d.count/byDept[0].count)*100}%`,background:COLORS[i%COLORS.length]}}/>
+
+        {/* Dept breakdown */}
+        <div style={{background:'#fff',borderRadius:12,border:'0.5px solid #E8EDE8',padding:'14px 16px'}}>
+          <div style={{fontSize:13,fontWeight:500,color:'#1a2e1a',marginBottom:12}}>ลาออกตามฝ่าย</div>
+          <div style={{display:'flex',flexDirection:'column',gap:7}}>
+            {filteredByDept.slice(0,6).map((d,i)=>{
+              const pct = Math.round((d.count/(filteredByDept[0]?.count||1))*100)
+              const colors = ['#DE350B','#FF8B00','#1565C0',G.primary,'#6A1B9A','#00838F']
+              return (
+                <div key={i} style={{display:'flex',alignItems:'center',gap:8}}>
+                  <span style={{fontSize:11,color:'#555',flexShrink:0,width:130,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{d.dept.replace('ฝ่าย','')}</span>
+                  <div style={{flex:1,height:6,background:'#F0F0F0',borderRadius:3,overflow:'hidden'}}>
+                    <div style={{width:`${pct}%`,height:6,background:colors[i%colors.length],borderRadius:3}}/>
+                  </div>
+                  <span style={{fontSize:11,fontWeight:500,color:'#333',width:16,textAlign:'right'}}>{d.count}</span>
                 </div>
-                <span className="text-xs font-bold text-gray-700 w-6 text-right">{d.count}</span>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       </div>
 
-      {/* Filter */}
-      <div className="flex gap-3 flex-wrap">
-        <div className="relative flex-1 min-w-48">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"/>
-          <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ค้นหาชื่อ ตำแหน่ง ฝ่าย..."
-            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl text-sm bg-white"/>
+      {/* Filter bar */}
+      <div style={{display:'flex',gap:10,marginBottom:12,flexWrap:'wrap'}}>
+        <div style={{position:'relative',flex:1,minWidth:200}}>
+          <Search style={{position:'absolute',left:10,top:'50%',transform:'translateY(-50%)',width:14,height:14,color:'#AAA'}}/>
+          <input value={search} onChange={e=>setSearch(e.target.value)}
+            placeholder="ค้นหาชื่อ ตำแหน่ง ฝ่าย..."
+            style={{width:'100%',padding:'8px 10px 8px 32px',border:'0.5px solid #D0D0D0',borderRadius:9,fontSize:13,background:'#fff',boxSizing:'border-box',outline:'none'}}/>
         </div>
-        <select value={filterMonth} onChange={e=>setFilterMonth(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white">
+        <select value={filterYear} onChange={e=>{setFilterYear(e.target.value);setFilterMonth('all')}}
+          style={{padding:'8px 12px',border:'0.5px solid #D0D0D0',borderRadius:9,fontSize:13,background:'#fff'}}>
+          <option value="all">ทุกปี</option>
+          {years.map(y=><option key={y} value={y}>ปี {y}</option>)}
+        </select>
+        <select value={filterMonth} onChange={e=>setFilterMonth(e.target.value)}
+          style={{padding:'8px 12px',border:'0.5px solid #D0D0D0',borderRadius:9,fontSize:13,background:'#fff'}}>
           <option value="all">ทุกเดือน</option>
           {months.map(m=><option key={m} value={m}>{m}</option>)}
         </select>
-        <select value={filterDept} onChange={e=>setFilterDept(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-sm bg-white">
+        <select value={filterDept} onChange={e=>setFilterDept(e.target.value)}
+          style={{padding:'8px 12px',border:'0.5px solid #D0D0D0',borderRadius:9,fontSize:13,background:'#fff'}}>
           <option value="all">ทุกฝ่าย</option>
           {depts.map(d=><option key={d} value={d}>{d.replace('ฝ่าย','')}</option>)}
         </select>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-gray-100 bg-gray-50 grid grid-cols-12 gap-2 text-xs font-semibold text-gray-400 uppercase">
-          <span className="col-span-1">เดือน</span>
-          <span className="col-span-3">ชื่อ</span>
-          <span className="col-span-3">ฝ่าย</span>
-          <span className="col-span-2">ตำแหน่ง</span>
-          <span className="col-span-2">วันสุดท้าย</span>
-          <span className="col-span-1 text-right">รายละเอียด</span>
+      <div style={{background:'#fff',borderRadius:12,border:'0.5px solid #E8EDE8',overflow:'hidden'}}>
+        {/* Header */}
+        <div style={{display:'grid',gridTemplateColumns:'60px 1fr 1fr 1fr 100px 40px',gap:8,padding:'10px 16px',background:'#F8F9F8',borderBottom:'0.5px solid #E8EDE8',fontSize:11,fontWeight:600,color:'#9AB09A',textTransform:'uppercase',letterSpacing:.3}}>
+          <span>เดือน</span><span>ชื่อ-สกุล</span><span>ฝ่าย</span><span>ตำแหน่ง</span><span>วันสุดท้าย</span><span/>
         </div>
-        {filtered.map((row,i)=>(
-          <div key={row.id} className={`px-4 py-3 border-b border-gray-50 grid grid-cols-12 gap-2 items-center hover:bg-gray-50 cursor-pointer ${i%2===1?'bg-gray-50/30':''}`}
-            onClick={()=>setSelected(selected?.id===row.id?null:row)}>
-            <span className="col-span-1 text-xs text-gray-500">{row.month_label}</span>
-            <div className="col-span-3">
-              <div className="text-sm font-medium text-gray-900 truncate">{row.full_name||'-'}</div>
+
+        {filtered.length === 0 ? (
+          <div style={{textAlign:'center',padding:40,color:'#CCC',fontSize:14}}>ไม่พบข้อมูล</div>
+        ) : filtered.map((row,i)=>(
+          <div key={row.id}>
+            <div
+              onClick={()=>setSelected(selected?.id===row.id ? null : row)}
+              style={{display:'grid',gridTemplateColumns:'60px 1fr 1fr 1fr 100px 40px',gap:8,padding:'11px 16px',borderBottom:'0.5px solid #F0F5F0',cursor:'pointer',background:selected?.id===row.id?G.light:i%2===1?'#FAFCFA':'#fff',transition:'background .1s'}}>
+              <span style={{fontSize:11,color:'#888'}}>{row.month_label}</span>
+              <div>
+                <div style={{fontSize:13,fontWeight:500,color:'#1a2e1a',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{row.full_name||'-'}</div>
+              </div>
+              <div style={{fontSize:12,color:'#666',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{(row.department||'-').replace('ฝ่าย','')}</div>
+              <div style={{fontSize:12,color:'#666',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{row.position||'-'}</div>
+              <div style={{fontSize:11,color:'#AAA'}}>
+                {row.last_working_date ? new Date(row.last_working_date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '-'}
+              </div>
+              <div style={{display:'flex',justifyContent:'center'}}>
+                {selected?.id===row.id
+                  ? <ChevronDown style={{width:14,height:14,color:G.dark}}/>
+                  : <ChevronRight style={{width:14,height:14,color:'#CCC'}}/>}
+              </div>
             </div>
-            <div className="col-span-3 text-xs text-gray-500 truncate">{(row.department||'-').replace('ฝ่าย','')}</div>
-            <div className="col-span-2 text-xs text-gray-500 truncate">{row.position||'-'}</div>
-            <div className="col-span-2 text-xs text-gray-400">{row.last_working_date?new Date(row.last_working_date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}):'-'}</div>
-            <div className="col-span-1 flex justify-end">
-              <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${selected?.id===row.id?'rotate-90':''}`}/>
-            </div>
+
+            {/* Expanded detail */}
             {selected?.id===row.id && (
-              <div className="col-span-12 mt-1 space-y-2">
-                {row.resign_reason && <div className="bg-red-50 border border-red-100 rounded-xl p-3">
-                  <div className="text-xs font-semibold text-red-700 mb-1">เหตุผลลาออก</div>
-                  <div className="text-xs text-red-600 leading-relaxed">{row.resign_reason}</div>
-                </div>}
-                {row.suggestions && <div className="bg-amber-50 border border-amber-100 rounded-xl p-3">
-                  <div className="text-xs font-semibold text-amber-700 mb-1">ข้อเสนอแนะ</div>
-                  <div className="text-xs text-amber-600 leading-relaxed">{row.suggestions}</div>
-                </div>}
-                {row.company_strengths && <div className="bg-green-50 border border-green-100 rounded-xl p-3">
-                  <div className="text-xs font-semibold text-green-700 mb-1">ข้อดีของบริษัท</div>
-                  <div className="text-xs text-green-600 leading-relaxed">{row.company_strengths}</div>
-                </div>}
+              <div style={{padding:'10px 16px 14px',background:G.light,borderBottom:'0.5px solid #C5E888',display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:10}}>
+                {row.resign_reason && (
+                  <div style={{background:'#FEECEC',borderRadius:10,padding:'10px 12px',border:'0.5px solid #FFCDD2'}}>
+                    <div style={{fontSize:11,fontWeight:600,color:'#C62828',marginBottom:5,display:'flex',alignItems:'center',gap:4}}>
+                      <span>🔴</span> เหตุผลลาออก
+                    </div>
+                    <div style={{fontSize:11,color:'#555',lineHeight:1.6}}>{row.resign_reason}</div>
+                  </div>
+                )}
+                {row.suggestions && (
+                  <div style={{background:'#FFF8E1',borderRadius:10,padding:'10px 12px',border:'0.5px solid #FFE082'}}>
+                    <div style={{fontSize:11,fontWeight:600,color:'#E65100',marginBottom:5,display:'flex',alignItems:'center',gap:4}}>
+                      <span>🟡</span> ข้อเสนอแนะ
+                    </div>
+                    <div style={{fontSize:11,color:'#555',lineHeight:1.6}}>{row.suggestions}</div>
+                  </div>
+                )}
+                {row.company_strengths && (
+                  <div style={{background:G.light,borderRadius:10,padding:'10px 12px',border:`0.5px solid ${G.light2}`}}>
+                    <div style={{fontSize:11,fontWeight:600,color:G.dark,marginBottom:5,display:'flex',alignItems:'center',gap:4}}>
+                      <span>🟢</span> ข้อดีของบริษัท
+                    </div>
+                    <div style={{fontSize:11,color:'#555',lineHeight:1.6}}>{row.company_strengths}</div>
+                  </div>
+                )}
               </div>
             )}
           </div>
         ))}
-        <div className="px-4 py-2 text-xs text-gray-400 border-t">แสดง {filtered.length} จาก {data.length} รายการ</div>
+        <div style={{padding:'8px 16px',fontSize:11,color:'#BBB',borderTop:'0.5px solid #F0F0F0'}}>
+          แสดง {filtered.length} จาก {data.length} รายการ
+        </div>
       </div>
     </div>
   )
