@@ -103,7 +103,7 @@ export default function Recruitment({ lang , onNavigate, navContext = {} }) {
     return Object.values(typeMap);
   }, [recruitments]);
 
-  const typeColors = ['#3b82f6', '#f59e0b', '#8b5cf6', '#10b981'];
+  const typeColors = ['#7DC242', '#f59e0b', '#7DC242', '#10b981'];
 
   // Filtered list
   const filteredRecruitments = useMemo(() => {
@@ -222,7 +222,7 @@ export default function Recruitment({ lang , onNavigate, navContext = {} }) {
                       <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 11 }} />
                       <Tooltip />
                       <Bar dataKey="open" name="เปิดรับ" fill="#22c55e" stackId="a" />
-                      <Bar dataKey="filled" name="ปิดแล้ว" fill="#3b82f6" stackId="a" />
+                      <Bar dataKey="filled" name="ปิดแล้ว" fill="#7DC242" stackId="a" />
                       <Bar dataKey="cancelled" name="ยกเลิก" fill="#ef4444" stackId="a" />
                     </BarChart>
                   </ResponsiveContainer>

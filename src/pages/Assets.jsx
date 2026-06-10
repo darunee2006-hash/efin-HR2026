@@ -503,7 +503,7 @@ export default function Assets({ lang , onNavigate, navContext = {} }) {
     }
   };
 
-  const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#6b7280'];
+  const COLORS = ['#10b981', '#7DC242', '#f59e0b', '#ef4444', '#6b7280'];
 
   if (loading) return <LoadingSpinner />;
 

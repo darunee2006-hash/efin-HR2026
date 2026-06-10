@@ -8,7 +8,7 @@ import { fmt, fmtDate, insertRow, updateRow } from '../lib/hooks'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { ImportModal, ImportExportButtons, exportToExcel } from '../components/ImportExport'
 
-const CHART_COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6', '#f97316', '#06b6d4']
+const CHART_COLORS = ['#7DC242', '#7DC242', '#ec4899', '#f59e0b', '#10b981', '#7DC242', '#f97316', '#06b6d4']
 
 export default function Leave({ lang, navContext = {}, onNavigate }) {
   const { filterByCompany, filterByEmployeeCompany } = useCompanyFilter()

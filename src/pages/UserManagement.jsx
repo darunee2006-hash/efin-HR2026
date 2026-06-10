@@ -9,7 +9,7 @@ import {
 } from 'lucide-react'
 
 // ── Brand palette ────────────────────────────────────────────
-const G = { primary:'#00A651', dark:'#007A3D', light:'#E6F9F0', light2:'#CCF0DE', accent:'#F5A623' }
+const G = { primary:'#7DC242', dark:'#007A3D', light:'#E6F9F0', light2:'#CCF0DE', accent:'#F5A623' }
 
 // ── Role config ──────────────────────────────────────────────
 const ROLES = [
@@ -23,7 +23,7 @@ const roleOf = (key) => ROLES.find(r => r.key === key) || ROLES[3]
 // ── Avatar ───────────────────────────────────────────────────
 function Av({ name = '', size = 32 }) {
   const txt = (name || '?').split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()
-  const colors = ['#00A651','#007A3D','#00C060','#F5A623','#3b82f6','#8b5cf6','#ec4899']
+  const colors = ['#7DC242','#007A3D','#00C060','#F5A623','#7DC242','#7DC242','#ec4899']
   const bg = colors[(name.charCodeAt(0)||0) % colors.length]
   return (
     <div style={{ width:size, height:size, borderRadius:'50%', background:bg, color:'#fff', display:'flex', alignItems:'center', justifyContent:'center', fontSize:size*0.38, fontWeight:600, flexShrink:0 }}>
@@ -58,7 +58,7 @@ function KpiCard({ icon, iconBg, label, value, active, onClick }) {
 
 // ── Field Input helper ───────────────────────────────────────
 function FInput({ label, value, onChange, type='text', options, half }) {
-  const cls = `w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00A651]`
+  const cls = `w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#7DC242]`
   return (
     <div className={half ? 'col-span-1' : 'col-span-2'}>
       <label className="block text-xs font-semibold text-gray-600 mb-1">{label}</label>
@@ -302,7 +302,7 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
         <div className="flex gap-0 border-b border-gray-100 overflow-x-auto">
           {TABS.map(t => (
             <button key={t.key} onClick={()=>setTab(t.key)}
-              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${tab===t.key ? 'border-[#00A651] text-[#007A3D]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+              className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${tab===t.key ? 'border-[#7DC242] text-[#007A3D]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
               {t.label}
             </button>
           ))}
@@ -317,7 +317,7 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">ชื่อแสดง</label>
-                <input className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00A651]"
+                <input className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#7DC242]"
                   value={profileForm.display_name} onChange={e=>setProfileForm(p=>({...p,display_name:e.target.value}))}/>
               </div>
               <div>
@@ -325,11 +325,11 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
                 <div className="grid grid-cols-2 gap-2">
                   {ROLES.map(r => (
                     <button key={r.key} onClick={()=>setProfileForm(p=>({...p,role:r.key}))}
-                      className={`flex items-start gap-2 p-2.5 rounded-xl border text-left transition-all ${profileForm.role===r.key ? 'border-[#00A651] bg-[#E6F9F0]' : 'border-gray-200 hover:border-gray-300'}`}>
+                      className={`flex items-start gap-2 p-2.5 rounded-xl border text-left transition-all ${profileForm.role===r.key ? 'border-[#7DC242] bg-[#E6F9F0]' : 'border-gray-200 hover:border-gray-300'}`}>
                       <span className="text-base leading-none mt-0.5">{r.icon}</span>
                       <div><div className="text-xs font-semibold text-gray-800">{r.label}</div>
                       <div className="text-[10px] text-gray-400 leading-tight mt-0.5">{r.desc}</div></div>
-                      {profileForm.role===r.key && <Check className="w-3.5 h-3.5 text-[#00A651] ml-auto shrink-0 mt-0.5"/>}
+                      {profileForm.role===r.key && <Check className="w-3.5 h-3.5 text-[#7DC242] ml-auto shrink-0 mt-0.5"/>}
                     </button>
                   ))}
                 </div>
@@ -406,7 +406,7 @@ function EditUserModal({ user, employees, onClose, onSaved, lang }) {
               <div className="col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">ที่อยู่</label>
                 <textarea value={empForm.address||''} onChange={e=>sf('address')(e.target.value)} rows={3}
-                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#00A651] resize-none"/>
+                  className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#7DC242] resize-none"/>
               </div>
             </div>
           )}
@@ -700,7 +700,7 @@ export default function UserManagement({ lang = 'th' }) {
       <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
         <KpiCard icon={<Users style={{width:18,height:18,color:G.primary}}/>}    iconBg={G.light}          label="ทั้งหมด"    value={counts.all}       active={filterRole==='all'}       onClick={() => setFilterRole('all')} />
         <KpiCard icon={<span className="text-lg">👑</span>}                       iconBg="#FEE2E2"          label="Super Admin" value={counts.superuser}  active={filterRole==='superuser'}  onClick={() => setFilterRole('superuser')} />
-        <KpiCard icon={<Shield style={{width:18,height:18,color:'#7c3aed'}}/>}    iconBg="#F3E5F5"          label="Admin"       value={counts.admin}     active={filterRole==='admin'}     onClick={() => setFilterRole('admin')} />
+        <KpiCard icon={<Shield style={{width:18,height:18,color:'#5A9020'}}/>}    iconBg="#F3E5F5"          label="Admin"       value={counts.admin}     active={filterRole==='admin'}     onClick={() => setFilterRole('admin')} />
         <KpiCard icon={<Settings style={{width:18,height:18,color:'#1d4ed8'}}/>}  iconBg="#EFF6FF"          label="Manager"     value={counts.manager}   active={filterRole==='manager'}   onClick={() => setFilterRole('manager')} />
         <KpiCard icon={<Users style={{width:18,height:18,color:'#374151'}}/>}     iconBg="#F9FAFB"          label="Employee"    value={counts.employee}  active={filterRole==='employee'}  onClick={() => setFilterRole('employee')} />
       </div>

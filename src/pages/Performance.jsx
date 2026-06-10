@@ -832,7 +832,7 @@ export default function Performance({ lang , onNavigate, navContext = {} }) {
 
   if (loading) return <div className="p-4 sm:p-6"><div className="text-gray-400">{lang === 'th' ? 'กำลังโหลด...' : 'Loading...'}</div></div>
 
-  const donutColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+  const donutColors = ['#7DC242', '#10b981', '#f59e0b', '#ef4444']
 
   return (
     <div className="p-4 sm:p-6 space-y-5">

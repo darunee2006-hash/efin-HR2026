@@ -222,7 +222,7 @@ export default function Payroll({ lang , onNavigate, navContext = {} }) {
     }));
   }, [filteredPayroll, lang]);
 
-  const DEPT_COLOR = '#8b5cf6';
+  const DEPT_COLOR = '#7DC242';
 
   // Export columns definition for Excel
   const exportColumns = [

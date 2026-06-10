@@ -139,7 +139,7 @@ export default function Welfare({ lang = 'th' , onNavigate, navContext = {} }) {
     return { name: cat.name, value: Math.round(total / 1000) / 1000 };
   }).filter(d => d.value > 0);
 
-  const COLORS = ['#ef4444', '#22c55e', '#3b82f6', '#f97316', '#a855f7', '#6b7280'];
+  const COLORS = ['#ef4444', '#22c55e', '#7DC242', '#f97316', '#a855f7', '#6b7280'];
 
   const employeeWelfareTotal = welfareData
     .filter((r) => selectedEmployee && r.employee.id === selectedEmployee.id)

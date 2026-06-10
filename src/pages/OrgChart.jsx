@@ -21,7 +21,7 @@ const defaultLvl = { bg: 'bg-gray-400', text: 'text-white', border: 'border-gray
 const getLvl = (l) => LEVEL_COLORS[l] || defaultLvl;
 
 const DEPT_PALETTE = [
-  '#DC2626','#059669','#0891B2','#7C3AED','#D97706',
+  '#DC2626','#7DC242','#0891B2','#7C3AED','#D97706',
   '#2563EB','#E11D48','#65A30D','#4F46E5','#EA580C',
   '#0D9488','#8B5CF6','#BE185D','#0369A1','#B45309',
 ];

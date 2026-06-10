@@ -295,7 +295,7 @@ const [_navApplied, _setNavApplied] = React.useState(false)
                           <td className="py-2 px-3 text-xs font-medium" style={{color:'#5A9020'}}>{e.bu||'-'}</td>
                           <td className="py-2 px-3 text-gray-500 text-xs max-w-[180px] truncate">{e.department_name_th ? e.department_name_th.replace(/^BU\s+[\w.]+[-–]\s*/,'').trim() : e.team_section||'-'}</td>
                           <td className="py-2 px-3">
-                            <span className="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-600">
+                            <span className="px-2 py-0.5 rounded-full text-xs bg-blue-50 text-[#5A9020]">
                               {e.employment_type === 'fulltime' ? th('เต็มเวลา', 'Full-time') : th('พาร์ทไทม์', 'Part-time')}
                             </span>
                           </td>

@@ -8,7 +8,7 @@ import { PageHeader, KPICard, Section, DetailPanel, TabPills } from '../componen
 import { supabase } from '../lib/supabase';
 import { useCompanyFilter } from '../lib/CompanyFilterContext';
 
-const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316'];
+const COLORS = ['#7DC242', '#10b981', '#f59e0b', '#ef4444', '#7DC242', '#ec4899', '#14b8a6', '#f97316'];
 
 export default function Reports({ lang , onNavigate, navContext = {} }) {
   const { filterByCompany } = useCompanyFilter();
@@ -330,7 +330,7 @@ export default function Reports({ lang , onNavigate, navContext = {} }) {
                 <YAxis tick={{ fontSize: 12 }} domain={headcountDomain} />
                 <Tooltip />
                 <Legend />
-                <Line type="monotone" dataKey="headcount" stroke="#3b82f6" dot={{ fill: '#3b82f6', r: 4 }} name="Headcount" />
+                <Line type="monotone" dataKey="headcount" stroke="#7DC242" dot={{ fill: '#7DC242', r: 4 }} name="Headcount" />
               </LineChart>
             </ResponsiveContainer>
           </Section>

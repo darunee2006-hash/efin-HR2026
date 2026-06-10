@@ -29,10 +29,10 @@ const DEPT_COST_TYPE = {
   'ฝ่ายนักลงทุนสัมพันธ์และการสื่อสารองค์กร': 'sales',
 }
 const COST_TYPE_LABELS = { service: 'ต้นทุนบริการ', sales: 'ต้นทุนขาย', admin: 'ต้นทุนบริหาร' }
-const COST_TYPE_COLORS = { service: '#6366f1', sales: '#06b6d4', admin: '#f59e0b' }
+const COST_TYPE_COLORS = { service: '#7DC242', sales: '#06b6d4', admin: '#f59e0b' }
 const COST_TYPE_BG = { service: 'bg-[#D0F0C0] text-[#7DC242]', sales: 'bg-cyan-100 text-cyan-600', admin: 'bg-amber-100 text-amber-600' }
-const BU_COLORS = {'BU efin.finance':'#6366f1','BU Content':'#06b6d4','BU IR Plus':'#8b5cf6','BU IT Solution':'#f59e0b','Cost Center':'#64748b','Event&Community':'#ec4899','ATESS':'#10b981'}
-const COLORS_ARR = ['#6366f1','#06b6d4','#8b5cf6','#f59e0b','#ef4444','#10b981','#ec4899','#f97316']
+const BU_COLORS = {'BU efin.finance':'#7DC242','BU Content':'#06b6d4','BU IR Plus':'#7DC242','BU IT Solution':'#f59e0b','Cost Center':'#64748b','Event&Community':'#ec4899','ATESS':'#10b981'}
+const COLORS_ARR = ['#7DC242','#06b6d4','#7DC242','#f59e0b','#ef4444','#10b981','#ec4899','#f97316']
 
 const fmt = n => n?.toLocaleString('th-TH',{minimumFractionDigits:0,maximumFractionDigits:0}) ?? '0'
 const fmtM = n => { if(!n||n===0) return '0'; if(Math.abs(n)>=1e6) return (n/1e6).toFixed(2)+'M'; if(Math.abs(n)>=1e3) return (n/1e3).toFixed(0)+'K'; return fmt(n) }
@@ -95,7 +95,7 @@ function CostDetailPopup({ title, icon: Icon, iconBg, data, columns, onClose, su
             <div className="relative">
               <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input type="text" placeholder="ค้นหา..." value={search} onChange={e => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 w-48" />
+                className="pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 w-48" />
             </div>
             <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
           </div>
@@ -1444,7 +1444,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
       <div className="bg-white rounded-xl border border-gray-200 p-5">
         <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2"><BarChart3 className="w-5 h-5 text-[#7DC242]"/>สัดส่วนต้นทุนแยก BU</h3>
         <div className="flex gap-6 mb-4">
-          {[{k:'service',l:'ต้นทุนบริการ',c:'#6366f1'},{k:'sales',l:'ต้นทุนขาย',c:'#06b6d4'},{k:'admin',l:'ต้นทุนบริหาร',c:'#f59e0b'}].map(x=>
+          {[{k:'service',l:'ต้นทุนบริการ',c:'#7DC242'},{k:'sales',l:'ต้นทุนขาย',c:'#06b6d4'},{k:'admin',l:'ต้นทุนบริหาร',c:'#f59e0b'}].map(x=>
             <div key={x.k} className="flex items-center gap-1.5 text-xs text-gray-600"><div className="w-2.5 h-2.5 rounded" style={{backgroundColor:x.c}}/>{x.l}</div>
           )}
         </div>
@@ -1455,7 +1455,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
             return <div key={buName} className="flex items-center gap-3">
               <div className="w-32 text-xs text-gray-600 text-right truncate flex-shrink-0">{buName}</div>
               <div className="flex-1 h-7 bg-gray-100 rounded overflow-hidden flex">
-                {sPct>0&&<div className="h-full flex items-center justify-center text-white text-[10px] font-semibold" style={{width:`${sPct}%`,backgroundColor:'#6366f1',minWidth:sPct>8?'auto':'0'}}>{sPct>=8?`${Math.round(sPct)}%`:''}</div>}
+                {sPct>0&&<div className="h-full flex items-center justify-center text-white text-[10px] font-semibold" style={{width:`${sPct}%`,backgroundColor:'#7DC242',minWidth:sPct>8?'auto':'0'}}>{sPct>=8?`${Math.round(sPct)}%`:''}</div>}
                 {slPct>0&&<div className="h-full flex items-center justify-center text-white text-[10px] font-semibold" style={{width:`${slPct}%`,backgroundColor:'#06b6d4',minWidth:slPct>8?'auto':'0'}}>{slPct>=8?`${Math.round(slPct)}%`:''}</div>}
                 {aPct>0&&<div className="h-full flex items-center justify-center text-white text-[10px] font-semibold" style={{width:`${aPct}%`,backgroundColor:'#f59e0b',minWidth:aPct>8?'auto':'0'}}>{aPct>=8?`${Math.round(aPct)}%`:''}</div>}
               </div>
@@ -1474,7 +1474,7 @@ export default function CostAnalysis({ lang, onNavigate, navContext = {} }){
             .map(([code,p])=>({code,name:buLookup[code]?.name||code,...p}))
             .sort((a,b)=>a.code.localeCompare(b.code,undefined,{numeric:true}))
           const filteredProducts=filterCostType==='all'?products:products.filter(p=>p[filterCostType]>0)
-          const buColor=BU_COLORS[buName]||'#6366f1'
+          const buColor=BU_COLORS[buName]||'#7DC242'
 
           return <div key={buName} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-5 py-4 flex items-center justify-between cursor-pointer hover:bg-gray-50" onClick={()=>setExpandedCostBU(p=>({...p,[buName]:!isExpanded}))}>

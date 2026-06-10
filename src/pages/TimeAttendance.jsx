@@ -158,7 +158,7 @@ export default function TimeAttendance({ lang , onNavigate, navContext = {} }) {
     ].filter(d => d.value > 0)
   }, [kpis])
 
-  const pieColors = ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6']
+  const pieColors = ['#ef4444', '#f59e0b', '#7DC242', '#7DC242']
 
   // Export
   const handleExport = () => {
@@ -362,7 +362,7 @@ export default function TimeAttendance({ lang , onNavigate, navContext = {} }) {
                 <Legend />
                 <Bar dataKey="ลาป่วย" fill="#ef4444" />
                 <Bar dataKey="ลากิจ" fill="#f59e0b" />
-                <Bar dataKey="ลาพักร้อน" fill="#3b82f6" />
+                <Bar dataKey="ลาพักร้อน" fill="#7DC242" />
                 <Bar dataKey="มาสาย" fill="#fb923c" />
                 <Bar dataKey="ขาด" fill="#dc2626" />
               </BarChart>

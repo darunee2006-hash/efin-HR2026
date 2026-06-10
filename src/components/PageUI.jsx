@@ -155,7 +155,7 @@ export function ScoreCircle({ score, max = 5, size = 80, label }) {
     <div className="flex flex-col items-center">
       <svg width={size} height={size} className="-rotate-90">
         <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#e5e7eb" strokeWidth="6" />
-        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#3b82f6" strokeWidth="6"
+        <circle cx={size/2} cy={size/2} r={r} fill="none" stroke="#7DC242" strokeWidth="6"
           strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} strokeLinecap="round" />
       </svg>
       <span className="text-lg font-bold text-gray-900 -mt-12">{score}</span>

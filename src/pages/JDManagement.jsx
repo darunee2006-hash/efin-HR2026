@@ -8,7 +8,7 @@ import {
   Filter, ChevronDown, ListChecks, Bell, TrendingUp
 } from 'lucide-react'
 
-const BLUE = '#1565C0'
+const BLUE = '#7DC242'
 const BLUE_L = '#E6F1FB'
 const GREEN = '#27500A'
 const GREEN_L = '#EAF3DE'
@@ -71,7 +71,7 @@ function JDViewModal({ jdId, empName, onClose }) {
           </div>
           <button onClick={onClose} style={{padding:6,border:'none',background:'transparent',cursor:'pointer'}}><X size={18} color='#666'/></button>
         </div>
-        <div style={{display:'flex',borderBottom:'0.5px solid #E0E0E0',overflowX:'auto',background:'#FAFAFA'}}>
+        <div style={{display:'flex',borderBottom:'0.5px solid #E0E0E0',overflowX:'auto',background:'#F4F7F5'}}>
           {TABS.map(t=>(
             <button key={t} onClick={()=>setTab(t)} style={{padding:'10px 14px',border:'none',borderBottom:`2px solid ${tab===t?BLUE:'transparent'}`,background:'transparent',color:tab===t?BLUE:'#666',fontSize:12,fontWeight:tab===t?500:400,cursor:'pointer',whiteSpace:'nowrap'}}>
               {t}
@@ -428,7 +428,7 @@ export default function JDManagement({ lang, onNavigate, navContext={} }) {
                 {filteredEmps.map((emp,i)=>{
                   const jd=jdByEmpId[emp.id]
                   return (
-                    <tr key={emp.id} style={{background:i%2===0?'#fff':'#FAFAFA'}}>
+                    <tr key={emp.id} style={{background:i%2===0?'#fff':'#F4F7F5'}}>
                       <td style={{...SD,color:'#CCC',fontFamily:'monospace'}}>{i+1}</td>
                       <td style={SD}>
                         <div style={{display:'flex',alignItems:'center',gap:7}}>

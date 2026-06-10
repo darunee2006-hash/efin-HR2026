@@ -480,7 +480,7 @@ export default function Training({ lang = 'th' , onNavigate, navContext = {} }) 
                 <XAxis dataKey="month" tick={{ fontSize: 11 }} />
                 <YAxis tick={{ fontSize: 11 }} />
                 <Tooltip formatter={v => [`${v} hrs`]} />
-                <Bar dataKey="hours" fill="#3b82f6" radius={[5, 5, 0, 0]} />
+                <Bar dataKey="hours" fill="#7DC242" radius={[5, 5, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Section>
