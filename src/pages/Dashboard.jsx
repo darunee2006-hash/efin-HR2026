@@ -353,7 +353,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       </div>
 
       {/* ── KPI Cards ── */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:11, marginBottom:16 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:11, marginBottom:16 }}>
         <div onClick={() => openDrill('total')} style={{ cursor:'pointer' }}>
           <StatCard icon={Users}      iconStyle={{background:G.light,  color:G.primary}} label={lang==='th'?'พนักงานทั้งหมด':'Total Employees'}  value={fmt(empFormula||empTotal)} unit={lang==='th'?'คน':'ppl'}
           change={`ต้นปี ${fmt(empStartYear)} + ใหม่ ${fmt(empNew)} − ลาออก ${fmt(empResigned)}`} changeUp />
@@ -369,6 +369,9 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
         </div>
         <div onClick={() => openDrill('attendance')} style={{ cursor:'pointer' }}>
           <StatCard icon={TrendingUp} iconStyle={{background:'#E0F7F4',color:'#009688'}} label={lang==='th'?'อัตราการเข้างาน':'Attendance Rate'}   value="96.2" unit="%" change="1.8% จากเดือนที่แล้ว" changeUp />
+        </div>
+        <div onClick={() => openDrill('resigned')} style={{ cursor:'pointer' }}>
+          <StatCard icon={TrendingDown} iconStyle={{background:'#FEECEC',color:'#C62828'}} label={lang==='th'?'ลาออกระหว่างปี':'Resigned YTD'} value={fmt(empResigned)} unit={lang==='th'?'คน':'ppl'} change={`ปี ${new Date().getFullYear()+543}`} changeUp={false} />
         </div>
       </div>
 
