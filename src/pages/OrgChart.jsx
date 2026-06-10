@@ -112,7 +112,7 @@ function DeptSection({ dept, emps, lang, color, isSelected, onSelect }) {
 }
 
 /* ─── Detail Panel ──────────────────────────────────── */
-function OrgDetailPanel({ deptName, emps, lang, color, onClose, groupBy = 'level', deptMap = {} }) {
+function OrgDetailPanel({ deptName, emps, lang, color, onClose, groupBy = 'level', deptMap = {}, onNavigate }) {
   // Group by level
   const levelGroups = useMemo(() => {
     if (groupBy !== 'level') return [];
@@ -267,7 +267,7 @@ function CLevelRow({ emps, lang }) {
 }
 
 /* ─── Dept List Item (for list view) ────────────────── */
-function DeptListItem({ deptName, data, color, lang }) {
+function DeptListItem({ deptName, data, color, lang, onNavigate }) {
   const [open, setOpen] = useState(false);
 
   const sortedLevels = useMemo(() => {
@@ -335,7 +335,7 @@ const COMPANIES = [
 ];
 
 /* ─── Company Org View ──────────────────────────────── */
-function CompanyOrgView({ employees, deptMap, lang, company }) {
+function CompanyOrgView({ employees, deptMap, lang, company, onNavigate }) {
   const [selectedBU, setSelectedBU] = useState(null);
 
   const compEmps = useMemo(() => {
@@ -806,6 +806,7 @@ export default function OrgChart({ lang, onNavigate }) {
             deptMap={deptMap}
             lang={lang}
             company={COMPANIES.find(c => c.code === selectedCompany) || COMPANIES[0]}
+            onNavigate={onNavigate}
           />
         </div>
       ) : viewMode === 'bu' ? (
