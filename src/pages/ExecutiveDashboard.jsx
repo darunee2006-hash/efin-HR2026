@@ -61,6 +61,8 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
   const [costData, setCostData] = useState([])
   const [filterMonth, setFilterMonth] = useState('all')
   const [lastUpdated, setLastUpdated] = useState(null)
+  const [revenueData, setRevenueData] = useState([])
+  const [revenueTotal, setRevenueTotal] = useState({ target:0, actual:0, variance:0 })
 
   useEffect(() => {
     const load = async () => {
@@ -74,6 +76,12 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
       ])
       setEmployees(empRes.data || [])
       setCostData(costRes.data || [])
+      // Fetch revenue targets
+      const { data: revData } = await supabase.from('hr_revenue_targets')
+        .select('*').eq('company_entity','ONL').order('actual_mb',{ascending:false})
+      setRevenueData(revData||[])
+      const tot = (revData||[]).reduce((s,r)=>({target:s.target+(Number(r.target_mb)||0),actual:s.actual+(Number(r.actual_mb)||0),variance:s.variance+(Number(r.variance_mb)||0)}),{target:0,actual:0,variance:0})
+      setRevenueTotal(tot)
       setLastUpdated(new Date())
       setLoading(false)
     }
@@ -409,6 +417,78 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Revenue Section */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 mt-4 mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div>
+            <h3 className="font-bold text-gray-900 text-base flex items-center gap-2">
+              <TrendingUp className="w-5 h-5" style={{color:G.primary}}/>
+              Revenues 2026 (Actual+Backlog BF) vs Target
+            </h3>
+            <p className="text-xs text-gray-400 mt-0.5">สรุป ม.ค.-พ.ค.69 · หน่วย: ล้านบาท (MB)</p>
+          </div>
+          <div className="flex gap-4 text-sm">
+            <div className="text-center">
+              <div className="text-xs text-gray-400">Target</div>
+              <div className="font-bold text-gray-900">{revenueTotal.target.toFixed(2)} MB</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-gray-400">Actual</div>
+              <div className="font-bold" style={{color:G.primary}}>{revenueTotal.actual.toFixed(2)} MB</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xs text-gray-400">Variance</div>
+              <div className="font-bold text-red-600">{revenueTotal.variance.toFixed(2)} MB</div>
+            </div>
+          </div>
+        </div>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-100">
+              <th className="text-left py-2 px-3 text-xs font-semibold text-gray-400">BU</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-gray-400">Target 2026 (MB)</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-gray-400">Actual+Backlog BF (MB)</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-gray-400">Variance (MB)</th>
+              <th className="text-right py-2 px-3 text-xs font-semibold text-gray-400">%Target</th>
+            </tr>
+          </thead>
+          <tbody>
+            {revenueData.map((r,i)=>{
+              const pct = r.target_mb > 0 ? ((r.actual_mb/r.target_mb)*100).toFixed(1) : '0.0'
+              const isNeg = r.variance_mb < 0
+              return (
+                <tr key={i} className={`border-b border-gray-50 ${i%2===1?'bg-gray-50/50':''}`}>
+                  <td className="py-2.5 px-3 font-medium text-gray-800">{r.bu}</td>
+                  <td className="py-2.5 px-3 text-right font-mono text-gray-700">{Number(r.target_mb).toFixed(2)}</td>
+                  <td className="py-2.5 px-3 text-right font-mono font-semibold" style={{color:G.primary}}>{Number(r.actual_mb).toFixed(2)}</td>
+                  <td className="py-2.5 px-3 text-right font-mono font-semibold" style={{color:isNeg?'#DE350B':'#00875A'}}>
+                    {isNeg?'':'+' }{Number(r.variance_mb).toFixed(2)}
+                  </td>
+                  <td className="py-2.5 px-3 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full" style={{width:`${Math.min(parseFloat(pct),100)}%`,background:parseFloat(pct)>=100?G.primary:parseFloat(pct)>=70?G.accent:'#DE350B'}}/>
+                      </div>
+                      <span className="text-xs font-medium" style={{color:parseFloat(pct)>=100?G.primary:parseFloat(pct)>=70?G.accent:'#DE350B'}}>{pct}%</span>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+            {/* Total row */}
+            <tr className="border-t-2 border-gray-300 bg-gray-50 font-bold">
+              <td className="py-2.5 px-3 text-gray-900">Total</td>
+              <td className="py-2.5 px-3 text-right font-mono text-gray-900">{revenueTotal.target.toFixed(2)}</td>
+              <td className="py-2.5 px-3 text-right font-mono" style={{color:G.primary}}>{revenueTotal.actual.toFixed(2)}</td>
+              <td className="py-2.5 px-3 text-right font-mono text-red-600">{revenueTotal.variance.toFixed(2)}</td>
+              <td className="py-2.5 px-3 text-right">
+                <span className="text-xs font-bold text-red-600">{revenueTotal.target>0?((revenueTotal.actual/revenueTotal.target)*100).toFixed(1):0}%</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       {/* Footer */}
