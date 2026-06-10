@@ -108,19 +108,39 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
   }, [activeEmps, resignedThisYear])
 
   // BU breakdown
+  const STD_BUS = ['BU efin.finance','BU Center','BU IR Plus','BU Content','BU IT Solution','Expert']
+
   const buBreakdown = useMemo(() => {
     const m = {}
     activeEmps.forEach(e => {
       const bu = e.bu || 'ไม่ระบุ'
+      if (!STD_BUS.includes(bu)) return  // เฉพาะ BU มาตรฐาน
       if (!m[bu]) m[bu] = { bu, count: 0, cost: 0, salary: 0 }
       m[bu].count++
       m[bu].salary += Number(e.base_salary) || 0
     })
     filteredCost.forEach(r => {
       const emp = employees.find(e => e.id === r.hr_employee_id)
+      if (!emp || !STD_BUS.includes(emp.bu)) return
+      if (m[emp.bu]) m[emp.bu].cost += Number(r.total_cost) || 0
+    })
+    return Object.values(m).sort((a,b) => b.count - a.count)
+  }, [activeEmps, filteredCost, employees])
+
+  // ฝ่ายงาน breakdown
+  const deptBreakdown = useMemo(() => {
+    const m = {}
+    activeEmps.forEach(e => {
+      const dept = e.department_name_th || 'ไม่ระบุ'
+      if (!m[dept]) m[dept] = { dept, bu: e.bu||'', count: 0, cost: 0, salary: 0 }
+      m[dept].count++
+      m[dept].salary += Number(e.base_salary) || 0
+    })
+    filteredCost.forEach(r => {
+      const emp = employees.find(e => e.id === r.hr_employee_id)
       if (!emp) return
-      const bu = emp.bu || 'ไม่ระบุ'
-      if (m[bu]) m[bu].cost += Number(r.total_cost) || 0
+      const dept = emp.department_name_th || 'ไม่ระบุ'
+      if (m[dept]) m[dept].cost += Number(r.total_cost) || 0
     })
     return Object.values(m).sort((a,b) => b.count - a.count)
   }, [activeEmps, filteredCost, employees])
@@ -340,38 +360,62 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
 
         {/* Top Departments by Cost */}
         <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
-          <SectionHeader icon={DollarSign} title="Top BU by People Cost" subtitle={`฿${fmtM(totalCostMonth)} รวม`} color={G.info}/>
-          <table className="w-full text-sm">
-            <thead><tr className="border-b border-gray-100">
-              <th className="text-left pb-2 text-xs text-gray-400 font-medium">BU</th>
-              <th className="text-right pb-2 text-xs text-gray-400 font-medium">คน</th>
-              <th className="text-right pb-2 text-xs text-gray-400 font-medium">ต้นทุน</th>
-              <th className="text-right pb-2 text-xs text-gray-400 font-medium">สัดส่วน</th>
+          {/* BU Section */}
+          <SectionHeader icon={DollarSign} title="ต้นทุนแยก BU" subtitle={`฿${fmtM(totalCostMonth)} รวม`} color={G.info}/>
+          <table className="w-full text-sm mb-4">
+            <thead><tr className="border-b border-gray-100 bg-gray-50">
+              <th className="text-left pb-2 pt-1 px-2 text-xs text-gray-400 font-medium">BU</th>
+              <th className="text-right pb-2 pt-1 px-2 text-xs text-gray-400 font-medium">คน</th>
+              <th className="text-right pb-2 pt-1 px-2 text-xs text-gray-400 font-medium">ต้นทุน</th>
+              <th className="text-right pb-2 pt-1 px-2 text-xs text-gray-400 font-medium">%</th>
             </tr></thead>
             <tbody>
-              {buBreakdown.slice(0,8).map((d,i) => {
+              {buBreakdown.map((d,i) => {
                 const pct = totalCostMonth > 0 ? (d.cost/totalCostMonth*100) : (d.salary / (activeEmps.reduce((s,e)=>s+(Number(e.base_salary)||0),0) || 1) * 100)
-                const barW = Math.max(pct, 2)
                 return (
                   <tr key={i} className="border-b border-gray-50 hover:bg-gray-50 cursor-pointer"
                     onClick={() => onNavigate && onNavigate('staffList', {bu: d.bu})}>
-                    <td className="py-2">
+                    <td className="py-1.5 px-2">
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{background:BU_COLORS[i%BU_COLORS.length]}}/>
-                        <span className="text-gray-700 font-medium text-xs truncate max-w-[120px]">{d.bu}</span>
+                        <span className="text-gray-800 font-medium text-xs">{d.bu}</span>
                       </div>
                       <div className="mt-1 h-1 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full" style={{width:`${barW}%`,background:BU_COLORS[i%BU_COLORS.length]}}/>
+                        <div className="h-full rounded-full" style={{width:`${Math.max(pct,2)}%`,background:BU_COLORS[i%BU_COLORS.length]}}/>
                       </div>
                     </td>
-                    <td className="py-2 text-right text-xs font-medium text-gray-700">{fmt(d.count)}</td>
-                    <td className="py-2 text-right text-xs font-mono text-gray-700">{d.cost > 0 ? '฿'+fmtM(d.cost) : '฿'+fmtM(d.salary)}</td>
-                    <td className="py-2 text-right text-xs text-gray-400">{pct.toFixed(1)}%</td>
+                    <td className="py-1.5 px-2 text-right text-xs font-medium text-gray-700">{fmt(d.count)}</td>
+                    <td className="py-1.5 px-2 text-right text-xs font-mono text-gray-700">{d.cost>0?'฿'+fmtM(d.cost):'฿'+fmtM(d.salary)}</td>
+                    <td className="py-1.5 px-2 text-right text-xs text-gray-400">{pct.toFixed(1)}%</td>
                   </tr>
                 )
               })}
             </tbody>
           </table>
+          {/* ฝ่ายงาน Section */}
+          <div className="border-t border-gray-100 pt-3">
+            <div className="text-xs font-semibold text-gray-500 mb-2 flex items-center gap-1">
+              <Building2 className="w-3.5 h-3.5"/>ต้นทุนแยกฝ่ายงาน
+            </div>
+            <table className="w-full text-xs">
+              <thead><tr className="border-b border-gray-100 bg-gray-50">
+                <th className="text-left pb-1 pt-1 px-2 text-[10px] text-gray-400 font-medium">ฝ่าย</th>
+                <th className="text-left pb-1 pt-1 px-2 text-[10px] text-gray-400 font-medium">BU</th>
+                <th className="text-right pb-1 pt-1 px-2 text-[10px] text-gray-400 font-medium">คน</th>
+                <th className="text-right pb-1 pt-1 px-2 text-[10px] text-gray-400 font-medium">ต้นทุน</th>
+              </tr></thead>
+              <tbody>
+                {deptBreakdown.slice(0,12).map((d,i) => (
+                  <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
+                    <td className="py-1 px-2 text-gray-700 truncate max-w-[120px]">{d.dept}</td>
+                    <td className="py-1 px-2 text-gray-400">{d.bu}</td>
+                    <td className="py-1 px-2 text-right font-medium text-gray-700">{fmt(d.count)}</td>
+                    <td className="py-1 px-2 text-right font-mono text-gray-600">{d.cost>0?'฿'+fmtM(d.cost):'฿'+fmtM(d.salary)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Strategic Recommendations */}
