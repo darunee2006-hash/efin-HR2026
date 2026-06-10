@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Wallet, Calculator, MinusCircle, Clock, Banknote, Plus, Download, Search, Shield } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabase'
+import { SalaryValue, SalaryLockBtn, useSalary } from '../lib/SalaryGuard';
 import { useCompanyFilter } from '../lib/CompanyFilterContext';
 import { PageHeader, KPICard, Section, DetailPanel, Avatar, StatusBadge, TabPills } from '../components/PageUI';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -75,7 +76,8 @@ export default function Payroll({ lang , onNavigate, navContext = {} }) {
   const [activeTab, setActiveTab] = useState('individual');
   const [payrollData, setPayrollData] = useState([]);
   const [employees, setEmployees] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true)
+  const { unlocked } = useSalary();
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [filterDept, setFilterDept] = useState('all');

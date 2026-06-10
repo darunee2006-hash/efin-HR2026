@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
+import { SalaryValue, SalaryLockBtn } from '../lib/SalaryGuard'
 import { useAuth } from '../lib/AuthContext'
 import {
   Users, UserPlus, Shield, Settings, Search, X, Save,
@@ -853,7 +854,7 @@ export default function UserManagement({ lang = 'th' }) {
                           <TD><span className="truncate block max-w-[170px] text-[10px]">{emp?.personal_email||'-'}</span></TD>
                           <TD>{emp?.education_level||'-'}</TD>
                           <TD><span className="truncate block max-w-[150px]">{emp?.education_university||'-'}</span></TD>
-                          <TD right>{fmtSalary(emp?.base_salary)}</TD>
+                          <td className="py-2 px-3 border-b border-gray-50 text-right" style={{background:rowBg}}><SalaryValue value={emp?.base_salary} style={{fontSize:11}}/></td>
                           <TD><span className="truncate block max-w-[120px]">{emp?.bank_name||'-'}</span></TD>
                           <TD mono>{emp?.bank_account||'-'}</TD>
                           <td className="py-2 px-3 border-b border-gray-50" style={{background:rowBg}}>
