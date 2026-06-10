@@ -9,6 +9,7 @@ const NAV = [
   { key: 'dashboard', icon: Home, minRole: 'employee' },
   { key: 'executiveDashboard', icon: BarChart3, minRole: 'manager' },
   { key: 'jdManagement', icon: FileText, minRole: 'employee' },
+  { key: 'exitInterview', icon: TrendingDown, minRole: 'manager' },
   { key: 'employees', icon: Users, minRole: 'manager' },
   { key: 'staffList', icon: List, minRole: 'supervisor' },
   { key: 'orgChart', icon: Network, minRole: 'manager' },
@@ -43,6 +44,7 @@ const ROLE_LEVEL = { employee: 0, supervisor: 1, manager: 2, admin: 3, superuser
 const extraLabels = {
   executiveDashboard: { th: 'Executive Dashboard', en: 'Executive Dashboard' },
   jdManagement: { th: 'จัดการ JD', en: 'JD Management' },
+  exitInterview: { th: 'Exit Interview', en: 'Exit Interview' },
   orgChart: { th: 'โครงสร้างองค์กร', en: 'Org Chart' },
   recruitment: { th: 'สรรหา', en: 'Recruitment' },
   training: { th: 'ฝึกอบรม', en: 'Training' },

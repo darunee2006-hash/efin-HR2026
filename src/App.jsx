@@ -31,6 +31,7 @@ import HolidayManagement from './pages/HolidayManagement'
 import StaffList from './pages/StaffList'
 import ExecutiveDashboard from './pages/ExecutiveDashboard'
 import JDManagement from './pages/JDManagement'
+import ExitInterview from './pages/ExitInterview'
 
 // Pages by role level
 const ROLE_PAGES = {
@@ -38,6 +39,7 @@ const ROLE_PAGES = {
     dashboard: Dashboard,
     executiveDashboard: ExecutiveDashboard,
     jdManagement: JDManagement,
+    exitInterview: ExitInterview,
     employees: Employees,
     staffList: StaffList,
     orgChart: OrgChart,
