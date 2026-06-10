@@ -294,7 +294,7 @@ export default function Dashboard({ lang = 'th', setPage, onNavigate }) {
       setDrillDown({ title: `พนักงานลาออกปี ${new Date().getFullYear()+543} (${resignedEmps.length} คน)`, rows: resignedEmps, columns: [
         { key:'code', label:'รหัส', get: r => r.employee_code },
         { key:'name', label:'ชื่อ-นามสกุล', get: r => `${r.first_name_th||''} ${r.last_name_th||''}`.trim() },
-        { key:'bu', label:'BU', get: r => r.bu || '—' },
+        { key:'dept', label:'ฝ่าย', get: r => r.department_name_th ? r.department_name_th.replace(/^BU\s+[\w.]+[-–]\s*/,'').trim() : (r.bu||'—') },
         { key:'date', label:'วันที่ลาออก', get: r => r.resignation_date ? new Date(r.resignation_date).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}) : '—' },
       ], navPage: 'employees' })
     }
