@@ -720,7 +720,7 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
                     employment_type: <td key="employment_type" className="px-4 py-3"><StatusBadge status={emp.employment_type} labels={empTypeLabels} /></td>,
                     company_entity: <td key="company_entity" className="px-4 py-3 text-gray-600 text-xs">{emp.company_entity || '-'}</td>,
                     bu: <td key="bu" className="px-4 py-3 text-gray-600 text-xs">{emp.bu || '-'}</td>,
-                    department: <td key="department" className="px-4 py-3 text-gray-600 text-xs">{dept ? (lang === 'th' ? dept.name_th : dept.name_en) : '-'}</td>,
+                    department: <td key="department" className="px-4 py-3 text-gray-600 text-xs">{emp.department_name_th || (dept ? (lang === 'th' ? dept.name_th : dept.name_en) : '-')}</td>,
                     position: <td key="position" className="px-4 py-3 text-gray-600">{emp.position_th || '-'}</td>,
                     cost_center: <td key="cost_center" className="px-4 py-3 text-gray-600 text-xs">{emp.cost_center || '-'}</td>,
                     level: <td key="level" className="px-4 py-3 text-gray-600 text-xs">{emp.level || '-'}</td>,
