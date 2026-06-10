@@ -62,6 +62,8 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
   const [filterMonth, setFilterMonth] = useState('all')
   const [lastUpdated, setLastUpdated] = useState(null)
   const [revenueData, setRevenueData] = useState([])
+  const [editingRev, setEditingRev] = useState(null)  // {id, bu, target_mb, actual_mb}
+  const [savingRev, setSavingRev] = useState(false)
   const [revenueTotal, setRevenueTotal] = useState({ target:0, actual:0, variance:0 })
 
   useEffect(() => {
@@ -461,17 +463,32 @@ export default function ExecutiveDashboard({ lang, onNavigate, navContext = {} }
               return (
                 <tr key={i} className={`border-b border-gray-50 ${i%2===1?'bg-gray-50/50':''}`}>
                   <td className="py-2.5 px-3 font-medium text-gray-800">{r.bu}</td>
-                  <td className="py-2.5 px-3 text-right font-mono text-gray-700">{Number(r.target_mb).toFixed(2)}</td>
-                  <td className="py-2.5 px-3 text-right font-mono font-semibold" style={{color:G.primary}}>{Number(r.actual_mb).toFixed(2)}</td>
+                  <td className="py-2.5 px-3 text-right">
+                    {editingRev?.id===r.id
+                      ? <input type="number" value={editingRev.target_mb} onChange={e=>setEditingRev(p=>({...p,target_mb:e.target.value}))} className="w-20 text-right text-sm border border-gray-300 rounded px-1 py-0.5 font-mono" step="0.01"/>
+                      : <span className="font-mono text-gray-700">{Number(r.target_mb).toFixed(2)}</span>}
+                  </td>
+                  <td className="py-2.5 px-3 text-right">
+                    {editingRev?.id===r.id
+                      ? <input type="number" value={editingRev.actual_mb} onChange={e=>setEditingRev(p=>({...p,actual_mb:e.target.value}))} className="w-20 text-right text-sm border border-gray-300 rounded px-1 py-0.5 font-mono" style={{color:G.primary}} step="0.01"/>
+                      : <span className="font-mono font-semibold" style={{color:G.primary}}>{Number(r.actual_mb).toFixed(2)}</span>}
+                  </td>
                   <td className="py-2.5 px-3 text-right font-mono font-semibold" style={{color:isNeg?'#DE350B':'#00875A'}}>
-                    {isNeg?'':'+' }{Number(r.variance_mb).toFixed(2)}
+                    {isNeg?'':'+' }{editingRev?.id===r.id?(Number(editingRev.actual_mb||0)-Number(editingRev.target_mb||0)).toFixed(2):Number(r.variance_mb).toFixed(2)}
                   </td>
                   <td className="py-2.5 px-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full rounded-full" style={{width:`${Math.min(parseFloat(pct),100)}%`,background:parseFloat(pct)>=100?G.primary:parseFloat(pct)>=70?G.accent:'#DE350B'}}/>
                       </div>
-                      <span className="text-xs font-medium" style={{color:parseFloat(pct)>=100?G.primary:parseFloat(pct)>=70?G.accent:'#DE350B'}}>{pct}%</span>
+                      <span className="text-xs font-medium w-8" style={{color:parseFloat(pct)>=100?G.primary:parseFloat(pct)>=70?G.accent:'#DE350B'}}>{pct}%</span>
+                      {editingRev?.id===r.id
+                        ? <>
+                            <button onClick={()=>saveRevenue(editingRev)} disabled={savingRev} className="text-[10px] px-2 py-0.5 rounded text-white" style={{background:G.primary}}>{savingRev?'...':'บันทึก'}</button>
+                            <button onClick={()=>setEditingRev(null)} className="text-[10px] px-2 py-0.5 rounded border border-gray-300 text-gray-500">ยกเลิก</button>
+                          </>
+                        : <button onClick={()=>setEditingRev({...r})} className="text-[10px] px-2 py-0.5 rounded border border-gray-200 text-gray-400 hover:text-gray-700 hover:border-gray-400">แก้ไข</button>
+                      }
                     </div>
                   </td>
                 </tr>
