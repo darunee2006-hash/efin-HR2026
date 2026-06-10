@@ -500,13 +500,13 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
   const companyFilteredEmployees = useMemo(() => filterByCompany(employees), [employees, filterByCompany]);
 
   const totalEmployees = companyFilteredEmployees.length;
-  const fullTimeCount = companyFilteredEmployees.filter(e => e.employment_type === 'permanent' || e.employment_type === 'fulltime').length;
-  const deptCount = new Set(companyFilteredEmployees.map(e => e.department_id)).size;
+  const fullTimeCount = companyFilteredEmployees.filter(e => ['permanent','fulltime','ประจำ'].includes(e.employment_type)).length;
+  const deptCount = new Set(companyFilteredEmployees.map(e => e.department_name_th).filter(Boolean)).size;
   const thisMonth = new Date();
   const newHireCount = companyFilteredEmployees.filter(e => {
     if (!e.hire_date) return false;
     const hireDate = new Date(e.hire_date);
-    return hireDate.getMonth() === thisMonth.getMonth() && hireDate.getFullYear() === thisMonth.getFullYear();
+    return hireDate.getFullYear() === thisMonth.getFullYear();
   }).length;
 
   const filteredEmployees = useMemo(() => {
@@ -520,9 +520,10 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
         emp.last_name_en?.toLowerCase().includes(searchLower) ||
         emp.email?.toLowerCase().includes(searchLower);
 
-      const matchesDept = filterDept === 'all' || emp.department_id === filterDept;
+      const matchesDept = filterDept === 'all' || emp.department_name_th === filterDept || emp.department_id === filterDept;
       const matchesStatus = filterStatus === 'all' || emp.status === filterStatus;
-      const matchesType = filterType === 'all' || emp.employment_type === filterType;
+      const ET_MAP = { permanent:'ประจำ', contract:'สัญญาจ้าง', outsource:'Outsource' }
+      const matchesType = filterType === 'all' || emp.employment_type === filterType || emp.employment_type === ET_MAP[filterType] || (filterType==='contract' && (emp.employment_type||'').includes('สัญญา'))
 
       return matchesSearch && matchesDept && matchesStatus && matchesType;
     }).sort((a, b) => (a.employee_code || '').localeCompare(b.employee_code || ''));
@@ -571,9 +572,9 @@ export default function Employees({ lang, navContext = {}, onNavigate }) {
         <TabPills
           tabs={[
             { key: 'all', label: 'ทั้งหมด', count: companyFilteredEmployees.length },
-            { key: 'permanent', label: 'ประจำ', count: companyFilteredEmployees.filter(e => e.employment_type === 'permanent').length },
-            { key: 'contract', label: 'สัญญาจ้าง', count: companyFilteredEmployees.filter(e => e.employment_type === 'contract').length },
-            { key: 'outsource', label: 'Outsource', count: companyFilteredEmployees.filter(e => e.employment_type === 'outsource').length },
+            { key: 'permanent', label: 'ประจำ', count: companyFilteredEmployees.filter(e => ['permanent','fulltime','ประจำ'].includes(e.employment_type)).length },
+            { key: 'contract', label: 'สัญญาจ้าง', count: companyFilteredEmployees.filter(e => e.employment_type === 'contract' || (e.employment_type||'').includes('สัญญา')).length },
+            { key: 'outsource', label: 'Outsource', count: companyFilteredEmployees.filter(e => ['outsource','Outsource'].includes(e.employment_type)).length },
           ]}
           active={filterType}
           onChange={(key) => {
