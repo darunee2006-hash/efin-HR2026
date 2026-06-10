@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Users, Calendar, DollarSign, Clock, Award, Home, Globe, Menu, ChevronRight, LogOut, Shield, Network, UserSearch, GraduationCap, Heart, FileText, BarChart3, ChevronLeft, UserPlus, UserMinus, Megaphone, Receipt, Scale, FileDown, RefreshCw, Settings, Building2, Key, Eye, EyeOff, X, Check, Calculator, CalendarDays, List } from 'lucide-react'
+import { Users, Calendar, DollarSign, Clock, Award, Home, Globe, Menu, ChevronRight, LogOut, Shield, Network, UserSearch, GraduationCap, Heart, FileText, BarChart3, ChevronLeft, UserPlus, UserMinus, Megaphone, Receipt, Scale, FileDown, RefreshCw, Settings, Building2, Key, Eye, EyeOff, X, Check, Calculator, CalendarDays, List, TrendingDown } from 'lucide-react'
 import { t } from '../lib/translations'
 import { useAuth } from '../lib/AuthContext'
 import { useCompanyFilter } from '../lib/CompanyFilterContext'
